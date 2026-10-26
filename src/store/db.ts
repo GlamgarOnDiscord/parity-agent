@@ -26,6 +26,15 @@ const MIGRATIONS = [
     error TEXT
   )`,
   "CREATE INDEX model_calls_run ON model_calls (run_id)",
+  `CREATE TABLE rules (
+    run_id TEXT NOT NULL,
+    rule_id TEXT NOT NULL,
+    body TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
+    decided_at TEXT,
+    note TEXT,
+    PRIMARY KEY (run_id, rule_id)
+  )`,
 ];
 
 export function openDb(path: string): Database {

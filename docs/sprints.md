@@ -81,3 +81,19 @@ Exit: final video exported, under 3:00.
 - X thread at 17:00
 
 Exit: submission confirmed on the platform.
+
+## Cut list, frozen at the end of S3 (2026-10-26)
+
+What S3 showed: a narrated recording already gives the legacy reference. Each key frame is read into fields, so the old app's checkpoints come from the capture itself (proof source `capture`), and only the rebuilt app needs automatic replays.
+
+| item | decision |
+|---|---|
+| Field matching, deterministic replay of the rebuilt app, noise masking, the one-cent catch | never cut |
+| Capture from a recording, rules with code-checked formulas, one-click review | never cut (done) |
+| Muse Code rebuild and diff-guided repair | never cut (S4) |
+| One-page proof report | never cut (S7) |
+| Desktop driver replaying the Wine app automatically | **cut**: the reference comes from the recording; re-capture instead of re-play |
+| Autonomous exploration with computer use under Wine | optional, only if S4 lands early (agentic bonus) |
+| FrontAccounting as a second app | optional (S6), worth it for "not a hand-picked demo" |
+| Playwright export of proven scenarios | optional (S5) |
+| Muse Spark Open path | keep, small: same structured client on Baseten once the key exists |
