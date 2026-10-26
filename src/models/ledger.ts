@@ -13,6 +13,16 @@ export interface CallRecord {
   error?: string;
 }
 
+/** Error text is stored for debugging, never secrets: keys and bearer tokens are masked, length is capped. */
+export function redact(text: string): string {
+  return text
+    .slice(0, 2000)
+    .replace(/Bearer\s+[\w.~+/=-]+/gi, "Bearer [redacted]")
+    .replace(/\b(key|api[_-]?key)[=:\s]+[\w-]{12,}/gi, "$1 [redacted]")
+    .replace(/\b(sk|pk)-[\w-]{12,}/gi, "$1-[redacted]")
+    .slice(0, 500);
+}
+
 export interface LoggedCall extends CallRecord {
   id: number;
   at: string;
@@ -48,7 +58,7 @@ export class Ledger {
         usd,
         call.durationMs,
         call.ok ? 1 : 0,
-        call.error ?? null,
+        call.error ? redact(call.error) : null,
       );
     return { ...call, id: row?.id ?? 0, at, costUsd: usd };
   }
