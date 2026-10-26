@@ -10,7 +10,7 @@ Verified 2026-10-26 with `bun run models:check` (5 calls, $0.04). Base URL `http
 | `muse-spark-1.3` computer use | OpenAI SDK, `responses.create`, `tools: [{ type: "computer" }]`                                                             | A `computer_call` item with an **`actions` array** (not a single `action`), `call_id`, `pending_safety_checks` and a `meta_safety_replay_receipt`. The first call asks for a screenshot |
 | `muse-voice-transcribe-1.0`   | `POST /asr/transcribe`, multipart: a JSON part `request` = `{ model, audioEncoding: "WAV" }` and a part `audio`             | `{ transcript, audioDurationMs, turns, sessionId }`. WAV must be mono s16le at 16000 or 24000 Hz; 22050 Hz is refused                                                                   |
 
-Not verified yet: Muse Spark Open on Baseten (`BASETEN_API_KEY` not set), Muse Code (`muse exec`, not installed).
+Not verified yet: Muse Spark Open on Baseten (`BASETEN_API_KEY` not set).
 
 Structured outputs are strict: every property of the JSON schema must be listed as required. Use `.nullable()` in Zod for fields that may be absent, never `.optional()` (verified 2026-10-26, 400 "'required' is required to be supplied").
 
@@ -20,3 +20,10 @@ Structured outputs are strict: every property of the JSON schema must be listed 
 - **`--contributor-mode off` is not enough**: without `--model`, a run reported `muse-spark-1.3-contributor` in its usage event. Always pass the Standard model and check the `run.usage` event; `src/models/muse-code.ts` refuses any contributor model it finds there.
 - By default it loads the user's Claude Code and Codex rules and skills; `--no-foreign-personal-context` keeps them out.
 - A trivial task used about 80k input tokens, mostly cached: the agent's own system prompt.
+
+## Computer use safety checks (verified 2026-10-26)
+
+- On a real web app (FrontAccounting in a local sandbox), **every click** came back with `pending_safety_checks: [{ code: "computer_action_requires_confirmation" }]`, from the first step.
+- Answering with the check in `acknowledged_safety_checks` of the next `computer_call_output` continues the run.
+- Parity never acknowledges by default: exploration stops and reports the pending actions. `bun run explore --ack computer_action_requires_confirmation` acknowledges that one code, only for an app on the loopback interface with the browser confined to it, and lists every acknowledged action in the report. Any other code still stops the run.
+- Cost: 12 steps with 1280x800 screenshots, $0.153.
