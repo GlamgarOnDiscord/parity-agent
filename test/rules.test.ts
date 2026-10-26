@@ -139,3 +139,38 @@ describe("RuleStore", async () => {
     expect(store.decide("run1", "R-99", "rejected")).toBeNull();
   });
 });
+
+describe("sum over invoice lines", async () => {
+  const { checkRule } = await import("../src/rules/extract");
+  const { parseExpr } = await import("../src/rules/expr");
+  const lines = {
+    video: "v.mp4",
+    duration: 1,
+    transcript: [],
+    frames: [
+      {
+        t: 0,
+        path: "f.png",
+        objects: [],
+        screen: {
+          id: "f",
+          app: "a",
+          fields: [
+            { id: "a", label: "Total price", value: "59.94 $" },
+            { id: "b", label: "Total price", value: "39.68 $" },
+            { id: "c", label: "Price", value: "19.98 $" },
+            { id: "d", label: "Sub-total:", value: "99.62 $" },
+          ],
+        },
+      },
+    ],
+  };
+
+  test("sum() adds every line with exactly that label, not look-alike columns", () => {
+    expect(checkRule(lines, "Sub-total:", "sum({Total price})").verified).toBe(1);
+  });
+
+  test("sum() only takes a field reference", () => {
+    expect(() => parseExpr("sum(1 + 2)")).toThrow();
+  });
+});

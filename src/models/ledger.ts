@@ -31,7 +31,35 @@ export interface LoggedCall extends CallRecord {
 
 /** The send log: every call that leaves the machine, with what it cost. */
 export class Ledger {
-  constructor(private readonly db: Database) {}
+  constructor(
+    private readonly db: Database,
+    /** Spending cap in USD across every run; calls are refused once it is reached. */
+    readonly budgetUsd = Number(process.env.PARITY_BUDGET_USD ?? 20),
+  ) {}
+
+  /** Throw before a paid call if the budget is spent. */
+  assertBudget(): void {
+    const spent = this.total().costUsd;
+    if (spent >= this.budgetUsd) {
+      throw new Error(
+        `budget reached: $${spent.toFixed(2)} of $${this.budgetUsd.toFixed(2)} (PARITY_BUDGET_USD)`,
+      );
+    }
+  }
+
+  /** A cached model answer, so the same request is never paid twice. */
+  cached<T>(key: string): T | undefined {
+    const row = this.db
+      .query<{ body: string }, [string]>("SELECT body FROM model_cache WHERE key = ?")
+      .get(key);
+    return row ? (JSON.parse(row.body) as T) : undefined;
+  }
+
+  remember(key: string, value: unknown): void {
+    this.db
+      .query("INSERT OR REPLACE INTO model_cache (key, body, created_at) VALUES (?, ?, ?)")
+      .run(key, JSON.stringify(value), new Date().toISOString());
+  }
 
   record(call: CallRecord): LoggedCall {
     const { usd } = costOf(call.model, call.usage);
