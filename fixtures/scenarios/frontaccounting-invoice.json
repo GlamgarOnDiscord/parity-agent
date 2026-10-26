@@ -1,0 +1,75 @@
+{
+  "id": "fa-direct-invoice",
+  "name": "Direct sales invoice, two lines with a discount, then placed",
+  "steps": [
+    {
+      "do": "open",
+      "path": "/"
+    },
+    {
+      "do": "fill",
+      "field": "User name",
+      "value": "admin"
+    },
+    {
+      "do": "fill",
+      "field": "Password",
+      "value": "password"
+    },
+    {
+      "do": "click",
+      "target": "Login"
+    },
+    {
+      "do": "open",
+      "path": "/sales/sales_order_entry.php?NewInvoice=0"
+    },
+    {
+      "do": "fill",
+      "field": "Item Code",
+      "value": "101"
+    },
+    {
+      "do": "fill",
+      "field": "Quantity",
+      "value": "3"
+    },
+    {
+      "do": "fill",
+      "field": "Discount %",
+      "value": "10"
+    },
+    {
+      "do": "click",
+      "target": "Add Item"
+    },
+    {
+      "do": "check",
+      "screen": "invoice-one-line",
+      "note": "three iPads at 10 percent off"
+    },
+    {
+      "do": "fill",
+      "field": "Item Code",
+      "value": "103"
+    },
+    {
+      "do": "fill",
+      "field": "Quantity",
+      "value": "2"
+    },
+    {
+      "do": "click",
+      "target": "Add Item"
+    },
+    {
+      "do": "check",
+      "screen": "invoice-two-lines",
+      "note": "two covers added"
+    },
+    {
+      "do": "click",
+      "target": "Place Invoice"
+    }
+  ]
+}

@@ -54,7 +54,7 @@ Exit: a run works with the network cut except for capture, and the UI shows ever
 
 ## S6 Second app and exploration (Nov 1)
 
-- FrontAccounting as the second target, an app the founder did not write; noise measured
+- FrontAccounting as the second target, an app the founder did not write; noise measured (done: [benchmarks.md](benchmarks.md))
 - Autonomous exploration with Muse Spark computer use finds a screen the recording missed (cut if flaky)
 
 Exit: one FrontAccounting scenario replays with a clean diff; noise figures recorded.

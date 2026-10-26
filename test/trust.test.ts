@@ -113,12 +113,12 @@ describe("Playwright export", () => {
 
   test("replays the steps with role and label locators", () => {
     expect(spec).toContain('await page.goto("/");');
-    expect(spec).toContain('(await control(page, "Code")).fill("HW001")');
-    expect(spec).toContain('getByRole("button", { name: "Add line" })');
+    expect(spec).toContain('await fillField(page, "Code", "HW001");');
+    expect(spec).toContain('await press(page, "Add line");');
   });
 
   test("checks the recorded values and skips volatile fields", () => {
-    expect(spec).toContain('[["Total:","69.21 $"]]');
+    expect(spec).toContain('[["Total:","69.21 $",null]]');
     expect(spec).not.toContain("10:02");
   });
 
@@ -139,7 +139,7 @@ describe("Playwright export", () => {
   });
 
   test("carries the same field reader as Parity", () => {
-    expect(spec).toContain("const collectFields = function collectFields()");
+    expect(spec).toContain("const scanPage = function scanPage(");
   });
 
   test("quotes hostile text instead of running it", () => {
@@ -154,7 +154,7 @@ describe("Playwright export", () => {
     const out = playwrightSpec(evil);
     expect(out).toContain('test("a\\"); process.exit(1); (\\"",');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: text of generated code
-    expect(out).toContain('control(page, "`${x}`")).fill("\\n")');
+    expect(out).toContain('fillField(page, "`${x}`", "\\n")');
   });
 });
 

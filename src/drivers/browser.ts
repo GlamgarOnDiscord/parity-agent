@@ -12,7 +12,7 @@ import puppeteer, {
 import type { Field, Screen } from "../fields/types";
 import type { ComputerAction, DataUrl } from "../models/types";
 import type { Step } from "../proof/schema";
-import { collectFields, type RawField } from "./read-fields";
+import { type RawField, scanPage } from "./read-fields";
 import { registerBrowser } from "./registry";
 import type { AppDriver, BrowserDriverOptions } from "./types";
 
@@ -23,17 +23,6 @@ const CHROME_PATHS = [
   "/usr/bin/chromium",
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
 ].filter((p): p is string => Boolean(p));
-
-/** Runs in the page: the form control whose label contains `text` (case-insensitive). */
-function controlByLabel(text: string): Element | null {
-  const needle = text.toLowerCase();
-  for (const el of document.querySelectorAll("input, select, textarea")) {
-    const labels = [...((el as HTMLInputElement).labels ?? [])].map((l) => l.textContent ?? "");
-    const names = [...labels, el.getAttribute("aria-label") ?? "", el.getAttribute("placeholder") ?? ""];
-    if (names.some((n) => n.toLowerCase().includes(needle))) return el;
-  }
-  return null;
-}
 
 /** Runs in the page: the button or link whose text contains `text`. */
 function clickableByText(text: string): Element | null {
@@ -70,7 +59,7 @@ class BrowserDriver implements AppDriver {
     await this.page.setViewport(this.options.viewport ?? { width: 1280, height: 800 });
   }
 
-  private async find(fn: (text: string) => Element | null, text: string, what: string) {
+  private async find(fn: (text: string) => unknown, text: string, what: string) {
     const handle = await this.page.evaluateHandle(fn, text);
     const element = handle.asElement() as ElementHandle<Element> | null;
     if (!element) throw new Error(`no ${what} matching "${text}" on ${this.page.url()}`);
@@ -87,19 +76,43 @@ class BrowserDriver implements AppDriver {
         return;
       }
       case "fill": {
-        const control = await this.find(controlByLabel, step.field, "field");
-        await control.evaluate((el) => {
-          (el as HTMLInputElement).value = "";
-        });
-        await control.type(step.value);
+        const control = await this.find(scanPage, step.field, "field");
+        const picked = await control.evaluate((el, value) => {
+          if (!(el instanceof HTMLSelectElement)) return null;
+          const want = value.toLowerCase();
+          const options = [...el.options];
+          const option =
+            options.find((o) => (o.textContent ?? "").trim().toLowerCase() === want || o.value === value) ??
+            options.find((o) => (o.textContent ?? "").toLowerCase().includes(want));
+          return option ? option.value : "";
+        }, step.value);
+        if (picked !== null) {
+          if (!picked) throw new Error(`no option "${step.value}" in ${step.field}`);
+          await (control as ElementHandle<HTMLSelectElement>).select(picked);
+        } else {
+          await control.evaluate((el) => {
+            (el as HTMLInputElement).value = "";
+          });
+          await control.type(step.value);
+          // Leaving the field fires `change`, which old apps use to look values up on the server.
+          await control.evaluate((el) => (el as HTMLElement).blur());
+        }
+        await this.settle();
         return;
       }
       case "click": {
         const target = await this.find(clickableByText, step.target, "button");
         await target.click();
+        await this.settle();
         return;
       }
     }
+  }
+
+  /** Waits for a navigation or an in-page request started by the last action to finish. */
+  private async settle() {
+    await new Promise((r) => setTimeout(r, 50));
+    await this.page.waitForNetworkIdle({ idleTime: 150, timeout: 10_000 }).catch(() => {});
   }
 
   async act(action: ComputerAction) {
@@ -139,7 +152,7 @@ class BrowserDriver implements AppDriver {
   }
 
   async readScreen(screenId: string): Promise<Screen> {
-    const raw: RawField[] = await this.page.evaluate(collectFields);
+    const raw = (await this.page.evaluate(scanPage)) as RawField[];
     const counts = new Map<string, number>();
     const fields: Field[] = raw.map((f) => {
       const n = (counts.get(f.label) ?? 0) + 1;

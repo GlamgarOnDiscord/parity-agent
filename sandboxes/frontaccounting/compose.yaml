@@ -1,0 +1,42 @@
+# FrontAccounting 2.4.20 with its upstream demo data. Run from the repo root:
+#   sh sandboxes/frontaccounting/fetch.sh
+#   docker compose -f sandboxes/frontaccounting/compose.yaml up -d --build
+#   http://127.0.0.1:8080  (demo login from the upstream seed: admin / password)
+name: parity-frontaccounting
+
+services:
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_DATABASE: frontaccounting
+      MARIADB_USER: fa
+      MARIADB_PASSWORD: fa
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    command:
+      [
+        --sql-mode=,
+        --innodb-buffer-pool-size=32M,
+        --performance-schema=OFF,
+        --skip-name-resolve,
+        --max-connections=20,
+        --innodb-log-file-size=8M,
+        --key-buffer-size=8M,
+        --aria-pagecache-buffer-size=8M,
+      ]
+    volumes:
+      - ../../legacy-apps/frontaccounting/src/sql/en_US-demo.sql:/docker-entrypoint-initdb.d/demo.sql:ro
+    tmpfs: [/var/lib/mysql]
+    mem_limit: 256m
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 2s
+      retries: 30
+
+  app:
+    build: .
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - ../../legacy-apps/frontaccounting/src:/src:ro
+    ports: ["127.0.0.1:8080:8080"]
+    mem_limit: 128m
