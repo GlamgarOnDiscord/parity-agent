@@ -122,6 +122,22 @@ describe("Playwright export", () => {
     expect(spec).not.toContain("10:02");
   });
 
+  test("a note cannot leave its comment, whatever line terminator it carries", () => {
+    for (const nl of ["\n", "\r", "\u2028", "\u2029"]) {
+      const noted = ProofSchema.parse({
+        ...proof,
+        scenarios: [
+          { id: "n", name: "n", steps: [{ do: "check", screen: "s", note: `x${nl}process.exit(1)` }] },
+        ],
+        checkpoints: [],
+      });
+      const line = playwrightSpec(noted)
+        .split(/\r\n|[\n\r\u2028\u2029]/)
+        .find((l) => l.includes("process.exit"));
+      expect(line?.trim().startsWith("//")).toBe(true);
+    }
+  });
+
   test("carries the same field reader as Parity", () => {
     expect(spec).toContain("const collectFields = function collectFields()");
   });

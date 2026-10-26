@@ -69,7 +69,7 @@ export function playwrightSpec(proof: Proof): string {
           const expected = (checkpoint?.screen.fields ?? [])
             .filter((f) => !volatile.has(f.label.toLowerCase()))
             .map((f) => [f.label, f.value]);
-          if (step.note) lines.push(`  // ${step.note.replace(/[\r\n]+/g, " ")}`);
+          if (step.note) lines.push(`  // ${step.note.replace(/[\r\n\u2028\u2029]+/g, " ")}`);
           lines.push(`  await expectFields(page, ${JSON.stringify(expected)});`);
           break;
         }
