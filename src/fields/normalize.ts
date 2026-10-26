@@ -44,7 +44,9 @@ export interface Normalized {
   value: string;
 }
 
-const MONEY = /^[-+(]?\s*[$€£]?\s*[-+]?\d{1,3}([ ,. ]\d{3})*([.,]\d{1,4})?\s*[$€£]?\)?$/;
+const MONEY = /^[-+(]?(?:[$€£]\s?)?[-+]?\d{1,3}(?:[ ,. ]\d{3})*(?:[.,]\d{1,4})?(?:\s?[$€£])?\)?$/;
+/** Displayed values longer than this are compared as plain text; keeps every pattern below linear. */
+export const MAX_VALUE_LENGTH = 64;
 const PLAIN_NUMBER = /^[-+]?\d+([.,]\d+)?$/;
 const PERCENT = /^[-+]?\d+([.,]\d+)?\s*%$/;
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -67,7 +69,7 @@ function decimalOf(raw: string): number {
 /** Detect the kind of a displayed value. `dateOrder` resolves 03/04/2026 (default month first, as in VS3). */
 export function normalizeValue(raw: string, hint?: FieldKind, dateOrder: "mdy" | "dmy" = "mdy"): Normalized {
   const s = raw.trim();
-  const kind = hint ?? inferKind(s);
+  const kind = s.length > MAX_VALUE_LENGTH ? "text" : (hint ?? inferKind(s));
   switch (kind) {
     case "money":
       return { kind, value: String(Math.round(decimalOf(s) * 100)) };
@@ -93,6 +95,7 @@ export function normalizeValue(raw: string, hint?: FieldKind, dateOrder: "mdy" |
 
 export function inferKind(raw: string): FieldKind {
   const s = raw.trim();
+  if (s.length > MAX_VALUE_LENGTH) return "text";
   if (PERCENT.test(s)) return "percent";
   if (ISO_DATE.test(s) || SLASH_DATE.test(s)) return "date";
   if (/^(true|false|yes|no|checked|unchecked)$/i.test(s)) return "bool";
