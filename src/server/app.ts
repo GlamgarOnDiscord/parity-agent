@@ -3,9 +3,11 @@ import { join, resolve } from "node:path";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { z } from "zod";
+import type { Capture } from "../capture/capture";
+import { coverageOf } from "../coverage/coverage";
 import { matchScreens } from "../fields/match";
 import type { Ledger } from "../models/ledger";
-import { ScreenSchema } from "../proof/schema";
+import { ProofSchema, ScreenSchema } from "../proof/schema";
 import type { RuleStore } from "../rules/store";
 import { reviewPage } from "./review";
 
@@ -102,6 +104,38 @@ export function createApp(ledger: Ledger, options: AppOptions) {
     const file = resolve(join(root, run, "frames", `frame-${String(n).padStart(4, "0")}.png`));
     if (!file.startsWith(root) || !existsSync(file)) return c.json({ error: "no such frame" }, 404);
     return new Response(Bun.file(file), { headers: { "content-type": "image/png" } });
+  });
+
+  app.get("/api/runs/:run/coverage", async (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
+    const dir = resolve(options.runsDir, run);
+    const capture = Bun.file(join(dir, "capture.json"));
+    const proof = Bun.file(join(dir, "proof.json"));
+    if (!(await capture.exists()) || !(await proof.exists()))
+      return c.json({ error: "no capture or proof" }, 404);
+    const parsed = ProofSchema.safeParse(await proof.json().catch(() => null));
+    if (!parsed.success) return c.json({ error: "invalid proof" }, 422);
+    const rules = options.rules.list(run).filter((r) => r.status !== "rejected");
+    const captured = (await capture.json().catch(() => null)) as Capture | null;
+    if (!Array.isArray(captured?.frames)) return c.json({ error: "invalid capture" }, 422);
+    return c.json(coverageOf(captured, parsed.data, rules));
+  });
+  // Calls made for a run: its capture and its rebuilds.
+  app.get("/api/runs/:run/calls", (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
+    const ids = [run, `rebuild-${run}`];
+    const calls = ids.flatMap((id) => ledger.list(id)).sort((a, b) => b.id - a.id);
+    const totals = ids.map((id) => ledger.total(id));
+    return c.json({
+      calls,
+      total: {
+        calls: totals.reduce((n, t) => n + t.calls, 0),
+        costUsd: totals.reduce((n, t) => n + t.costUsd, 0),
+        sentBytes: totals.reduce((n, t) => n + t.sentBytes, 0),
+      },
+    });
   });
 
   // The send log: everything that left the machine, and what it cost.

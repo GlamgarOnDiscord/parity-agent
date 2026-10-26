@@ -48,7 +48,7 @@ Exit: the rebuilt invoice screen replays the VS3 scenarios with every field equa
 - Coverage map: what was recorded, explored and never tested
 - Local by default: replays and diffs offline; the send log shown in the UI
 - Muse Spark Open path for rule extraction (open-weights bonus)
-- Playwright export of proven web scenarios (cut if late)
+- Playwright export of proven web scenarios (done: `bun run export:playwright`)
 
 Exit: a run works with the network cut except for capture, and the UI shows every call that left.
 
