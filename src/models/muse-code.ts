@@ -1,4 +1,5 @@
-import { existsSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Ledger } from "./ledger";
 
@@ -21,11 +22,23 @@ export interface MuseCodeOptions {
   timeoutMs?: number;
 }
 
-const MUSE_PATHS = [
-  process.env.PARITY_MUSE_PATH,
-  join(process.env.LOCALAPPDATA ?? "", "Programs", "muse", "muse.cmd"),
-  "/usr/local/bin/muse",
-].filter((p): p is string => Boolean(p));
+/**
+ * The real Muse Code executable. On Windows `muse.cmd` only forwards to `muse-bin-<version>.exe`; calling the
+ * binary directly keeps every argument away from cmd.exe and its metacharacters.
+ */
+function museBinary(): string {
+  if (process.env.PARITY_MUSE_PATH) return process.env.PARITY_MUSE_PATH;
+  const dir = join(process.env.LOCALAPPDATA ?? "", "Programs", "muse");
+  if (existsSync(dir)) {
+    const bin = readdirSync(dir)
+      .filter((f) => /^muse-bin-[\w.-]+\.exe$/.test(f))
+      .sort()
+      .at(-1);
+    if (bin) return join(dir, bin);
+  }
+  for (const p of ["/usr/local/bin/muse", "/usr/bin/muse"]) if (existsSync(p)) return p;
+  throw new Error("Muse Code not found; install it or set PARITY_MUSE_PATH to the executable");
+}
 
 interface UsageModel {
   model: string;
@@ -41,12 +54,18 @@ interface UsageModel {
  */
 export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Promise<MuseCodeRun> {
   if (options.model.endsWith("-contributor")) throw new Error("contributor models are not allowed");
-  const muse = MUSE_PATHS.find((p) => existsSync(p));
-  if (!muse) throw new Error("Muse Code not found; install it or set PARITY_MUSE_PATH");
+  const muse = museBinary();
+  if (muse.toLowerCase().endsWith(".cmd") || muse.toLowerCase().endsWith(".bat")) {
+    throw new Error("point PARITY_MUSE_PATH at the Muse Code executable, not a .cmd wrapper");
+  }
+  // The prompt carries text read from captured apps: it goes through a file, never through argv.
+  const promptDir = mkdtempSync(join(tmpdir(), "parity-prompt-"));
+  const promptFile = join(promptDir, "prompt.md");
+  writeFileSync(promptFile, options.prompt, "utf-8");
   const started = performance.now();
   const proc = Bun.spawn(
     [
-      ...(muse.endsWith(".cmd") ? ["cmd", "/c", muse] : [muse]),
+      muse,
       "exec",
       "--api-key-stdin",
       "--contributor-mode",
@@ -59,7 +78,8 @@ export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Pro
       "--max-model-steps",
       String(options.maxSteps ?? 40),
       "--json",
-      options.prompt,
+      "--prompt-file",
+      promptFile,
     ],
     { stdin: "pipe", stdout: "pipe", stderr: "pipe" },
   );
@@ -72,6 +92,7 @@ export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Pro
     proc.exited,
   ]);
   clearTimeout(timer);
+  rmSync(promptDir, { recursive: true, force: true });
 
   const models: UsageModel[] = [];
   for (const line of stdout.split("\n")) {
