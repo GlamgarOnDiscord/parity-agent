@@ -3,28 +3,54 @@ import { z } from "zod";
 import { matchScreens } from "../fields/match";
 import type { Ledger } from "../models/ledger";
 
+const Text = z.string().max(256);
 const FieldSchema = z.object({
-  id: z.string().min(1),
-  label: z.string(),
-  value: z.string(),
+  id: z.string().min(1).max(128),
+  label: Text,
+  value: Text,
   kind: z.enum(["money", "number", "percent", "date", "bool", "text"]).optional(),
   box: z.object({ x: z.number(), y: z.number(), w: z.number(), h: z.number() }).optional(),
-  group: z.string().optional(),
+  group: Text.optional(),
 });
 const ScreenSchema = z.object({
-  id: z.string().min(1),
-  app: z.string(),
-  title: z.string().optional(),
-  fields: z.array(FieldSchema).max(2000),
+  id: z.string().min(1).max(128),
+  app: Text,
+  title: Text.optional(),
+  fields: z.array(FieldSchema).max(500),
 });
 const MatchBody = z.object({
   legacy: ScreenSchema,
   rebuilt: ScreenSchema,
-  mapping: z.record(z.string(), z.string()).optional(),
+  mapping: z.record(z.string().max(128), z.string().max(128)).optional(),
 });
 
-export function createApp(ledger: Ledger) {
+export interface AppOptions {
+  /** Per-launch secret required on /api/*. */
+  token: string;
+  port: number;
+}
+
+export function createApp(ledger: Ledger, options: AppOptions) {
   const app = new Hono();
+  const allowedHosts = new Set([`127.0.0.1:${options.port}`, `localhost:${options.port}`]);
+
+  // Local only, and not reachable from a web page through DNS rebinding or a cross-site request.
+  app.use("*", async (c, next) => {
+    if (!allowedHosts.has(c.req.header("host") ?? "")) return c.json({ error: "forbidden host" }, 403);
+    const origin = c.req.header("origin");
+    if (origin && !allowedHosts.has(origin.replace(/^https?:\/\//, ""))) {
+      return c.json({ error: "forbidden origin" }, 403);
+    }
+    await next();
+  });
+  app.use("/api/*", async (c, next) => {
+    if (c.req.header("authorization") !== `Bearer ${options.token}`)
+      return c.json({ error: "unauthorized" }, 401);
+    if (c.req.method === "POST" && !c.req.header("content-type")?.startsWith("application/json")) {
+      return c.json({ error: "expected application/json" }, 415);
+    }
+    await next();
+  });
 
   app.get("/health", (c) => c.json({ ok: true }));
 
