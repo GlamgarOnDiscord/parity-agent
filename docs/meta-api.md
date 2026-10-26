@@ -13,3 +13,10 @@ Verified 2026-10-26 with `bun run models:check` (5 calls, $0.04). Base URL `http
 Not verified yet: Muse Spark Open on Baseten (`BASETEN_API_KEY` not set), Muse Code (`muse exec`, not installed).
 
 Structured outputs are strict: every property of the JSON schema must be listed as required. Use `.nullable()` in Zod for fields that may be absent, never `.optional()` (verified 2026-10-26, 400 "'required' is required to be supplied").
+
+## Muse Code (verified 2026-10-26, version 1.4.13)
+
+- Headless: `muse exec --api-key-stdin --contributor-mode off --model muse-spark-1.3 --no-foreign-personal-context --workspace <dir> --max-model-steps <n> --json "<prompt>"`.
+- **`--contributor-mode off` is not enough**: without `--model`, a run reported `muse-spark-1.3-contributor` in its usage event. Always pass the Standard model and check the `run.usage` event; `src/models/muse-code.ts` refuses any contributor model it finds there.
+- By default it loads the user's Claude Code and Codex rules and skills; `--no-foreign-personal-context` keeps them out.
+- A trivial task used about 80k input tokens, mostly cached: the agent's own system prompt.
