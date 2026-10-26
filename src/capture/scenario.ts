@@ -56,6 +56,8 @@ export async function proofFromCapture(
         .join(", ")}. Which button or menu item did the user activate? Give its text exactly as shown.`,
       images: [await asDataUrl(before.path), await asDataUrl(after.path)],
       runId: options.runId,
+      effort: "minimal",
+      maxOutputTokens: 1000,
     });
     steps.push({ do: "click", target: value.button });
     steps.push({ do: "check", screen: `frame-${i + 1}`, note: `after ${value.button}` });

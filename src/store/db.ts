@@ -35,6 +35,11 @@ const MIGRATIONS = [
     note TEXT,
     PRIMARY KEY (run_id, rule_id)
   )`,
+  `CREATE TABLE model_cache (
+    key TEXT PRIMARY KEY,
+    body TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  )`,
 ];
 
 export function openDb(path: string): Database {

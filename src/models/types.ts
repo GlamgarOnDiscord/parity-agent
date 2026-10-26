@@ -10,6 +10,10 @@ export interface StructuredRequest<T> {
   system?: string;
   images?: DataUrl[];
   runId?: string;
+  /** Reasoning budget: reading a screen needs little, settling a contradiction a bit more. */
+  effort?: "minimal" | "low" | "medium" | "high";
+  /** Hard cap on output tokens (reasoning included), to keep each call's cost bounded. */
+  maxOutputTokens?: number;
 }
 
 /** Text in, validated object out: rule extraction, field labelling, diff explanations. */
