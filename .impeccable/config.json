@@ -1,0 +1,20 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "geist mono",
+        "createdAt": "2026-10-26T22:24:27.944Z",
+        "reason": "brand decision: founder/brand.md 'The look (already built; keep it)' sets Geist and Geist Mono as the Parity typefaces"
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist",
+        "createdAt": "2026-10-26T22:37:16.632Z",
+        "reason": "brand decision: founder/brand.md 'The look (already built; keep it)' and PRODUCT.md Brand Commitments set Geist and Geist Mono"
+      }
+    ]
+  }
+}

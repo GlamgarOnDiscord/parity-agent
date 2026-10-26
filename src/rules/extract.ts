@@ -148,6 +148,44 @@ export function checkRule(c: Capture, target: string, expression: string): RuleC
   return check;
 }
 
+export interface WorkedExample {
+  frame: number;
+  inputs: { label: string; value: number }[];
+  /** The value the screen shows for the target field. */
+  shown: number;
+  /** The value the formula gives from the inputs on the same frame. */
+  computed: number;
+}
+
+/** The formula worked out on the first frame where it can be, with the numbers the screen showed. */
+export function workedExample(c: Capture, target: string, expression: string): WorkedExample | undefined {
+  let expr: Expr;
+  try {
+    expr = parseExpr(expression);
+  } catch {
+    return undefined;
+  }
+  const labels = [...new Set(fieldsOf(expr))];
+  let fallback: WorkedExample | undefined;
+  for (const [i, frame] of c.frames.entries()) {
+    const shown = valueOn(frame, target);
+    const inputs = labels.map((label) => ({ label, value: valueOn(frame, label) }));
+    if (shown === undefined || inputs.some((x) => x.value === undefined)) continue;
+    try {
+      const computed = evaluate(
+        expr,
+        (l) => valueOn(frame, l),
+        (l) => allOn(frame, l),
+      );
+      const example = { frame: i + 1, inputs: inputs as WorkedExample["inputs"], shown, computed };
+      // An empty screen (all zeros) proves little; prefer the first frame with real amounts.
+      if (shown !== 0) return example;
+      fallback ??= example;
+    } catch {}
+  }
+  return fallback;
+}
+
 /**
  * Propose rules with Muse Spark, then prove what can be proved: quotes must exist in the transcript, and every
  * formula is re-computed on every frame. A formula the screens contradict goes to Muse Wonder with the evidence.

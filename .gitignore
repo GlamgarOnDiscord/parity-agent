@@ -8,3 +8,6 @@ recordings/
 .DS_Store
 !.env.example
 legacy-apps/
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/config.local.json
