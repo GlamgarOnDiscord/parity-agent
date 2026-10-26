@@ -54,7 +54,7 @@ if (models.open) {
 }
 await check(
   "segment (sam)",
-  async () => (await models.segment.segment({ image, phrase: "text field", runId })).raw,
+  async () => (await models.segment.segment({ image, phrase: "button", runId })).raw,
 );
 await check("computer (muse-spark)", async () => {
   const step = await models.computer.step({
@@ -62,7 +62,7 @@ await check("computer (muse-spark)", async () => {
     screenshot: image,
     runId,
   });
-  return { action: step.action, text: step.text, safety: step.safetyChecks };
+  return { actions: step.actions, text: step.text, safety: step.safetyChecks };
 });
 const audio = Bun.file(new URL("./sample-voice.wav", import.meta.url));
 if (await audio.exists()) {

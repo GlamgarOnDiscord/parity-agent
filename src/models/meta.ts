@@ -53,7 +53,11 @@ export function structuredClient(
     async generate<T>(req: StructuredRequest<T>) {
       const content = [
         { type: "text" as const, text: req.prompt },
-        ...(req.images ?? []).map((image) => ({ type: "image" as const, image })),
+        ...(req.images ?? []).map((image) => ({
+          type: "file" as const,
+          data: image,
+          mediaType: /^data:(image\/[\w.+-]+);/.exec(image)?.[1] ?? "image/png",
+        })),
       ];
       const r = await timed(() =>
         generateText({
@@ -116,15 +120,21 @@ export function segmentClient(endpoint: Endpoint, model: string, ledger: Ledger)
   };
 }
 
-const TranscriptBody = z.looseObject({ text: z.string() });
+const TranscriptBody = z.looseObject({ transcript: z.string(), audioDurationMs: z.number().optional() });
 
-/** Muse Voice Transcribe: POST /asr/transcribe, multipart. */
+/**
+ * Muse Voice Transcribe: POST /asr/transcribe, multipart with a JSON `request` part and an `audio` part.
+ * Verified 2026-10-26: WAV must be mono s16le at 16000 or 24000 Hz.
+ */
 export function transcribeClient(endpoint: Endpoint, model: string, ledger: Ledger): TranscribeClient {
   return {
     async transcribe(req: TranscribeRequest) {
       const form = new FormData();
-      form.set("model", model);
-      form.set("file", req.audio, req.filename);
+      form.set(
+        "request",
+        new Blob([JSON.stringify({ model, audioEncoding: "WAV" })], { type: "application/json" }),
+      );
+      form.set("audio", req.audio, req.filename);
       const r = await timed(async () => {
         const res = await fetch(`${endpoint.baseURL}/asr/transcribe`, {
           method: "POST",
@@ -134,22 +144,24 @@ export function transcribeClient(endpoint: Endpoint, model: string, ledger: Ledg
         if (!res.ok) throw new Error(`transcribe ${res.status}: ${(await res.text()).slice(0, 300)}`);
         return res.json() as Promise<unknown>;
       });
+      const body = r.error ? undefined : TranscriptBody.safeParse(r.value);
+      const measured = body?.success ? body.data.audioDurationMs : undefined;
       const call = ledger.record({
         runId: req.runId,
         role: "transcribe",
         provider: endpoint.provider,
         model,
-        usage: { audioSeconds: req.durationSeconds },
+        usage: { audioSeconds: measured !== undefined ? measured / 1000 : req.durationSeconds },
         sentBytes: req.audio.size,
         durationMs: r.ms,
-        ok: !r.error,
-        error: r.error ? String(r.error) : undefined,
+        ok: Boolean(body?.success),
+        error: r.error ? String(r.error) : body?.success ? undefined : "unexpected transcript shape",
       });
       if (r.error) throw r.error;
-      const body = TranscriptBody.safeParse(r.value);
-      if (!body.success)
+      if (!body?.success) {
         throw new Error(`unexpected transcript shape: ${JSON.stringify(r.value).slice(0, 300)}`);
-      return { text: body.data.text, raw: r.value, call };
+      }
+      return { text: body.data.transcript, raw: r.value, call };
     },
   };
 }
@@ -157,7 +169,9 @@ export function transcribeClient(endpoint: Endpoint, model: string, ledger: Ledg
 const ComputerCall = z.looseObject({
   type: z.literal("computer_call"),
   call_id: z.string(),
-  action: z.looseObject({ type: z.string() }),
+  // Verified 2026-10-26: Meta returns a list of actions per call, not a single `action`.
+  actions: z.array(z.looseObject({ type: z.string() })).default([]),
+  meta_safety_replay_receipt: z.string().optional(),
   pending_safety_checks: z
     .array(z.object({ id: z.string(), code: z.string(), message: z.string() }))
     .default([]),
@@ -210,11 +224,12 @@ export function computerClient(endpoint: Endpoint, model: string, ledger: Ledger
       if (r.error || !r.value) throw r.error ?? new Error("no response");
       const item = (r.value.output as unknown[]).map((o) => ComputerCall.safeParse(o)).find((p) => p.success);
       if (!item?.success)
-        return { responseId: r.value.id, safetyChecks: [], text: r.value.output_text, call };
+        return { responseId: r.value.id, actions: [], safetyChecks: [], text: r.value.output_text, call };
       return {
         responseId: r.value.id,
         callId: item.data.call_id,
-        action: item.data.action as ComputerAction,
+        actions: item.data.actions as ComputerAction[],
+        safetyReceipt: item.data.meta_safety_replay_receipt,
         safetyChecks: item.data.pending_safety_checks,
         call,
       };
