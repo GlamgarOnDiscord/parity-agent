@@ -30,3 +30,7 @@ Model id, base URL and implementation per role come from config. Swapping one is
 ## D2. Puppeteer over Bun's own WebSocket instead of Playwright (2026-10-26)
 
 Playwright's launch talks to Chrome over pipes, and its bundled `ws` client never completes the CDP handshake under Bun on Windows (both reproduced: launch timeout, then `connectOverCDP` timeout). Bun's native `WebSocket` reaches the same endpoint instantly. Puppeteer accepts a custom `ConnectionTransport`, so Parity starts Chrome itself on a local debugging port with a throwaway profile and hands Puppeteer a transport built on Bun's `WebSocket`. Behind the `AppDriver` interface nothing else changed. Playwright test export, planned for proven scenarios, only writes text files and does not need the library.
+
+## D3. The legacy reference comes from the recording (2026-10-26)
+
+Replaying an old Windows app automatically needs a desktop driver, a vision loop and a sandbox per run; reading the key frames of the narrated recording gives the same checkpoints for a few cents, once. Proofs therefore take their reference checkpoints from the capture (`reference.source = "capture"`), and automatic replays target only the rebuilt app. A new behavior of the old app is captured by recording it again, not by driving it.

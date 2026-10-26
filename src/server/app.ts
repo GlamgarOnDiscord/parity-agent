@@ -1,8 +1,12 @@
+import { existsSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { Hono } from "hono";
 import { z } from "zod";
 import { matchScreens } from "../fields/match";
 import type { Ledger } from "../models/ledger";
 import { ScreenSchema } from "../proof/schema";
+import type { RuleStore } from "../rules/store";
+import { reviewPage } from "./review";
 
 const MatchBody = z.object({
   legacy: ScreenSchema,
@@ -14,7 +18,16 @@ export interface AppOptions {
   /** Per-launch secret required on /api/*. */
   token: string;
   port: number;
+  rules: RuleStore;
+  /** Where captures live: runs/<run>/frames/frame-0001.png */
+  runsDir: string;
 }
+
+const RUN = /^[\w.-]{1,64}$/;
+const Decision = z.object({
+  status: z.enum(["accepted", "rejected"]),
+  note: z.string().max(1000).optional(),
+});
 
 export function createApp(ledger: Ledger, options: AppOptions) {
   const app = new Hono();
@@ -39,6 +52,37 @@ export function createApp(ledger: Ledger, options: AppOptions) {
   });
 
   app.get("/health", (c) => c.json({ ok: true }));
+
+  app.get("/review/:run", (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.text("bad run", 400);
+    return c.html(reviewPage(run, options.token));
+  });
+
+  app.get("/api/runs", (c) => c.json(options.rules.runs()));
+  app.get("/api/runs/:run/rules", (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
+    return c.json(options.rules.list(run));
+  });
+  app.post("/api/runs/:run/rules/:rule", async (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
+    const body = Decision.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json({ error: z.prettifyError(body.error) }, 400);
+    const rule = options.rules.decide(run, c.req.param("rule"), body.data.status, body.data.note);
+    return rule ? c.json(rule) : c.json({ error: "no such rule" }, 404);
+  });
+  app.get("/api/runs/:run/frames/:n", async (c) => {
+    const run = c.req.param("run");
+    const n = Number(c.req.param("n"));
+    if (!RUN.test(run) || !Number.isInteger(n) || n < 1 || n > 9999)
+      return c.json({ error: "bad frame" }, 400);
+    const root = resolve(options.runsDir);
+    const file = resolve(join(root, run, "frames", `frame-${String(n).padStart(4, "0")}.png`));
+    if (!file.startsWith(root) || !existsSync(file)) return c.json({ error: "no such frame" }, 404);
+    return new Response(Bun.file(file), { headers: { "content-type": "image/png" } });
+  });
 
   // The send log: everything that left the machine, and what it cost.
   app.get("/api/calls", (c) => c.json(ledger.list(c.req.query("run"))));

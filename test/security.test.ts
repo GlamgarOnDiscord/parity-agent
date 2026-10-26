@@ -3,12 +3,14 @@ import { MAX_PAIRS, matchScreens } from "../src/fields/match";
 import { inferKind } from "../src/fields/normalize";
 import type { Screen } from "../src/fields/types";
 import { Ledger, redact } from "../src/models/ledger";
+import { RuleStore } from "../src/rules/store";
 import { createApp } from "../src/server/app";
 import { openDb } from "../src/store/db";
 import { vs3Invoice, webInvoice } from "./fixtures/screens";
 
 const token = "test-token-0123456789";
-const app = createApp(new Ledger(openDb(":memory:")), { token, port: 8787 });
+const memDb = openDb(":memory:");
+const app = createApp(new Ledger(memDb), { token, port: 8787, rules: new RuleStore(memDb), runsDir: "runs" });
 const base = "http://127.0.0.1:8787";
 const auth = { authorization: `Bearer ${token}` };
 
