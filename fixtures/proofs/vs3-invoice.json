@@ -1,0 +1,46 @@
+{
+  "format": "parity-proof",
+  "version": 1,
+  "createdAt": "2026-10-26T19:00:00.000Z",
+  "reference": { "app": "Virtual Salesman 3", "source": "manual" },
+  "scenarios": [
+    {
+      "id": "s2-invoice-gst-qst",
+      "name": "Invoice with GST and QST, deposit paid",
+      "steps": [
+        { "do": "open", "path": "/" },
+        { "do": "fill", "field": "Bill to", "value": "Nantes Builders" },
+        { "do": "fill", "field": "Item", "value": "HW001" },
+        { "do": "fill", "field": "Quantity", "value": "3" },
+        { "do": "fill", "field": "Deposit", "value": "20.00" },
+        { "do": "click", "target": "Compute" },
+        { "do": "check", "screen": "invoice", "note": "totals after compute" }
+      ]
+    }
+  ],
+  "checkpoints": [
+    {
+      "scenario": "s2-invoice-gst-qst",
+      "step": 6,
+      "screen": {
+        "id": "invoice",
+        "app": "Virtual Salesman 3",
+        "title": "Invoice",
+        "fields": [
+          { "id": "l-customer", "label": "Customer", "value": "Nantes Builders" },
+          { "id": "l-item", "label": "Item", "value": "HW001", "group": "lines" },
+          { "id": "l-qty", "label": "Qty", "value": "3", "group": "lines" },
+          { "id": "l-price", "label": "Price", "value": "19.98", "group": "lines" },
+          { "id": "l-sub", "label": "Sub Total", "value": "59.94", "group": "totals" },
+          { "id": "l-gst", "label": "GST (5%)", "value": "3.00", "group": "totals" },
+          { "id": "l-qst", "label": "QST (9.975%)", "value": "6.28", "group": "totals" },
+          { "id": "l-total", "label": "Total", "value": "69.21", "group": "totals" },
+          { "id": "l-deposit", "label": "Deposit", "value": "20.00", "group": "payment" },
+          { "id": "l-balance", "label": "Balance", "value": "49.21", "group": "payment" }
+        ]
+      }
+    }
+  ],
+  "mappings": { "invoice": { "l-customer": "bill-to" } },
+  "volatile": []
+}

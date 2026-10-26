@@ -2,22 +2,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { matchScreens } from "../fields/match";
 import type { Ledger } from "../models/ledger";
+import { ScreenSchema } from "../proof/schema";
 
-const Text = z.string().max(256);
-const FieldSchema = z.object({
-  id: z.string().min(1).max(128),
-  label: Text,
-  value: Text,
-  kind: z.enum(["money", "number", "percent", "date", "bool", "text"]).optional(),
-  box: z.object({ x: z.number(), y: z.number(), w: z.number(), h: z.number() }).optional(),
-  group: Text.optional(),
-});
-const ScreenSchema = z.object({
-  id: z.string().min(1).max(128),
-  app: Text,
-  title: Text.optional(),
-  fields: z.array(FieldSchema).max(500),
-});
 const MatchBody = z.object({
   legacy: ScreenSchema,
   rebuilt: ScreenSchema,

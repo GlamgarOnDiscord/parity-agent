@@ -6,11 +6,11 @@ Benchmarks come later. Until then, nothing in the pipeline depends on a specific
 
 **Browser driver.** Replay code talks to a `BrowserDriver` interface (open, act, read fields, screenshot, close). Implementations:
 
-| driver                            | status                                                              |
-| --------------------------------- | ------------------------------------------------------------------- |
-| Playwright on Chromium            | default                                                             |
-| Playwright over CDP on Lightpanda | to benchmark (vendor claims about 10x speed and memory, unverified) |
-| Puppeteer / raw CDP               | to benchmark                                                        |
+| driver                                                                | status                                                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Chrome started with a throwaway profile, driven by Puppeteer over CDP | default                                                             |
+| Lightpanda over CDP (`PARITY_CDP_URL`)                                | to benchmark (vendor claims about 10x speed and memory, unverified) |
+| Any CDP browser already running                                       | to benchmark                                                        |
 
 Chosen by config (`PARITY_BROWSER=chromium|lightpanda|cdp`), never by import. Desktop apps use a separate `DesktopDriver` (Xvfb + input events in the Wine sandbox).
 
@@ -26,3 +26,7 @@ Chosen by config (`PARITY_BROWSER=chromium|lightpanda|cdp`), never by import. De
 Model id, base URL and implementation per role come from config. Swapping one is a config change plus, at most, one adapter file.
 
 **Benchmark plan (later).** Same scenarios on FrontAccounting and Virtual Salesman 3: wall time per replay, peak RAM, flaky runs out of 20, and for models, cost and accuracy on the 15 hand-observed rules. Results go in `docs/benchmarks.md`; the default changes only if a challenger wins on speed without losing reliability.
+
+## D2. Puppeteer over Bun's own WebSocket instead of Playwright (2026-10-26)
+
+Playwright's launch talks to Chrome over pipes, and its bundled `ws` client never completes the CDP handshake under Bun on Windows (both reproduced: launch timeout, then `connectOverCDP` timeout). Bun's native `WebSocket` reaches the same endpoint instantly. Puppeteer accepts a custom `ConnectionTransport`, so Parity starts Chrome itself on a local debugging port with a throwaway profile and hands Puppeteer a transport built on Bun's `WebSocket`. Behind the `AppDriver` interface nothing else changed. Playwright test export, planned for proven scenarios, only writes text files and does not need the library.
