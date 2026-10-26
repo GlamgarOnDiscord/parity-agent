@@ -1,4 +1,5 @@
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { createServer, type Server } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import puppeteer, {
@@ -231,10 +232,26 @@ async function attach(
 }
 
 /** Start Chrome on a local debugging port with a throwaway profile; return its browser WebSocket URL. */
+/** A proxy that accepts connections and closes them at once: every request sent to it fails. */
+async function deadEnd(): Promise<{ port: number; server: Server }> {
+  const server = createServer((socket) => socket.destroy());
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("egress guard did not start");
+  return { port: address.port, server };
+}
+
+/**
+ * Local by default, for the whole browser: all traffic goes to a dead-end proxy, loopback included, except the
+ * app's own host and port. This covers what page-level interception misses: popups, WebSockets, workers.
+ */
 async function launchChrome(
   executablePath: string,
+  appUrl: string,
 ): Promise<{ wsUrl: string; cleanup: () => Promise<void> }> {
   const profile = mkdtempSync(join(tmpdir(), "parity-chrome-"));
+  const guard = await deadEnd();
+  const app = new URL(appUrl);
   const proc = Bun.spawn(
     [
       executablePath,
@@ -247,6 +264,8 @@ async function launchChrome(
       "--disable-extensions",
       "--disable-background-networking",
       "--disable-sync",
+      `--proxy-server=http://127.0.0.1:${guard.port}`,
+      `--proxy-bypass-list=<-loopback>;${app.host}`,
       "about:blank",
     ],
     { stdout: "ignore", stderr: "pipe" },
@@ -254,6 +273,7 @@ async function launchChrome(
   const cleanup = async () => {
     proc.kill();
     await proc.exited;
+    guard.server.close();
     rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   };
   const reader = proc.stderr.getReader();
@@ -277,7 +297,7 @@ async function launchChrome(
 registerBrowser("chromium", async (options) => {
   const executablePath = CHROME_PATHS.find((p) => existsSync(p));
   if (!executablePath) throw new Error("no Chrome or Chromium found; set PARITY_CHROME_PATH");
-  const { wsUrl, cleanup } = await launchChrome(executablePath);
+  const { wsUrl, cleanup } = await launchChrome(executablePath, options.url);
   return attach("chromium", wsUrl, options, cleanup);
 });
 
