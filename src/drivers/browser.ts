@@ -41,7 +41,7 @@ function collectFields(): RawField[] {
     if (fromLabel) return fromLabel;
     return el.getAttribute("placeholder") ?? el.getAttribute("name") ?? "";
   };
-  const valueOf = (el: Element): string => {
+  const fieldValue = (el: Element): string => {
     if (el instanceof HTMLInputElement) return el.type === "checkbox" ? String(el.checked) : el.value;
     if (el instanceof HTMLSelectElement) return el.selectedOptions[0]?.textContent ?? el.value;
     if (el instanceof HTMLTextAreaElement || el instanceof HTMLOutputElement) return el.value;
@@ -56,7 +56,7 @@ function collectFields(): RawField[] {
     if (!label) continue;
     out.push({
       label,
-      value: valueOf(el).replace(/\s+/g, " ").trim(),
+      value: fieldValue(el).replace(/\s+/g, " ").trim(),
       box: { x: r.x / vw, y: r.y / vh, w: r.width / vw, h: r.height / vh },
       group: el.closest("[data-group]")?.getAttribute("data-group") ?? undefined,
     });
