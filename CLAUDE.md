@@ -9,7 +9,7 @@ Rebuilds old business software as a web app and proves the new app behaves the s
 - AI never decides equality: matching and diffing are deterministic code. AI captures, proposes and explains.
 - Local by default: the server binds 127.0.0.1; every model call goes through the `Ledger` (send log with cost and bytes).
 - Drivers and model clients are chosen by config, never imported directly (`docs/decisions.md` D1).
-- Never commit `.env`, keys, recordings or anything under `runs/` or `generated/`.
+- Never commit `.env`, keys, recordings or anything under `runs/` or `generated/`. One exception, decided 2026-10-26: the README media in `docs/media/` (a short GIF and a report image).
 - Code, comments, identifiers and docs in English. Branch + PR for every change.
 - Keep RAM low: one server process, one sandbox at a time, containers capped at 1 GB.
 

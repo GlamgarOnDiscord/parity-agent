@@ -3,7 +3,7 @@ import { detectVolatile } from "../diff/volatile";
 import type { AppDriver } from "../drivers/types";
 import { matchScreens } from "../fields/match";
 import type { Checkpoint, Proof } from "../proof/schema";
-import { replay } from "./replay";
+import { type OnCheck, replay } from "./replay";
 
 export interface CheckpointResult {
   scenario: string;
@@ -23,11 +23,15 @@ export interface ProveResult {
  * Replay every scenario of the proof on the candidate app, twice: the two runs reveal which fields change on
  * their own (noise), then the first run is compared field by field with the reference checkpoints.
  */
-export async function prove(proof: Proof, candidate: AppDriver): Promise<ProveResult> {
+export async function prove(
+  proof: Proof,
+  candidate: AppDriver,
+  options: { onCheck?: OnCheck } = {},
+): Promise<ProveResult> {
   const first: Checkpoint[] = [];
   const second: Checkpoint[] = [];
   for (const scenario of proof.scenarios) {
-    first.push(...(await replay(candidate, scenario)));
+    first.push(...(await replay(candidate, scenario, options.onCheck)));
     second.push(...(await replay(candidate, scenario)));
   }
   const volatile = [

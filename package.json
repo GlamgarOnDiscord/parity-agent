@@ -1,6 +1,7 @@
 {
   "name": "parity-agent",
   "private": true,
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "dev": "bun --watch src/server/index.ts",
@@ -17,6 +18,7 @@
     "export:playwright": "bun scripts/export-playwright.ts",
     "record:reference": "bun scripts/record-reference.ts",
     "explore": "bun scripts/explore.ts",
+    "report": "bun scripts/report.ts",
     "sample:recording": "bun scripts/make-sample-recording.ts"
   },
   "dependencies": {
