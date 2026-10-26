@@ -54,7 +54,10 @@ export type ComputerAction =
 export interface ComputerStep {
   responseId: string;
   callId?: string;
-  action?: ComputerAction;
+  /** Actions to execute in order, then answer with one screenshot. */
+  actions: ComputerAction[];
+  /** Opaque receipt Meta attaches to each computer call; kept with the step for audit. */
+  safetyReceipt?: string;
   /** Safety checks the caller must acknowledge or refuse before continuing. */
   safetyChecks: { id: string; code: string; message: string }[];
   /** Final text when the model stops asking for actions. */
