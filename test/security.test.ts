@@ -106,3 +106,36 @@ describe("proof steps", () => {
     expect(ok("javascript:alert(1)")).toBe(false);
   });
 });
+
+describe("browser session", () => {
+  const db = openDb(":memory:");
+  const key = "launch-key-0123456789";
+  const local = createApp(new Ledger(db), {
+    token,
+    launchKey: key,
+    port: 8787,
+    rules: new RuleStore(db),
+    runsDir: "runs",
+  });
+  const h = { host: "127.0.0.1:8787" };
+
+  test("the review page needs a session and never contains the API token", async () => {
+    expect((await local.request(`${base}/review/x`, { headers: h })).status).toBe(401);
+    expect((await local.request(`${base}/open?k=wrong`, { headers: h })).status).toBe(403);
+    const opened = await local.request(`${base}/open?k=${key}&run=x`, { headers: h });
+    expect(opened.status).toBe(302);
+    const cookie = opened.headers.get("set-cookie") ?? "";
+    expect(cookie).toContain("HttpOnly");
+    expect(cookie).toContain("SameSite=Strict");
+    const session = cookie.split(";")[0] ?? "";
+    const page = await local.request(`${base}/review/x`, { headers: { ...h, cookie: session } });
+    expect(page.status).toBe(200);
+    expect(await page.text()).not.toContain(token);
+    const api = await local.request(`${base}/api/runs`, { headers: { ...h, cookie: session } });
+    expect(api.status).toBe(200);
+  });
+
+  test("the launch key works once", async () => {
+    expect((await local.request(`${base}/open?k=${key}`, { headers: h })).status).toBe(403);
+  });
+});
