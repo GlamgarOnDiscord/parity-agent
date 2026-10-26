@@ -65,3 +65,27 @@ describe("config", () => {
     );
   });
 });
+
+describe("cost controls", () => {
+  test("calls are refused once the budget is spent", () => {
+    const ledger = new Ledger(openDb(":memory:"), 0.01);
+    expect(() => ledger.assertBudget()).not.toThrow();
+    ledger.record({
+      role: "structured",
+      provider: "meta",
+      model: "muse-wonder-1.0",
+      usage: { outputTokens: 1000 },
+      sentBytes: 0,
+      durationMs: 1,
+      ok: true,
+    });
+    expect(() => ledger.assertBudget()).toThrow(/budget reached/);
+  });
+
+  test("a cached answer is returned as stored", () => {
+    const ledger = new Ledger(openDb(":memory:"));
+    expect(ledger.cached("k")).toBeUndefined();
+    ledger.remember("k", { label: "Total" });
+    expect(ledger.cached<{ label: string }>("k")).toEqual({ label: "Total" });
+  });
+});

@@ -24,6 +24,16 @@ interface Endpoint {
 
 const bytesOf = (value: unknown) => new TextEncoder().encode(JSON.stringify(value)).length;
 
+/** Same model, prompt, images and schema: same answer, served from the cache. */
+function cacheKey(provider: string, model: string, req: StructuredRequest<unknown>): string {
+  const hasher = new Bun.CryptoHasher("sha256");
+  hasher.update(
+    JSON.stringify([provider, model, req.system ?? "", req.prompt, req.effort ?? "", req.images ?? []]),
+  );
+  hasher.update(JSON.stringify(z.toJSONSchema(req.schema)));
+  return hasher.digest("hex");
+}
+
 async function timed<T>(fn: () => Promise<T>): Promise<{ value?: T; error?: unknown; ms: number }> {
   const start = performance.now();
   try {
@@ -51,6 +61,22 @@ export function structuredClient(
     provider: endpoint.provider,
     model,
     async generate<T>(req: StructuredRequest<T>) {
+      const key = cacheKey(endpoint.provider, model, req);
+      const hit = ledger.cached<T>(key);
+      if (hit !== undefined) {
+        const call = ledger.record({
+          runId: req.runId,
+          role: `${role} (cached)`,
+          provider: "cache",
+          model,
+          usage: {},
+          sentBytes: 0,
+          durationMs: 0,
+          ok: true,
+        });
+        return { value: hit, call };
+      }
+      ledger.assertBudget();
       const content = [
         { type: "text" as const, text: req.prompt },
         ...(req.images ?? []).map((image) => ({
@@ -65,6 +91,8 @@ export function structuredClient(
           system: req.system,
           messages: [{ role: "user", content }],
           output: Output.object({ schema: req.schema }),
+          maxOutputTokens: req.maxOutputTokens ?? 8000,
+          providerOptions: { [endpoint.provider]: { reasoningEffort: req.effort ?? "low" } },
         }),
       );
       const call = ledger.record({
@@ -79,6 +107,7 @@ export function structuredClient(
         error: r.error ? String(r.error) : undefined,
       });
       if (r.error || !r.value) throw r.error ?? new Error("no response");
+      ledger.remember(key, r.value.output);
       return { value: r.value.output as T, call };
     },
   };
@@ -102,6 +131,7 @@ export function segmentClient(endpoint: Endpoint, model: string, ledger: Ledger)
           ],
         },
       ];
+      ledger.assertBudget();
       const r = await timed(() => client.responses.create({ model, input }));
       const call = ledger.record({
         runId: req.runId,
@@ -135,6 +165,7 @@ export function transcribeClient(endpoint: Endpoint, model: string, ledger: Ledg
         new Blob([JSON.stringify({ model, audioEncoding: "WAV" })], { type: "application/json" }),
       );
       form.set("audio", req.audio, req.filename);
+      ledger.assertBudget();
       const r = await timed(async () => {
         const res = await fetch(`${endpoint.baseURL}/asr/transcribe`, {
           method: "POST",
@@ -206,6 +237,7 @@ export function computerClient(endpoint: Endpoint, model: string, ledger: Ledger
         input,
         ...(req.previous ? { previous_response_id: req.previous.responseId } : {}),
       };
+      ledger.assertBudget();
       // The Meta `computer` tool is not in the OpenAI SDK's tool union, hence the cast.
       const r = await timed(() =>
         client.responses.create(body as unknown as OpenAI.Responses.ResponseCreateParamsNonStreaming),

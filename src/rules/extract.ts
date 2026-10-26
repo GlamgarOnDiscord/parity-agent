@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { Capture } from "../capture/capture";
 import { labelSimilarity } from "../fields/match";
-import { normalizeValue } from "../fields/normalize";
+import { labelTokens, normalizeValue } from "../fields/normalize";
 import type { ModelClients } from "../models/types";
 import { type Expr, evaluate, fieldsOf, parseExpr } from "./expr";
 
@@ -64,7 +64,8 @@ const Revised = z.object({
 });
 
 const LANGUAGE = `Formula language: numbers, field labels in braces exactly as shown (for example {Sub Total}),
-+ - * / and parentheses, round(x, digits) half up, min(a, b), max(a, b), abs(x). Nothing else.`;
++ - * / and parentheses, round(x, digits) half up, min(a, b), max(a, b), abs(x), and sum({Label}) which adds
+every field with that label on the screen (use it for totals over invoice lines). Nothing else.`;
 
 function framesTable(c: Capture): string {
   return c.frames
@@ -96,6 +97,19 @@ function valueOn(frame: Capture["frames"][number], label: string): number | unde
   return undefined;
 }
 
+/**
+ * Every numeric value shown under exactly this label on a frame (the lines of an invoice). Exact on purpose:
+ * a sum over "Total price" must never pick up a "Price" column from another table.
+ */
+function allOn(frame: Capture["frames"][number], label: string): number[] {
+  const wanted = labelTokens(label).join(" ");
+  return frame.screen.fields
+    .filter((f) => labelTokens(f.label).join(" ") === wanted)
+    .map((f) => normalizeValue(f.value))
+    .filter((n) => n.kind === "money" || n.kind === "number" || n.kind === "percent")
+    .map((n) => (n.kind === "money" ? Number(n.value) / 100 : Number(n.value)));
+}
+
 /** Re-compute the target on every frame, in plain code. */
 export function checkRule(c: Capture, target: string, expression: string): RuleCheck {
   let expr: Expr;
@@ -113,7 +127,11 @@ export function checkRule(c: Capture, target: string, expression: string): RuleC
     }
     let computed: number;
     try {
-      computed = evaluate(expr, (l) => valueOn(frame, l));
+      computed = evaluate(
+        expr,
+        (l) => valueOn(frame, l),
+        (l) => allOn(frame, l),
+      );
     } catch {
       check.untestable++;
       return;
@@ -134,7 +152,12 @@ export function checkRule(c: Capture, target: string, expression: string): RuleC
  * Propose rules with Muse Spark, then prove what can be proved: quotes must exist in the transcript, and every
  * formula is re-computed on every frame. A formula the screens contradict goes to Muse Wonder with the evidence.
  */
-export async function extractRules(c: Capture, models: ModelClients, runId?: string): Promise<Rule[]> {
+export async function extractRules(
+  c: Capture,
+  models: ModelClients,
+  runId?: string,
+  options: { wonder?: boolean } = {},
+): Promise<Rule[]> {
   const prompt = `You are reading how a legacy business application behaves, from a screen recording.
 
 Narration (what the user said, with times):
@@ -150,7 +173,13 @@ Rules are general: they must hold for every transaction, not describe this one (
 quantities from the recording, no "the user typed"). Skip steps of the scenario that are not rules.
 Prefer rules the frames or the narration actually show. Quotes must be copied word for word from the narration.`;
 
-  const { value, call } = await models.structured.generate({ schema: Proposed, prompt, runId });
+  const { value, call } = await models.structured.generate({
+    schema: Proposed,
+    prompt,
+    runId,
+    effort: "low",
+    maxOutputTokens: 16000,
+  });
   const transcript = c.transcript.map((l) => ({ ...l, lower: l.text.toLowerCase() }));
   const rules: Rule[] = [];
 
@@ -179,17 +208,31 @@ Prefer rules the frames or the narration actually show. Quotes must be copied wo
       model: call.model,
       confidence: p.confidence,
     };
-    if (p.kind === "computation" && p.target && p.expression) {
+    if (p.kind === "computation" && p.target && p.expression)
       rule.check = checkRule(c, p.target, p.expression);
-      if (rule.check.contradicted > 0 || rule.check.error) {
-        const revised = await models.hard.generate({
-          schema: Revised,
-          runId,
-          prompt: `A proposed rule for a legacy business app does not match what its screens show.
+    rules.push(rule);
+  }
 
-Rule: ${p.statement}
-Target field: ${p.target}
-Formula: ${p.expression}
+  // Escalate contradicted formulas, at most MAX_ESCALATIONS, once every rule is known so a revision that
+  // computes an input from one of its own outputs (circular) can be refused.
+  let escalations = 0;
+  for (const rule of rules) {
+    if (!rule.target || !rule.expression || !rule.check) continue;
+    if (rule.check.contradicted === 0 && !rule.check.error) continue;
+    if (escalations++ >= MAX_ESCALATIONS) break;
+    // Muse Spark settles contradictions by default; Muse Wonder (5x the output price) only when asked.
+    const reviser = options.wonder ? models.hard : models.structured;
+    const revised = await reviser
+      .generate({
+        schema: Revised,
+        runId,
+        effort: "medium",
+        maxOutputTokens: 12000,
+        prompt: `A proposed rule for a legacy business app does not match what its screens show.
+
+Rule: ${rule.statement}
+Target field: ${rule.target}
+Formula: ${rule.expression}
 ${rule.check.error ? `The formula does not parse: ${rule.check.error}` : `Frames where it fails: ${JSON.stringify(rule.check.examples)}`}
 
 Fields seen on each key frame:
@@ -199,21 +242,49 @@ Narration:
 ${transcriptText(c)}
 
 Find the formula that reproduces the screens exactly (think about rounding: per line, per tax, or once at the
-end), or say the evidence is inconsistent. ${LANGUAGE}`,
-        });
-        rule.escalated = true;
-        rule.model = `${call.model} + ${revised.call.model}`;
-        if (revised.value.verdict === "revised" && revised.value.expression) {
-          const recheck = checkRule(c, p.target, revised.value.expression);
-          if (recheck.verified > 0 && recheck.contradicted === 0 && !recheck.error) {
-            rule.expression = revised.value.expression;
-            rule.statement = revised.value.statement ?? rule.statement;
-            rule.check = recheck;
-          }
-        }
-      }
+end), computed from the fields the target depends on, never from fields computed after it. Or say the evidence
+is inconsistent. ${LANGUAGE}`,
+      })
+      .catch(() => null);
+    if (!revised) {
+      rule.escalated = true;
+      continue;
     }
-    rules.push(rule);
+    rule.escalated = true;
+    rule.model = `${rule.model} + ${revised.call.model}`;
+    const expression = revised.value.expression;
+    if (revised.value.verdict !== "revised" || !expression) continue;
+    let parsed: Expr;
+    try {
+      parsed = parseExpr(expression);
+    } catch {
+      continue;
+    }
+    if (fieldsOf(parsed).some((f) => dependsOn(rules, f, rule.target ?? ""))) continue;
+    const recheck = checkRule(c, rule.target, expression);
+    if (recheck.verified > 0 && recheck.contradicted === 0 && !recheck.error) {
+      rule.expression = expression;
+      const statement = revised.value.statement;
+      if (statement && !statement.includes("{")) rule.statement = statement;
+      rule.check = recheck;
+    }
   }
   return rules;
+}
+
+/** Revisions are paid calls: at most this many per extraction. */
+const MAX_ESCALATIONS = 2;
+
+/** True when `field` is computed, directly or not, from `target` by the other rules. */
+function dependsOn(rules: Rule[], field: string, target: string, seen = new Set<string>()): boolean {
+  if (labelSimilarity(field, target) >= 0.85) return true;
+  if (seen.has(field)) return false;
+  seen.add(field);
+  const rule = rules.find((r) => r.target && r.expression && labelSimilarity(r.target, field) >= 0.85);
+  if (!rule?.expression) return false;
+  try {
+    return fieldsOf(parseExpr(rule.expression)).some((f) => dependsOn(rules, f, target, seen));
+  } catch {
+    return false;
+  }
 }

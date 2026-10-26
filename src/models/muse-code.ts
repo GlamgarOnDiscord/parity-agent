@@ -54,6 +54,7 @@ interface UsageModel {
  */
 export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Promise<MuseCodeRun> {
   if (options.model.endsWith("-contributor")) throw new Error("contributor models are not allowed");
+  ledger.assertBudget();
   const muse = museBinary();
   if (muse.toLowerCase().endsWith(".cmd") || muse.toLowerCase().endsWith(".bat")) {
     throw new Error("point PARITY_MUSE_PATH at the Muse Code executable, not a .cmd wrapper");
@@ -76,7 +77,7 @@ export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Pro
       "--workspace",
       options.workspace,
       "--max-model-steps",
-      String(options.maxSteps ?? 40),
+      String(options.maxSteps ?? 20),
       "--json",
       "--prompt-file",
       promptFile,
