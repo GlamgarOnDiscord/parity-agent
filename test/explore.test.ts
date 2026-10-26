@@ -16,16 +16,42 @@ const elsewhere = Bun.serve({
     return new Response("outside");
   },
 });
+// UDP is not proxied: a STUN request from WebRTC would reach this socket directly.
+let udpPackets = 0;
+const udp = await Bun.udpSocket({
+  hostname: "127.0.0.1",
+  socket: {
+    data() {
+      udpPackets++;
+    },
+  },
+});
 const PAGES: Record<string, string> = {
   "/": `<label>Customer <input value="Donald"></label>${link("/prices", 100, "Price list")}${link(`http://127.0.0.1:${elsewhere.port}/`, 200, "Vendor site")}`,
   // Every way a page can reach another origin besides its own requests: a popup, a WebSocket, a worker, an image.
-  "/leaky": `<script>
+  "/leaky": `<button onclick="window.open('/rtc')">Open details</button>
+    <a href="/rtc" target="_blank">Open in a new tab</a><script>
     const away = "127.0.0.1:${elsewhere.port}";
     window.open("http://" + away + "/popup");
     try { new WebSocket("ws://" + away + "/socket"); } catch {}
     const code = "fetch('http://" + away + "/worker').catch(() => {})";
     new Worker(URL.createObjectURL(new Blob([code], { type: "text/javascript" })));
     new Image().src = "http://localhost:${elsewhere.port}/image";
+    try {
+      const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:127.0.0.1:${udp.port}" }] });
+      pc.createDataChannel("x");
+      pc.createOffer().then((o) => pc.setLocalDescription(o));
+    } catch {}
+    // The same from a popup and from a frame on the app's own origin.
+    window.open("/rtc");
+    document.body.insertAdjacentHTML("beforeend", '<iframe src="/rtc"></iframe>');
+  </script>`,
+  "/rtc": `<script>
+    try {
+      const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:127.0.0.1:${udp.port}" }] });
+      pc.createDataChannel("x");
+      pc.createOffer().then((o) => pc.setLocalDescription(o));
+    } catch {}
   </script>`,
   "/prices": `<label>Item <input value="101"></label><label>Unit price <input value="300.00"></label><label>Tax rate <input value="5%"></label>`,
 };
@@ -53,6 +79,7 @@ afterAll(async () => {
   await driver.close();
   server.stop(true);
   elsewhere.stop(true);
+  udp.close();
 });
 
 /** A scripted stand-in for Muse Spark: each call returns the next batch of actions, then stops. */
@@ -88,8 +115,12 @@ describe("egress", () => {
     const before = outside;
     await driver.reset();
     await driver.perform({ do: "open", path: "/leaky" });
+    // A user gesture, like the clicks of an exploring model, is what lets a popup through Chrome's blocker.
+    await driver.perform({ do: "click", target: "Open details" });
+    await driver.perform({ do: "click", target: "Open in a new tab" });
     await new Promise((r) => setTimeout(r, 1500));
     expect(outside - before).toBe(0);
+    expect(udpPackets).toBe(0);
   });
 });
 
