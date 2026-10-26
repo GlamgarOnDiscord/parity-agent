@@ -37,6 +37,14 @@ export function reviewPage(runId: string): string {
   .status { font-size: 12px; color: var(--t2); text-align: center; }
   .accepted { border-color: rgba(34, 197, 94, .5); }
   .rejected { opacity: .55; }
+  h2.section { font-size: 16px; margin: 36px 0 4px; }
+  .scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--t2); font-weight: 500; }
+  tr:last-child td { border-bottom: 0; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .gap { background: rgba(239, 68, 68, .15); color: #fca5a5; }
   @media (max-width: 640px) { .rule { grid-template-columns: 1fr; } .actions { flex-direction: row; } }
 </style>
 </head>
@@ -45,6 +53,12 @@ export function reviewPage(runId: string): string {
   <h1>Rules to review</h1>
   <p class="sub" id="summary">Loading…</p>
   <div id="rules"></div>
+  <h2 class="section">Coverage</h2>
+  <p class="sub" id="coverage-summary">Loading…</p>
+  <div class="scroll"><table id="coverage"></table></div>
+  <h2 class="section">Sent from this machine</h2>
+  <p class="sub" id="calls-summary">Loading…</p>
+  <div class="scroll"><table id="calls"></table></div>
 </main>
 <script>
   const RUN = ${JSON.stringify(runId)};
@@ -102,7 +116,35 @@ export function reviewPage(runId: string): string {
       list.append(el("article", { class: "rule " + r.status }, body, actions));
     }
   }
+  const row = (cells, head = false) => el("tr", {}, ...cells.map((c) =>
+    c instanceof Node ? el(head ? "th" : "td", {}, c) : el(head ? "th" : "td", typeof c === "number" ? { class: "num" } : {}, c)));
+  const STATE = { tested: ["ok", "tested"], ruled: ["esc", "rule only"], seen: ["gap", "never tested"] };
+  async function loadCoverage() {
+    const res = await fetch("/api/runs/" + encodeURIComponent(RUN) + "/coverage", { headers: AUTH });
+    const summary = document.getElementById("coverage-summary");
+    if (!res.ok) { summary.textContent = "No capture or proof for this run yet."; return; }
+    const { rows, counts } = await res.json();
+    summary.textContent = counts.tested + " fields checked by the proof · " + counts.ruled +
+      " explained by a rule only · " + counts.seen + " seen in the recording and never tested";
+    document.getElementById("coverage").replaceChildren(
+      row(["Field", "State", "Frames", "Rules", "Checks"], true),
+      ...rows.map((r) => row([r.label, el("span", { class: "tag " + STATE[r.state][0] }, STATE[r.state][1]),
+        r.frames.join(", ") || "none", r.rules.join(", ") || "none", r.checkpoints])));
+  }
+  async function loadCalls() {
+    const { calls, total } = await (await fetch("/api/runs/" + encodeURIComponent(RUN) + "/calls", { headers: AUTH })).json();
+    document.getElementById("calls-summary").textContent = total.calls + " calls · " +
+      (total.sentBytes / 1e6).toFixed(2) + " MB sent · $" + total.costUsd.toFixed(3) +
+      ". Replay, matching and diff ran on this machine and sent nothing.";
+    document.getElementById("calls").replaceChildren(
+      row(["When", "Role", "Model", "Sent", "Cost", "Result"], true),
+      ...calls.map((c) => row([new Date(c.at).toLocaleString(), c.role, c.model,
+        (c.sentBytes / 1e3).toFixed(1) + " kB", "$" + c.costUsd.toFixed(4),
+        el("span", { class: "tag " + (c.ok ? "ok" : "bad") }, c.ok ? "ok" : "failed")])));
+  }
   load();
+  loadCoverage();
+  loadCalls();
 </script>
 </body>
 </html>`;
