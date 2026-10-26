@@ -48,8 +48,8 @@ Cut list frozen on day 3. Optional: autonomous exploration, FrontAccounting, Pla
 
 ## Bonus prizes in the same work
 
-- Most Viral on X (20k USD): a daily clip from Oct 27 to Nov 4.
-- Open Weights (10k USD): Muse Spark Open on Baseten.
-- Agentic (5k USD): computer-use exploration, if it holds.
+- Most Viral on X: a daily clip from Oct 27 to Nov 4.
+- Open Weights: Muse Spark Open on Baseten.
+- Agentic: computer-use exploration, if it holds.
 
 Evidence behind these choices: `founder/` (board, competitors, buyer panel, offer, CFO, launch plan).

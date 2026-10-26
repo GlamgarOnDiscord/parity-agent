@@ -1,6 +1,6 @@
-# Parity Proof
+# Parity
 
-Records how an app behaves and replays it before and after any change, showing every field that moved, with proof. Built solo for the Meta Global AI Developer Hackathon (indie track, code from 2026-10-26 after the kickoff, submission 2026-11-04 21:00 ET).
+Rebuilds old business software as a web app and proves the new app behaves the same, field by field; the proof can be replayed after any later change. Built solo for a nine-day AI hackathon (code from 2026-10-26 after the kickoff, submission 2026-11-04 21:00 ET).
 
 ## Hard rules
 
