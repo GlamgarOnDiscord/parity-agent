@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T00:00:00Z",
+  "title": "Design System: Parity",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "tonalRamp": ["#0c0c0e", "#0e0e10", "#111113", "#161618", "#19191c", "#202024", "#26262b", "#313137"]
+      },
+      "app": { "role": "neutral", "displayName": "App" },
+      "side": { "role": "neutral", "displayName": "Side" },
+      "card": { "role": "neutral", "displayName": "Card" },
+      "card-raised": { "role": "neutral", "displayName": "Card Raised" },
+      "tick-off": { "role": "neutral", "displayName": "Tick Off" },
+      "line": { "role": "neutral", "displayName": "Line" },
+      "line-strong": { "role": "neutral", "displayName": "Line Strong" },
+      "text-primary": { "role": "neutral", "displayName": "Text Primary" },
+      "text-secondary": { "role": "neutral", "displayName": "Text Secondary" },
+      "text-muted": { "role": "neutral", "displayName": "Text Muted" },
+      "mark-blue": {
+        "role": "primary",
+        "displayName": "Measure Blue",
+        "tonalRamp": ["#0f1a4d", "#1a2b80", "#2a4bff", "#4c6fff", "#7690ff", "#a3b4ff", "#cdd6ff", "#eef1ff"]
+      },
+      "button-blue": { "role": "primary", "displayName": "Deep Button Blue" },
+      "link-blue": { "role": "primary", "displayName": "Link Blue" },
+      "result-green": {
+        "role": "tertiary",
+        "displayName": "Result Green",
+        "tonalRamp": ["#052e16", "#14532d", "#166534", "#15803d", "#22c55e", "#4ade80", "#86efac", "#dcfce7"]
+      },
+      "result-green-text": { "role": "tertiary", "displayName": "Result Green Text" },
+      "result-red": {
+        "role": "tertiary",
+        "displayName": "Result Red",
+        "tonalRamp": ["#450a0a", "#7f1d1d", "#991b1b", "#dc2626", "#ef4444", "#f87171", "#fca5a5", "#fee2e2"]
+      },
+      "result-red-text": { "role": "tertiary", "displayName": "Result Red Text" },
+      "result-amber": {
+        "role": "tertiary",
+        "displayName": "Result Amber",
+        "tonalRamp": ["#451a03", "#78350f", "#92400e", "#d97706", "#f59e0b", "#fbbf24", "#fcd34d", "#fef3c7"]
+      },
+      "result-amber-text": { "role": "tertiary", "displayName": "Result Amber Text" },
+      "capture-white": { "role": "neutral", "displayName": "Capture White" },
+      "paper": { "role": "neutral", "displayName": "Paper (document)" },
+      "paper-ink": { "role": "neutral", "displayName": "Paper Ink (document)" },
+      "paper-soft": { "role": "neutral", "displayName": "Paper Soft (document)" },
+      "paper-line": { "role": "neutral", "displayName": "Paper Line (document)" },
+      "paper-equal": { "role": "tertiary", "displayName": "Paper Equal (document)" },
+      "paper-diff": { "role": "tertiary", "displayName": "Paper Diff (document)" },
+      "paper-noise": { "role": "tertiary", "displayName": "Paper Noise (document)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Selected rule title on review." },
+      "headline": { "displayName": "Headline", "purpose": "Diff page title beside the verdict pill." },
+      "figure": { "displayName": "Figure", "purpose": "Meter totals, mono with a 14px muted unit." },
+      "statement": { "displayName": "Statement", "purpose": "The rule in plain words, max 62ch." },
+      "title": { "displayName": "Title", "purpose": "Panel headers." },
+      "body": { "displayName": "Body", "purpose": "Default text, tabular numerals." },
+      "value": {
+        "displayName": "Value",
+        "purpose": "Ids, frame numbers, table values, before/after values."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Table column heads and the formula label, uppercase in source."
+      }
+    },
+    "shadows": [
+      {
+        "name": "inset-hairline",
+        "value": "inset 0 0 0 1px #313137",
+        "purpose": "Space-free border on hollow tags and gap ticks. Not elevation."
+      },
+      {
+        "name": "field-halo-diff",
+        "value": "0 0 0 4px rgba(239, 68, 68, .22)",
+        "purpose": "Ring around a different field on captured screens."
+      },
+      {
+        "name": "field-halo-same",
+        "value": "0 0 0 4px rgba(76, 111, 255, .22)",
+        "purpose": "Ring around an equal field on captured screens."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid #7690ff; outline-offset: 2px",
+        "purpose": "Keyboard focus everywhere."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state",
+        "value": ".16s ease-out",
+        "purpose": "Background, color and border changes on nav, buttons, list items."
+      },
+      {
+        "name": "slide-return",
+        "value": "transform .2s ease-out",
+        "purpose": "Slide-to-validate knob springing back."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "transition: none; animation: none",
+        "purpose": "Under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      { "name": "shell-stack", "value": "900px" },
+      { "name": "review-activity-drop", "value": "1200px" },
+      { "name": "diff-single-column", "value": "1100px" },
+      { "name": "review-stack", "value": "760px" },
+      { "name": "phone", "value": "640px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Default action button; the only button style rendered on current screens.",
+      "html": "<button class=\"ds-btn\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3v18\"/><rect x=\"3\" y=\"6\" width=\"6\" height=\"12\" rx=\"1.5\"/><rect x=\"15\" y=\"6\" width=\"6\" height=\"12\" rx=\"1.5\"/></svg>Open the diff</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 8px; font: 500 13px/1.5 Geist, system-ui, sans-serif; border: 1px solid #313137; background: #202024; color: #f4f4f5; cursor: pointer; transition: background .16s ease-out, border-color .16s ease-out; } .ds-btn:hover { background: #2a2a2f; } .ds-btn:focus-visible { outline: 2px solid #7690ff; outline-offset: 2px; } .ds-btn:disabled { opacity: .45; cursor: not-allowed; }"
+    },
+    {
+      "name": "Tags",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "Status and coverage tags: ok, bad, warn, blue (rule only), hollow (never tested), neutral.",
+      "html": "<div class=\"ds-tags\"><span class=\"ds-tag ds-ok\">tested</span><span class=\"ds-tag ds-blue\">rule only</span><span class=\"ds-tag ds-hollow\">never tested</span><span class=\"ds-tag ds-bad\">different</span><span class=\"ds-tag ds-warn\">noise</span><span class=\"ds-tag\">R-04</span></div>",
+      "css": ".ds-tags { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px; background: #111113; } .ds-tag { display: inline-flex; align-items: center; gap: 5px; font: 500 11px 'Geist Mono', ui-monospace, monospace; padding: 2px 7px; border-radius: 5px; background: #202024; color: #a1a1aa; white-space: nowrap; } .ds-ok { background: rgba(34,197,94,.12); color: #86efac; } .ds-bad { background: rgba(239,68,68,.14); color: #fca5a5; } .ds-warn { background: rgba(245,158,11,.14); color: #fcd34d; } .ds-blue { background: rgba(76,111,255,.16); color: #7690ff; } .ds-hollow { background: transparent; box-shadow: inset 0 0 0 1px #313137; color: #a1a1aa; }"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Side rail with icon links, current item, and a mono count pill.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"><path d=\"M8 6h11M8 12h11M8 18h11\"/><path d=\"M4 6h.01M4 12h.01M4 18h.01\"/></svg>Rules</a><a href=\"#\" aria-current=\"page\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><path d=\"M12 3v18\"/><rect x=\"3\" y=\"6\" width=\"6\" height=\"12\" rx=\"1.5\"/><rect x=\"15\" y=\"6\" width=\"6\" height=\"12\" rx=\"1.5\"/></svg>Diff<span class=\"ds-count\">1</span></a></nav>",
+      "css": ".ds-nav { width: 232px; background: #161618; padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; font: 13px/1.5 Geist, system-ui, sans-serif; } .ds-nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: #a1a1aa; text-decoration: none; transition: background .16s ease-out, color .16s ease-out; } .ds-nav a:hover { background: #19191c; color: #f4f4f5; } .ds-nav a[aria-current='page'] { background: #202024; color: #f4f4f5; } .ds-nav a:focus-visible { outline: 2px solid #7690ff; outline-offset: 2px; } .ds-count { margin-left: auto; font: 11px 'Geist Mono', monospace; color: #8b8b94; background: #202024; border-radius: 5px; padding: 1px 6px; }"
+    },
+    {
+      "name": "Meter Card with Tick Meter",
+      "kind": "card",
+      "refersTo": "tick-meter",
+      "description": "Card with a mono total and a 32-segment tick meter; the unit of quantity.",
+      "html": "<section class=\"ds-card ds-meter\"><header>Fields equal</header><div class=\"ds-big\">7 / 8<small>equal</small></div><div class=\"ds-ticks\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"bad\"></i><i class=\"bad\"></i><i class=\"bad\"></i><i class=\"bad\"></i></div><p><b>1</b> different · <b>0</b> noise · <b>0</b> missing</p></section>",
+      "css": ".ds-card { background: #19191c; border: 1px solid #26262b; border-radius: 14px; color: #f4f4f5; font: 13px/1.5 Geist, system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-meter { padding: 16px 18px; display: grid; gap: 10px; width: 340px; } .ds-meter header { color: #a1a1aa; } .ds-big { font: 500 28px/1 'Geist Mono', monospace; letter-spacing: -0.02em; } .ds-big small { font-size: 14px; color: #8b8b94; margin-left: 6px; } .ds-meter p { margin: 0; color: #8b8b94; font-size: 12px; } .ds-meter p b { color: #a1a1aa; font-weight: 500; } .ds-ticks { display: grid; grid-template-columns: repeat(32, 1fr); gap: 2px; height: 10px; } .ds-ticks i { border-radius: 1px; background: #2a2a30; } .ds-ticks i.on { background: #4c6fff; } .ds-ticks i.part { background: rgba(76,111,255,.45); } .ds-ticks i.gap { background: transparent; box-shadow: inset 0 0 0 1px #313137; } .ds-ticks i.bad { background: #ef4444; } .ds-ticks i.warn { background: #f59e0b; }"
+    },
+    {
+      "name": "Formula Well",
+      "kind": "input",
+      "refersTo": "chip",
+      "description": "Rule formula as field chips in a ground-coloured well; target chip in blue.",
+      "html": "<div class=\"ds-formula\"><span class=\"ds-chip ds-target\">QST</span><span class=\"ds-eq\">=</span><span>round((</span><span class=\"ds-chip\">Sub-total</span><span>+</span><span class=\"ds-chip\">GST</span><span>) * 0.09975, 2)</span></div>",
+      "css": ".ds-formula { background: #0e0e10; border: 1px solid #26262b; border-radius: 10px; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font: 13px 'Geist Mono', monospace; color: #a1a1aa; } .ds-eq { color: #8b8b94; margin: 0 4px; } .ds-chip { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 6px; background: #202024; border: 1px solid #313137; color: #f4f4f5; font: 12px Geist, system-ui, sans-serif; } .ds-target { border-color: rgba(76,111,255,.5); color: #7690ff; }"
+    },
+    {
+      "name": "Split Compare",
+      "kind": "custom",
+      "refersTo": "compare-knob",
+      "description": "Two captured screens split by a draggable knob; changed field outlined red.",
+      "html": "<div class=\"ds-compare\" style=\"--x:50%\"><div class=\"ds-side ds-r\"><span class=\"ds-val\">69.21 $</span></div><div class=\"ds-side ds-l\"><span class=\"ds-val ds-hl\">69.22 $</span></div><input type=\"range\" min=\"0\" max=\"100\" value=\"50\" aria-label=\"Move the split\" oninput=\"this.parentNode.style.setProperty('--x', this.value + '%')\"><span class=\"ds-bar\"></span><span class=\"ds-knob\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><path d=\"M12 3v18\"/><rect x=\"3\" y=\"6\" width=\"6\" height=\"12\" rx=\"1.5\"/><rect x=\"15\" y=\"6\" width=\"6\" height=\"12\" rx=\"1.5\"/></svg></span><span class=\"ds-who ds-wl\">Rebuilt</span><span class=\"ds-who ds-wr\">Legacy</span></div>",
+      "css": ".ds-compare { position: relative; width: 520px; aspect-ratio: 4 / 1; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid #313137; user-select: none; font: 13px Geist, system-ui, sans-serif; } .ds-side { position: absolute; inset: 0; background: #fff; display: flex; align-items: center; } .ds-r { justify-content: flex-end; padding-right: 60px; } .ds-l { padding-left: 60px; clip-path: inset(0 calc(100% - var(--x, 50%)) 0 0); } .ds-val { color: #111; padding: 2px 6px; } .ds-hl { border: 2px solid #ef4444; border-radius: 4px; box-shadow: 0 0 0 4px rgba(239,68,68,.22); } .ds-bar { position: absolute; top: 0; bottom: 0; left: var(--x, 50%); width: 2px; margin-left: -1px; background: #0e0e10; pointer-events: none; } .ds-knob { position: absolute; top: 50%; left: var(--x, 50%); width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; background: #0e0e10; color: #fff; display: grid; place-items: center; pointer-events: none; } .ds-compare input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; } .ds-compare:has(input:focus-visible) .ds-knob { box-shadow: 0 0 0 3px #7690ff; } .ds-who { position: absolute; top: 12px; font: 600 12px Geist, system-ui, sans-serif; padding: 4px 10px; border-radius: 999px; background: #0e0e10; color: #fff; pointer-events: none; } .ds-wl { left: 12px; } .ds-wr { right: 12px; }"
+    },
+    {
+      "name": "Slide to Validate",
+      "kind": "custom",
+      "refersTo": "slide-to-validate",
+      "description": "Pill track with a knob; release past 85% validates, Enter or Space also validates. Paired with Reject.",
+      "html": "<div class=\"ds-decide\"><button class=\"ds-reject\">Reject</button><div class=\"ds-slide\"><span class=\"ds-fill\"></span><span>Slide to validate</span><button class=\"ds-sknob\" aria-label=\"Validate this rule\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></button></div></div>",
+      "css": ".ds-decide { display: flex; gap: 10px; align-items: center; padding: 14px 18px; background: #161618; width: 360px; font: 13px/1.5 Geist, system-ui, sans-serif; } .ds-reject { height: 34px; padding: 0 14px; border-radius: 8px; font: inherit; font-weight: 500; border: 1px solid #313137; background: #202024; color: #f4f4f5; cursor: pointer; } .ds-reject:hover { background: #2a2a2f; } .ds-slide { position: relative; flex: 1; height: 42px; border-radius: 999px; background: #202024; border: 1px solid #313137; display: grid; place-items: center; color: #a1a1aa; overflow: hidden; } .ds-fill { position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(34,197,94,.18); transition: width .2s ease-out; } .ds-sknob { position: absolute; left: 4px; top: 4px; width: 32px; height: 32px; border-radius: 50%; background: #f4f4f5; color: #0e0e10; border: 0; display: grid; place-items: center; cursor: grab; transition: transform .2s ease-out; } .ds-slide:hover .ds-sknob { transform: translateX(12px); } .ds-slide:hover .ds-fill { width: 48px; } .ds-sknob:focus-visible { outline: 2px solid #7690ff; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Instrument Panel",
+    "overview": "A near-black, flat operator console. Every screen shows the whole extent first (every rule with its check counts, every field with its state), and lets the one item that matters stand out by status colour alone. Density is high and quiet: 13 px Geist body, 1 px lines, mono for every value and id, tabular numerals everywhere.\n\nDepth comes from tonal steps of near-black, never from shadow. Blue marks what is measured or live; green, red and amber only report results. The recorded screens of the legacy and rebuilt apps are the only white on the page, so evidence reads as evidence.\n\nA second, separate surface exists: the printable proof report, a light paper document that shares the type and the blue pixel but none of the console's tonal stack (see Colors, Document variant).",
+    "keyCharacteristics": [
+      "Tonal near-black stack, 1 px lines, no shadows on surfaces.",
+      "Geist for reading, Geist Mono for values, ids, counts and column labels.",
+      "32-segment tick meters as the unit of quantity.",
+      "Status colour reserved for results; blue for measured work.",
+      "White only inside captured screen evidence."
+    ],
+    "rules": [
+      {
+        "name": "The Results Only Rule",
+        "body": "Green, red and amber report a result or a review state. They never decorate, never label a section, never fill a button.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gap Is Not A Failure Rule",
+        "body": "Never-tested coverage is shown hollow (outlined tag, outlined tick), never red. Red belongs to differences only.",
+        "section": "colors"
+      },
+      {
+        "name": "The Evidence Is White Rule",
+        "body": "White grounds appear only behind captured screens.",
+        "section": "colors"
+      },
+      {
+        "name": "The Mono Means Data Rule",
+        "body": "If it is a value, an id, a count or a model name, it is Geist Mono. Prose is never mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tonal Step Rule",
+        "body": "To lift something, move it one tone up the stack and give it a line. Do not add a drop shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do show the whole extent before the exception: every rule, every field, every checkpoint as a 32-segment tick meter.",
+      "Do set values, ids and counts in Geist Mono with tabular numerals.",
+      "Do lift with a tonal step and a 1px line (card #19191c on 1px #26262b).",
+      "Do use the hollow tag and hollow tick for never-tested coverage, and the blue tag for rule-only coverage.",
+      "Do keep radii on the ladder: 14px cards, 10px inset boxes, 8px controls, 5px tags."
+    ],
+    "donts": [
+      "Don't use green, red or amber for anything but a result or review state.",
+      "Don't colour a coverage gap red.",
+      "Don't add drop shadows or gradients to surfaces.",
+      "Don't use white grounds outside captured screen evidence.",
+      "Don't build rows of same-size KPI cards with charts that have nothing behind them; meters carry the real counts and their breakdown."
+    ]
+  }
+}

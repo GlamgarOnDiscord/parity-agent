@@ -69,7 +69,7 @@ Exit: a stranger can follow the README on a clean clone and get a diff.
 
 ## S8 Polish and video (Nov 3)
 
-- Craft on the two screens that matter: rule review and diff
+- Craft on the two screens that matter: rule review and diff (done: `/review/<run>` and `/diff/<run>`, reviewed until ship)
 - Record the 3-minute video from the script in [pitch.md](pitch.md); every second real
 
 Exit: final video exported, under 3:00.
