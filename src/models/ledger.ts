@@ -29,6 +29,25 @@ export interface LoggedCall extends CallRecord {
   costUsd: number;
 }
 
+/** One row of the send log, as the UI shows it. */
+export interface SentCall {
+  id: number;
+  runId: string | null;
+  at: string;
+  role: string;
+  provider: string;
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+  units: number;
+  unitKind: string | null;
+  sentBytes: number;
+  costUsd: number;
+  durationMs: number;
+  ok: number;
+  error: string | null;
+}
+
 /** The send log: every call that leaves the machine, with what it cost. */
 export class Ledger {
   constructor(
@@ -91,13 +110,13 @@ export class Ledger {
     return { ...call, id: row?.id ?? 0, at, costUsd: usd };
   }
 
-  list(runId?: string, limit = 200) {
+  list(runId?: string, limit = 200): SentCall[] {
     const sql = `SELECT id, run_id AS runId, at, role, provider, model, input_tokens AS inputTokens,
       output_tokens AS outputTokens, units, unit_kind AS unitKind, sent_bytes AS sentBytes, cost_usd AS costUsd,
       duration_ms AS durationMs, ok, error FROM model_calls ${runId ? "WHERE run_id = ?" : ""}
       ORDER BY id DESC LIMIT ?`;
     const args = runId ? [runId, limit] : [limit];
-    return this.db.query(sql).all(...args);
+    return this.db.query<SentCall, (string | number)[]>(sql).all(...args);
   }
 
   total(runId?: string): { calls: number; costUsd: number; sentBytes: number } {

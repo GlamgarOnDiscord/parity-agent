@@ -49,17 +49,18 @@ NO PARITY: differences above.
 
 Every line looks right; the total is one cent off. `bun run prove --fixed` replays the corrected rebuild: 10 equal, parity.
 
-| part                                                                 | status                         |
-| -------------------------------------------------------------------- | ------------------------------ |
-| Field matching across two UIs with different labels and layouts      | done                           |
-| Deterministic replay, field diff, noise detection                    | done (web apps)                |
-| Send log with cost per model call; local API with a per-launch token | done                           |
-| Clients for every Meta model by role                                 | done, first real calls pending |
-| Capture from a recording (transcription, SAM, field reading)         | next                           |
-| Rules in plain language with evidence, review screen                 | next                           |
-| Rebuild and repair with Muse Code                                    | planned                        |
-| Desktop driver for old Windows apps (Wine sandbox)                   | planned                        |
-| Coverage map, one-page proof report, Playwright export               | planned                        |
+| part                                                                     | status                                     |
+| ------------------------------------------------------------------------ | ------------------------------------------ |
+| Field matching across two UIs with different labels and layouts          | done                                       |
+| Deterministic replay, field diff, noise detection                        | done (web apps)                            |
+| Send log with cost per model call, shown per run in the review screen    | done                                       |
+| Clients for every Meta model by role                                     | done, verified with real calls             |
+| Capture from a recording (transcription, SAM, field reading)             | done                                       |
+| Rules in plain language with evidence, review screen                     | done                                       |
+| Rebuild and repair with Muse Code                                        | done: VS3 (2006) rebuilt at parity, $0.46  |
+| Coverage map: checked, explained by a rule only, never tested            | done                                       |
+| Playwright export of a proof (`bun run export:playwright`)               | done                                       |
+| Exploration of a second app, one-page proof report                       | next                                       |
 
 Plan and exit checks: [docs/sprints.md](docs/sprints.md).
 
