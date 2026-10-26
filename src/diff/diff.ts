@@ -21,11 +21,20 @@ export interface ScreenDiff {
   counts: { equal: number; different: number; masked: number; missing: number; extra: number };
 }
 
-const isVolatile = (field: Field, volatile: Set<string>) => volatile.has(labelTokens(field.label).join(" "));
+// `Total` masks every Total; `Total @ row-3` only the one in that group; `Total @ none` only the ungrouped one.
+const volatileId = (label: string, group?: string) =>
+  `${labelTokens(label).join(" ")}${group === undefined ? "" : ` @ ${group}`}`;
+const isVolatile = (field: Field, volatile: Set<string>) =>
+  volatile.has(volatileId(field.label)) || volatile.has(volatileId(field.label, field.group ?? "none"));
 
 /** Compare matched fields by value, in plain code. Volatile fields are shown as masked, not hidden. */
 export function diffScreens(match: ScreenMatch, volatileLabels: string[] = []): ScreenDiff {
-  const volatile = new Set(volatileLabels.map((l) => labelTokens(l).join(" ")));
+  const volatile = new Set(
+    volatileLabels.map((v) => {
+      const at = v.lastIndexOf(" @ ");
+      return at < 0 ? volatileId(v) : volatileId(v.slice(0, at), v.slice(at + 3));
+    }),
+  );
   const fields = match.matches.map((m): FieldDiff => {
     const kind = m.legacy.kind ?? m.rebuilt.kind;
     let a = normalizeValue(m.legacy.value, kind);

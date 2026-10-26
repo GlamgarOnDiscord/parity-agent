@@ -7,3 +7,4 @@ recordings/
 *.log
 .DS_Store
 !.env.example
+legacy-apps/

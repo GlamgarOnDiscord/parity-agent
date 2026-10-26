@@ -60,7 +60,8 @@ Every line looks right; the total is one cent off. `bun run prove --fixed` repla
 | Rebuild and repair with Muse Code                                        | done: VS3 (2006) rebuilt at parity, $0.46  |
 | Coverage map: checked, explained by a rule only, never tested            | done                                       |
 | Playwright export of a proof (`bun run export:playwright`)               | done                                       |
-| Exploration of a second app, one-page proof report                       | next                                       |
+| Second app nobody here wrote: FrontAccounting 2.4.20, noise measured     | done ([benchmarks](docs/benchmarks.md))    |
+| Autonomous exploration, one-page proof report                            | next                                       |
 
 Plan and exit checks: [docs/sprints.md](docs/sprints.md).
 
@@ -73,6 +74,15 @@ bun test                # includes two end-to-end runs in headless Chrome
 bun run prove           # the one-cent example above
 bun run dev             # local API on http://127.0.0.1:8787 (token printed at launch)
 bun run models:check    # one real call per Meta model, a few cents
+```
+
+Second app, FrontAccounting in Docker (no model call):
+
+```sh
+sh sandboxes/frontaccounting/fetch.sh
+docker compose -f sandboxes/frontaccounting/compose.yaml up -d --build
+bun run record:reference fixtures/scenarios/frontaccounting-invoice.json --url http://127.0.0.1:8080/ --runs 5
+bun run prove --proof fixtures/scenarios/frontaccounting-invoice.proof.json --url http://127.0.0.1:8080/
 ```
 
 Needs Bun and a local Chrome or Chromium (`PARITY_CHROME_PATH` to point at one). The browser runs headless with a throwaway profile.
