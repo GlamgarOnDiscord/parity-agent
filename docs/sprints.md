@@ -61,8 +61,8 @@ Exit: one FrontAccounting scenario replays with a clean diff; noise figures reco
 
 ## S7 Proof report and README (Nov 2)
 
-- One-page proof report (light document style): verdict, each difference with evidence, sign-off
-- README with real numbers only, demo GIF, licence chosen
+- One-page proof report (light document style): verdict, each difference with evidence, sign-off (done: `bun run report`)
+- README with real numbers only, demo GIF, licence chosen (done: Apache-2.0; a clean clone gets the one-cent diff without a key)
 - Code pushed to the public repo through PRs
 
 Exit: a stranger can follow the README on a clean clone and get a diff.
