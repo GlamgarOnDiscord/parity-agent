@@ -89,3 +89,18 @@ describe("redact", () => {
     expect(redact("x".repeat(5000)).length).toBe(500);
   });
 });
+
+describe("proof steps", () => {
+  test("an open step can only target a path on the app under test", async () => {
+    const { StepSchema } = await import("../src/proof/schema");
+    const ok = (path: string) => StepSchema.safeParse({ do: "open", path }).success;
+    expect(ok("/")).toBe(true);
+    expect(ok("/invoices/101?x=1")).toBe(true);
+    expect(ok("file:///C:/Windows/win.ini")).toBe(false);
+    expect(ok("http://169.254.169.254/latest/meta-data")).toBe(false);
+    expect(ok("//evil.example/")).toBe(false);
+    expect(ok("/\\evil.example")).toBe(false);
+    expect(ok("/evil.example")).toBe(true);
+    expect(ok("javascript:alert(1)")).toBe(false);
+  });
+});

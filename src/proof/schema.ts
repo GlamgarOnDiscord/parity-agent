@@ -20,7 +20,14 @@ export const ScreenSchema = z.object({
 
 /** One step a user takes. Targets are field labels, so the same scenario runs on both apps. */
 export const StepSchema = z.discriminatedUnion("do", [
-  z.object({ do: z.literal("open"), path: Text.default("/") }),
+  z.object({
+    do: z.literal("open"),
+    // A path on the app under test only: never an absolute URL, a protocol-relative URL or a backslash.
+    path: Text.regex(
+      /^\/(?![/\\])[^\\]*$/,
+      "path must be relative to the app, starting with a single /",
+    ).default("/"),
+  }),
   z.object({ do: z.literal("fill"), field: Text, value: Text }),
   z.object({ do: z.literal("click"), target: Text }),
   z.object({ do: z.literal("check"), screen: Text, note: Text.optional() }),

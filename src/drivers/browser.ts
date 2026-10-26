@@ -119,11 +119,13 @@ class BrowserDriver implements AppDriver {
 
   async perform(step: Exclude<Step, { do: "check" }>) {
     switch (step.do) {
-      case "open":
-        await this.page.goto(new URL(step.path, this.options.url).toString(), {
-          waitUntil: "domcontentloaded",
-        });
+      case "open": {
+        const base = new URL(this.options.url);
+        const target = new URL(step.path, base);
+        if (target.origin !== base.origin) throw new Error(`refusing to leave ${base.origin}: ${step.path}`);
+        await this.page.goto(target.toString(), { waitUntil: "domcontentloaded" });
         return;
+      }
       case "fill": {
         const control = await this.find(controlByLabel, step.field, "field");
         await control.evaluate((el) => {
