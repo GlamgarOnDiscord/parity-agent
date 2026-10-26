@@ -6,6 +6,8 @@ import type { Step } from "../proof/schema";
 export interface AppDriver {
   readonly kind: "browser" | "desktop";
   readonly name: string;
+  /** True when Parity launched the browser itself with its egress guard (proxy dead end, WebRTC policy). */
+  readonly confined: boolean;
   /** Bring the app to a known clean state (fresh sandbox, seeded data). */
   reset(): Promise<void>;
   /** A scenario step, addressed by labels so the same scenario runs on the legacy and the rebuilt app. */
