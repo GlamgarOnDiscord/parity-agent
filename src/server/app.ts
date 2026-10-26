@@ -8,7 +8,9 @@ import { coverageOf } from "../coverage/coverage";
 import { matchScreens } from "../fields/match";
 import type { Ledger } from "../models/ledger";
 import { ProofSchema, ScreenSchema } from "../proof/schema";
+import { workedExample } from "../rules/extract";
 import type { RuleStore } from "../rules/store";
+import { type DiffInput, diffPage, type SavedResult } from "./diff";
 import { reviewPage } from "./review";
 
 const MatchBody = z.object({
@@ -29,6 +31,9 @@ export interface AppOptions {
 }
 
 const RUN = /^[\w.-]{1,64}$/;
+const EVIDENCE = /^[\w.-]{1,96}\.png$/;
+const FONTS = new Set(["Geist-Variable.woff2", "GeistMono-Variable.woff2"]);
+const FONT_DIR = join(import.meta.dir, "assets", "fonts");
 const Decision = z.object({
   status: z.enum(["accepted", "rejected"]),
   note: z.string().max(1000).optional(),
@@ -73,6 +78,15 @@ export function createApp(ledger: Ledger, options: AppOptions) {
 
   app.get("/health", (c) => c.json({ ok: true }));
 
+  // The two faces of the brand, served from this repository: no font is fetched from anywhere else.
+  app.get("/assets/fonts/:file", (c) => {
+    const file = c.req.param("file");
+    if (!FONTS.has(file)) return c.text("not found", 404);
+    return new Response(Bun.file(join(FONT_DIR, file)), {
+      headers: { "content-type": "font/woff2", "cache-control": "max-age=86400" },
+    });
+  });
+
   app.get("/review/:run", (c) => {
     const run = c.req.param("run");
     if (!RUN.test(run)) return c.text("bad run", 400);
@@ -81,7 +95,76 @@ export function createApp(ledger: Ledger, options: AppOptions) {
     return c.html(reviewPage(run));
   });
 
+  app.get("/diff/:run", async (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.text("bad run", 400);
+    if (getCookie(c, SESSION_COOKIE) !== session)
+      return c.text("Open the link printed by the server first.", 401);
+    const dir = resolve(options.runsDir, run);
+    const json = async <T>(name: string): Promise<T | undefined> => {
+      const f = Bun.file(join(dir, name));
+      return (await f.exists()) ? ((await f.json().catch(() => undefined)) as T | undefined) : undefined;
+    };
+    const proof = ProofSchema.safeParse(await json("proof.json"));
+    if (!proof.success) return c.text("No proof for this run yet.", 404);
+    const capture = await json<Capture>("capture.json");
+    const rules = options.rules.list(run).filter((r) => r.status !== "rejected");
+    const ids = [run, `rebuild-${run}`];
+    const totals = ids.map((id) => ledger.total(id));
+    const input: DiffInput = {
+      run,
+      proof: proof.data,
+      saved: await json<SavedResult>("result.json"),
+      coverage: Array.isArray(capture?.frames) ? coverageOf(capture, proof.data, rules) : undefined,
+      calls: {
+        calls: totals.reduce((n, t) => n + t.calls, 0),
+        costUsd: totals.reduce((n, t) => n + t.costUsd, 0),
+        sentBytes: totals.reduce((n, t) => n + t.sentBytes, 0),
+      },
+      exploration: await json<DiffInput["exploration"]>("exploration.json"),
+      budgetUsd: ledger.budgetUsd,
+    };
+    return c.html(diffPage(input));
+  });
+
   app.get("/api/runs", (c) => c.json(options.rules.runs()));
+  // Evidence for one rule: where its field sits on each recorded frame, and the formula worked out on one frame.
+  app.get("/api/runs/:run/rules/:rule/evidence", async (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
+    const rule = options.rules.list(run).find((r) => r.id === c.req.param("rule"));
+    if (!rule) return c.json({ error: "no such rule" }, 404);
+    const file = Bun.file(join(resolve(options.runsDir), run, "capture.json"));
+    const capture = (await file.exists()) ? ((await file.json().catch(() => null)) as Capture | null) : null;
+    if (!Array.isArray(capture?.frames)) return c.json({ worked: null, frames: [] });
+    const key = (s: string) =>
+      s
+        .replace(/[\s:]+$/, "")
+        .trim()
+        .toLowerCase();
+    const target = rule.target ?? rule.fields[0] ?? "";
+    return c.json({
+      worked:
+        rule.target && rule.expression
+          ? (workedExample(capture, rule.target, rule.expression) ?? null)
+          : null,
+      frames: rule.evidence.frames.map((f) => ({
+        index: f.index,
+        box:
+          capture.frames[f.index - 1]?.screen.fields.find((x) => key(x.label) === key(target))?.box ?? null,
+      })),
+    });
+  });
+
+  app.get("/api/runs/:run/evidence/:file", (c) => {
+    const run = c.req.param("run");
+    const file = c.req.param("file");
+    if (!RUN.test(run) || !EVIDENCE.test(file)) return c.json({ error: "bad evidence" }, 400);
+    const root = resolve(options.runsDir);
+    const path = resolve(join(root, run, "evidence", file));
+    if (!path.startsWith(root) || !existsSync(path)) return c.json({ error: "no such evidence" }, 404);
+    return new Response(Bun.file(path), { headers: { "content-type": "image/png" } });
+  });
   app.get("/api/runs/:run/rules", (c) => {
     const run = c.req.param("run");
     if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);

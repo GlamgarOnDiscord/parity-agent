@@ -67,7 +67,7 @@ Model calls need a Meta Model API key: `cp .env.example .env` and set `MODEL_API
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | -------------- |
 | `bun run models:check`                                 | one real call per Meta model                                                                        | a few cents    |
 | `bun run capture <video>`                              | key frames, transcript, fields per frame, rules with evidence                                       | yes            |
-| `bun run dev`                                          | local review screen: accept or reject each rule, coverage, every call sent (link printed at launch) | none           |
+| `bun run dev`                                          | local screens (link printed at launch): rules to accept or reject with their evidence, and the diff of the last replay, coverage first | none           |
 | `bun run rebuild runs/<run>`                           | Muse Code builds the app from the accepted rules, Parity proves it and asks for repairs             | yes, Muse Code |
 | `bun run prove --proof <proof.json> --url <app>`       | replays a proof on any web app                                                                      | none           |
 | `bun run report runs/<run>`                            | the one-page proof report, with both screens zoomed on each difference                              | none           |
