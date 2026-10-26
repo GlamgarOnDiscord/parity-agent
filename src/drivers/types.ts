@@ -1,5 +1,6 @@
 import type { Screen } from "../fields/types";
 import type { ComputerAction, DataUrl } from "../models/types";
+import type { Step } from "../proof/schema";
 
 /** One way to drive an app under test. Replay and exploration only ever see this interface. */
 export interface AppDriver {
@@ -7,10 +8,13 @@ export interface AppDriver {
   readonly name: string;
   /** Bring the app to a known clean state (fresh sandbox, seeded data). */
   reset(): Promise<void>;
+  /** A scenario step, addressed by labels so the same scenario runs on the legacy and the rebuilt app. */
+  perform(step: Exclude<Step, { do: "check" }>): Promise<void>;
+  /** A raw computer-use action, for exploration. */
   act(action: ComputerAction): Promise<void>;
   screenshot(): Promise<DataUrl>;
   /** The fields visible on the current screen, read without AI when the platform allows it. */
-  readScreen(): Promise<Screen>;
+  readScreen(screenId: string): Promise<Screen>;
   close(): Promise<void>;
 }
 
