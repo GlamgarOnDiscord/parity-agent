@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { createServer, type Server } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -51,6 +51,7 @@ class BrowserDriver implements AppDriver {
     private page: Page,
     private readonly options: BrowserDriverOptions,
     private readonly cleanup: () => Promise<void>,
+    readonly confined: boolean,
   ) {}
 
   async reset() {
@@ -252,6 +253,7 @@ async function attach(
   wsUrl: string,
   options: BrowserDriverOptions,
   cleanup: () => Promise<void>,
+  confined: boolean,
 ) {
   const browser = await puppeteer.connect({
     transport: await webSocketTransport(wsUrl),
@@ -262,7 +264,7 @@ async function attach(
   const page = await context.newPage();
   await page.setViewport(options.viewport ?? { width: 1280, height: 800 });
   await confine(page, options.url);
-  return new BrowserDriver(name, browser, context, page, options, cleanup);
+  return new BrowserDriver(name, browser, context, page, options, cleanup, confined);
 }
 
 /** Start Chrome on a local debugging port with a throwaway profile; return its browser WebSocket URL. */
@@ -284,6 +286,18 @@ async function launchChrome(
   appUrl: string,
 ): Promise<{ wsUrl: string; cleanup: () => Promise<void> }> {
   const profile = mkdtempSync(join(tmpdir(), "parity-chrome-"));
+  // Browser-level WebRTC policy in the throwaway profile: no UDP outside the proxy, which accepts none.
+  mkdirSync(join(profile, "Default"), { recursive: true });
+  writeFileSync(
+    join(profile, "Default", "Preferences"),
+    JSON.stringify({
+      webrtc: {
+        ip_handling_policy: "disable_non_proxied_udp",
+        multiple_routes_enabled: false,
+        nonproxied_udp_enabled: false,
+      },
+    }),
+  );
   const guard = await deadEnd();
   const app = new URL(appUrl);
   // Always with a port: a bare host would let every port of it through.
@@ -336,13 +350,15 @@ registerBrowser("chromium", async (options) => {
   const executablePath = CHROME_PATHS.find((p) => existsSync(p));
   if (!executablePath) throw new Error("no Chrome or Chromium found; set PARITY_CHROME_PATH");
   const { wsUrl, cleanup } = await launchChrome(executablePath, options.url);
-  return attach("chromium", wsUrl, options, cleanup);
+  // Launched here, so the proxy guard and the WebRTC policy are in force.
+  return attach("chromium", wsUrl, options, cleanup, true);
 });
 
 /** Lightpanda or any CDP browser already running: PARITY_CDP_URL is its browser WebSocket URL. */
 const viaCdp = async (name: string, options: BrowserDriverOptions) => {
   if (!options.cdpUrl) throw new Error("PARITY_CDP_URL is required for this driver");
-  return attach(name, options.cdpUrl, options, async () => {});
+  // A browser Parity did not launch: only page-level confinement applies.
+  return attach(name, options.cdpUrl, options, async () => {}, false);
 };
 registerBrowser("lightpanda", (options) => viaCdp("lightpanda", options));
 registerBrowser("cdp", (options) => viaCdp("cdp", options));
