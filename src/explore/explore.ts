@@ -80,6 +80,11 @@ export async function explore(
   computer: ComputerClient,
   options: ExploreOptions,
 ): Promise<Exploration> {
+  if (driver.kind === "browser" && !driver.confined) {
+    throw new Error(
+      "exploration needs a browser Parity launched itself (driver chromium), confined to the app",
+    );
+  }
   const acknowledge = new Set(options.acknowledge ?? []);
   if (acknowledge.size > 0 && !LOOPBACK.has(new URL(options.origin).hostname)) {
     throw new Error(`safety checks are only acknowledged for an app on this machine, not ${options.origin}`);
