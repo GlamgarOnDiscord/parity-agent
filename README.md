@@ -1,39 +1,89 @@
-# Parity Proof
+# Parity
 
-Record your app once; Parity replays it before and after any change and shows every field that moved, with proof. Nothing leaves your machine unless you send it.
+**Parity rebuilds old business software as a modern web app, and proves the new app does exactly what the old one did.**
 
-Built during the Meta Global AI Developer Hackathon (indie track, Oct 26 to Nov 4, 2026). Every line of code here was written after the kickoff.
+Point it at an app nobody fully understands anymore: an old Windows program, a legacy web tool. Parity watches it being used, explores it on its own, writes down its business rules in plain language for an expert to confirm, generates the new app, then replays the same scenarios on both versions until every field matches. Then the proof stays: replay it after any later change, by a person or an AI coding agent, and see every field that moved.
+
+```
+record ─► explore ─► rules ─► rebuild ─► prove ─► keep proving
+```
+
+| step        | what happens                                                                                                            | Meta model                                                                 |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **Record**  | A screen recording of someone using the old app, narrated if they like ("the Quebec tax always goes on top of the GST") | Muse Voice Transcribe                                                      |
+| **See**     | Fields, buttons and screens are found on every key frame                                                                | SAM 3.1, Muse Spark                                                        |
+| **Explore** | The agent drives the old app in a sandbox to reach screens and error paths the recording missed                         | Muse Spark (computer use)                                                  |
+| **Rules**   | Business rules written in plain language, each with its evidence, for an expert to accept or reject                     | Muse Spark, Muse Wonder for hard cases, Muse Spark Open for on-premise use |
+| **Rebuild** | A new web app generated from the accepted rules, repaired difference by difference                                      | Muse Code                                                                  |
+| **Prove**   | Every scenario replayed on both apps; fields matched and compared in plain code                                         | none: the proof is deterministic                                           |
+
+## Principles
+
+- **AI never decides what "the same" means.** Matching and comparison are plain code. AI captures, proposes and explains.
+- **Noise is measured, not guessed.** Each scenario runs twice on the same app; anything that changes on its own (a timestamp, a generated id) is masked and shown as masked.
+- **Nothing leaves your machine unless you send it.** Replays and diffs run offline. Every model call is logged with its cost and the bytes sent.
+- **A clean report is never silent.** Fields with no counterpart and screens never tested are listed, not dropped.
+
+## What works today
+
+The proof engine runs end to end in a real browser. On an invoice from Virtual Salesman 3, an old Windows sales app that adds unrounded taxes and rounds once, against a rebuilt web invoice that rounds each tax first:
+
+```
+$ bun run prove
+
+Reference: Virtual Salesman 3   Candidate: http://127.0.0.1:40941/   (996 ms, 2 runs each)
+Volatile, masked: Printed at, Reference
+
+s2-invoice-gst-qst › invoice (step 6)
+  = Customer: Nantes Builders      Bill to: Nantes Builders
+  = Sub Total: 59.94               Subtotal: $59.94
+  ✗ Total: 69.21                   Total: $69.22
+  = GST (5%): 3.00                 Federal tax (GST 5%): $3.00
+  = QST (9.975%): 6.28             Provincial tax (QST 9.975%): $6.28
+  ✗ Balance: 49.21                 Balance due: $49.22
+  ...
+  8 equal, 2 different, 0 masked, 0 missing
+
+NO PARITY: differences above.
+```
+
+Every line looks right; the total is one cent off. `bun run prove --fixed` replays the corrected rebuild: 10 equal, parity.
+
+| part                                                                 | status                         |
+| -------------------------------------------------------------------- | ------------------------------ |
+| Field matching across two UIs with different labels and layouts      | done                           |
+| Deterministic replay, field diff, noise detection                    | done (web apps)                |
+| Send log with cost per model call; local API with a per-launch token | done                           |
+| Clients for every Meta model by role                                 | done, first real calls pending |
+| Capture from a recording (transcription, SAM, field reading)         | next                           |
+| Rules in plain language with evidence, review screen                 | next                           |
+| Rebuild and repair with Muse Code                                    | planned                        |
+| Desktop driver for old Windows apps (Wine sandbox)                   | planned                        |
+| Coverage map, one-page proof report, Playwright export               | planned                        |
+
+Plan and exit checks: [docs/sprints.md](docs/sprints.md).
 
 ## Run it
 
 ```sh
 bun install
-cp .env.example .env   # add MODEL_API_KEY
-bun test
-bun run dev            # http://127.0.0.1:8787, local only
-bun run models:check   # one real call per Meta model, a few cents
+cp .env.example .env    # add MODEL_API_KEY for the model calls
+bun test                # includes two end-to-end runs in headless Chrome
+bun run prove           # the one-cent example above
+bun run dev             # local API on http://127.0.0.1:8787 (token printed at launch)
+bun run models:check    # one real call per Meta model, a few cents
 ```
 
-Today: field matching between an old Windows screen and its rebuilt web screen (deterministic, no AI), a send log that records every model call with its cost, and clients for every Meta model by role. Replay and diff come next ([sprints](docs/sprints.md)).
+Needs Bun and a local Chrome or Chromium (`PARITY_CHROME_PATH` to point at one). The browser runs headless with a throwaway profile.
 
-## Research and plan
+## Design choices
 
-| path                                                                                                                                         | what it is                                                                                      |
-| -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`docs/pitch.md`](docs/pitch.md)                                                                                                             | The hackathon pitch: the one line, each judging criterion, the 3-minute video, the cut list     |
-| [`founder/summary.md`](founder/summary.md)                                                                                                   | Half a page: what Parity is, the evidence, the biggest risk, the first thing to build           |
-| [`founder/business-plan.md`](founder/business-plan.md)                                                                                       | Everything below compiled into one document                                                     |
-| [`founder/board.md`](founder/board.md)                                                                                                       | Three framework lenses scoring the idea (3 fund if, 5 / 10)                                     |
-| [`founder/competitors.md`](founder/competitors.md)                                                                                           | Competitor map with sources, the gap and the threats                                            |
-| [`founder/panel/results.md`](founder/panel/results.md)                                                                                       | 20 simulated buyers on the current offer (40 % would try it; pitch v1 was 15 %, in `panel-v1/`) |
-| [`founder/offer.md`](founder/offer.md)                                                                                                       | The offer built from the panel's objections, and the re-test                                    |
-| [`founder/cfo.md`](founder/cfo.md)                                                                                                           | Meta credit budget for the hackathon and a hosted-tier scenario                                 |
-| [`founder/marketing.md`](founder/marketing.md), [`brand.md`](founder/brand.md), [`ops.md`](founder/ops.md), [`launch.md`](founder/launch.md) | Positioning, name checks, daily routines, risk register, dated launch plan                      |
+Browser drivers and model clients are chosen by configuration, so they can be benchmarked and swapped ([docs/decisions.md](docs/decisions.md)). Stack: Bun, TypeScript, Hono, SQLite, Zod, Puppeteer over CDP, the Vercel AI SDK and the OpenAI SDK pointed at the Meta Model API.
 
-The buyer panel is simulated and the numbers are projections. They pick what to test; real users decide.
+## Research behind it
 
-Research produced with the [Founder skill](https://github.com/Jakeschincariol/founder-skill) (MIT).
+Before writing code, the idea went through a product review: a board of three framework lenses, a competitor map, a simulated buyer panel (15 % would try the first pitch, 40 % the revised offer), pricing, a credit budget and a launch plan. All of it is in [`founder/`](founder/summary.md), with the pitch in [`docs/pitch.md`](docs/pitch.md). The panel is simulated and the numbers are projections.
 
 ## Licence
 
-To be chosen before the code lands (MIT or Apache-2.0).
+To be chosen (MIT or Apache-2.0).
