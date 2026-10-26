@@ -3,7 +3,7 @@
 //   bun run report runs/vs3 --app <dir> | --url <url>
 //   bun run report --proof fixtures/proofs/vs3-invoice.json --fixture [--fixed]   (the one-cent example)
 import { createHash } from "node:crypto";
-import { existsSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import type { Capture } from "../src/capture/capture";
@@ -119,6 +119,20 @@ const html = renderReport({
   parityVersion: git.success ? git.stdout.toString().trim() : "unknown",
   generatedAt: new Date(),
 });
+// The diff screen (`bun run dev`, then /diff/<run>) reads the last replay and its screenshots from the run folder.
+if (runDir) {
+  mkdirSync(join(runDir, "evidence"), { recursive: true });
+  const evidence: Record<string, string> = {};
+  for (const [key, shot] of Object.entries(rebuiltImages)) {
+    const name = `${key.replace(/[^\w.-]/g, "-")}.png`;
+    await Bun.write(join(runDir, "evidence", name), Buffer.from(shot.split(",")[1] ?? "", "base64"));
+    evidence[key] = name;
+  }
+  await Bun.write(
+    join(runDir, "result.json"),
+    JSON.stringify({ result, candidate, at: new Date().toISOString(), evidence }, null, 2),
+  );
+}
 const out = values.out ?? (runDir ? join(runDir, "report.html") : "runs/report.html");
 await Bun.write(out, html);
 console.log(`${result.equal ? "PARITY" : "NO PARITY"}. Report: ${out}`);
