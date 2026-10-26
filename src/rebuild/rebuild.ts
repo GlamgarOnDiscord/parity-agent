@@ -1,4 +1,5 @@
-import { cpSync, existsSync, mkdirSync } from "node:fs";
+import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import type { Config } from "../config";
 import { requireKey } from "../config";
@@ -26,11 +27,28 @@ export interface RebuildResult {
 
 const TEMPLATE = resolve("templates/generated-app");
 
-/** Start the generated app with its server restored from the template, so generated code never runs on the host. */
+/** Copy regular files only: a symlink written by the model is never followed. */
+function copyRegular(from: string, to: string, depth = 0): void {
+  if (depth > 8) return;
+  mkdirSync(to, { recursive: true });
+  for (const name of readdirSync(from)) {
+    const src = join(from, name);
+    const st = lstatSync(src);
+    if (st.isSymbolicLink()) continue;
+    if (st.isDirectory()) copyRegular(src, join(to, name), depth + 1);
+    else if (st.isFile() && st.size <= 5_000_000) cpSync(src, join(to, name));
+  }
+}
+
+/**
+ * Start the generated app from a fresh staging directory: the trusted server.ts from the template plus the
+ * regular files of public/. Generated code never runs on the host, only in the headless browser.
+ */
 async function startApp(appDir: string): Promise<{ url: string; stop: () => void }> {
-  cpSync(join(TEMPLATE, "server.ts"), join(appDir, "server.ts"));
-  // The running Bun binary: a `bun` shim on PATH would leave the real server behind when stopped.
-  const proc = Bun.spawn([process.execPath, join(appDir, "server.ts")], {
+  const stage = mkdtempSync(join(tmpdir(), "parity-app-"));
+  cpSync(join(TEMPLATE, "server.ts"), join(stage, "server.ts"));
+  copyRegular(join(appDir, "public"), join(stage, "public"));
+  const proc = Bun.spawn([process.execPath, join(stage, "server.ts")], {
     env: { PATH: process.env.PATH ?? "", PORT: "0" },
     stdout: "pipe",
     stderr: "pipe",
@@ -45,10 +63,17 @@ async function startApp(appDir: string): Promise<{ url: string; stop: () => void
     const m = /listening on (http:\/\/127\.0\.0\.1:\d+)/.exec(out);
     if (m?.[1]) {
       reader.releaseLock();
-      return { url: `${m[1]}/`, stop: () => proc.kill() };
+      return {
+        url: `${m[1]}/`,
+        stop: () => {
+          proc.kill();
+          proc.exited.then(() => rmSync(stage, { recursive: true, force: true }));
+        },
+      };
     }
   }
   proc.kill();
+  rmSync(stage, { recursive: true, force: true });
   throw new Error(`the generated app did not start: ${out.slice(-300)}`);
 }
 
