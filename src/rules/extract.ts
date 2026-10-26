@@ -90,7 +90,7 @@ function valueOn(frame: Capture["frames"][number], label: string): number | unde
       .map((f) => ({ f, s: labelSimilarity(f.label, label) }))
       .filter((x) => x.s >= 0.85)
       .sort((a, b) => b.s - a.s)[0]?.f;
-  if (!field || !field.value) return undefined;
+  if (!field?.value) return undefined;
   const n = normalizeValue(field.value);
   if (n.kind === "money") return Number(n.value) / 100;
   if (n.kind === "number" || n.kind === "percent") return Number(n.value);

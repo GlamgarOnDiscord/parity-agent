@@ -90,7 +90,7 @@ function publicDirOf(appDir: string): string {
  * Start the generated app from a fresh staging directory: the trusted server.ts from the template plus the
  * regular files of public/. Generated code never runs on the host, only in the headless browser.
  */
-async function startApp(appDir: string): Promise<{ url: string; stop: () => void }> {
+export async function startApp(appDir: string): Promise<{ url: string; stop: () => void }> {
   const stage = mkdtempSync(join(tmpdir(), "parity-app-"));
   cpSync(join(TEMPLATE, "server.ts"), join(stage, "server.ts"));
   copyRegular(publicDirOf(appDir), join(stage, "public"));

@@ -1,0 +1,173 @@
+{
+  "format": "parity-proof",
+  "version": 1,
+  "createdAt": "2026-10-26T19:37:49.328Z",
+  "reference": {
+    "app": "Virtual Salesman 3",
+    "source": "capture"
+  },
+  "scenarios": [
+    {
+      "id": "vs3-invoice",
+      "name": "Invoice with GST and QST, two lines",
+      "steps": [
+        {
+          "do": "open",
+          "path": "/"
+        },
+        {
+          "do": "fill",
+          "field": "Code",
+          "value": "HW001"
+        },
+        {
+          "do": "fill",
+          "field": "Qty",
+          "value": "3"
+        },
+        {
+          "do": "click",
+          "target": "Add line"
+        },
+        {
+          "do": "check",
+          "screen": "frame-4",
+          "note": "after the hammers"
+        },
+        {
+          "do": "fill",
+          "field": "Code",
+          "value": "HW002"
+        },
+        {
+          "do": "fill",
+          "field": "Qty",
+          "value": "2"
+        },
+        {
+          "do": "click",
+          "target": "Add line"
+        },
+        {
+          "do": "check",
+          "screen": "frame-6",
+          "note": "after the screwdriver sets"
+        }
+      ]
+    }
+  ],
+  "checkpoints": [
+    {
+      "scenario": "vs3-invoice",
+      "step": 4,
+      "screen": {
+        "id": "frame-4",
+        "app": "Virtual Salesman 3",
+        "title": "Sales transaction line items with totals",
+        "fields": [
+          {
+            "id": "sub-total",
+            "label": "Sub-total:",
+            "value": "59.94 $",
+            "box": {
+              "x": 0.046,
+              "y": 0.958,
+              "w": 0.04,
+              "h": 0.02
+            }
+          },
+          {
+            "id": "gst",
+            "label": "GST:",
+            "value": "3.00 $",
+            "box": {
+              "x": 0.294,
+              "y": 0.958,
+              "w": 0.033,
+              "h": 0.02
+            }
+          },
+          {
+            "id": "qst",
+            "label": "QST:",
+            "value": "6.28 $",
+            "box": {
+              "x": 0.541,
+              "y": 0.958,
+              "w": 0.033,
+              "h": 0.02
+            }
+          },
+          {
+            "id": "total",
+            "label": "Total:",
+            "value": "69.21 $",
+            "box": {
+              "x": 0.789,
+              "y": 0.958,
+              "w": 0.04,
+              "h": 0.02
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "vs3-invoice",
+      "step": 8,
+      "screen": {
+        "id": "frame-6",
+        "app": "Virtual Salesman 3",
+        "title": "Invoice line items",
+        "fields": [
+          {
+            "id": "sub-total",
+            "label": "Sub-total:",
+            "value": "99.62 $",
+            "box": {
+              "x": 0.046,
+              "y": 0.957,
+              "w": 0.064,
+              "h": 0.02
+            }
+          },
+          {
+            "id": "gst",
+            "label": "GST:",
+            "value": "4.98 $",
+            "box": {
+              "x": 0.293,
+              "y": 0.957,
+              "w": 0.053,
+              "h": 0.02
+            }
+          },
+          {
+            "id": "qst",
+            "label": "QST:",
+            "value": "10.43 $",
+            "box": {
+              "x": 0.541,
+              "y": 0.957,
+              "w": 0.06,
+              "h": 0.02
+            }
+          },
+          {
+            "id": "total",
+            "label": "Total:",
+            "value": "115.03 $",
+            "box": {
+              "x": 0.789,
+              "y": 0.957,
+              "w": 0.066,
+              "h": 0.02
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "mappings": {},
+  "volatile": []
+}
