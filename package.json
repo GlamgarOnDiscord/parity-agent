@@ -12,6 +12,7 @@
     "models:check": "bun scripts/check-models.ts",
     "prove": "bun scripts/prove.ts",
     "capture": "bun scripts/capture.ts",
+    "rebuild": "bun scripts/rebuild.ts",
     "sample:recording": "bun scripts/make-sample-recording.ts"
   },
   "dependencies": {

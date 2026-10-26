@@ -1,0 +1,17 @@
+body {
+  font:
+    14px / 1.5 system-ui,
+    sans-serif;
+  margin: 32px;
+  color: #111;
+}
+form,
+.values {
+  display: grid;
+  grid-template-columns: 220px 240px;
+  gap: 8px 12px;
+  max-width: 520px;
+}
+output {
+  font-variant-numeric: tabular-nums;
+}
