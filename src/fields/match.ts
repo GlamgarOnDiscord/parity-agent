@@ -26,6 +26,8 @@ export interface MatchOptions {
 }
 
 const WEIGHTS = { label: 0.7, kind: 0.15, position: 0.15 };
+/** Upper bound on scored pairs, so one request cannot pin the CPU. */
+export const MAX_PAIRS = 250_000;
 
 function dice(a: string[], b: string[]): number {
   if (!a.length || !b.length) return 0;
@@ -111,12 +113,25 @@ export function matchScreens(legacy: Screen, rebuilt: Screen, options: MatchOpti
     usedRebuilt.add(r.id);
   }
 
+  const openLegacy = legacy.fields.filter((f) => !usedLegacy.has(f.id));
+  const openRebuilt = rebuilt.fields.filter((f) => !usedRebuilt.has(f.id));
+  if (openLegacy.length * openRebuilt.length > MAX_PAIRS) {
+    throw new Error(`too many field pairs to score (${openLegacy.length} x ${openRebuilt.length})`);
+  }
+
+  // Best and second-best score seen by each field, to flag ambiguity in O(1) per match.
+  const top = new Map<string, [number, number]>();
+  const bump = (key: string, score: number) => {
+    const [first, second] = top.get(key) ?? [0, 0];
+    top.set(key, score > first ? [score, first] : [first, Math.max(second, score)]);
+  };
   const pairs: { l: Field; r: Field; score: number }[] = [];
-  for (const l of legacy.fields) {
-    if (usedLegacy.has(l.id)) continue;
-    for (const r of rebuilt.fields) {
-      if (usedRebuilt.has(r.id)) continue;
-      pairs.push({ l, r, score: pairScore(l, r) });
+  for (const l of openLegacy) {
+    for (const r of openRebuilt) {
+      const score = pairScore(l, r);
+      pairs.push({ l, r, score });
+      bump(`l:${l.id}`, score);
+      bump(`r:${r.id}`, score);
     }
   }
   pairs.sort((x, y) => y.score - x.score || x.l.id.localeCompare(y.l.id) || x.r.id.localeCompare(y.r.id));
@@ -124,17 +139,13 @@ export function matchScreens(legacy: Screen, rebuilt: Screen, options: MatchOpti
   for (const p of pairs) {
     if (p.score < threshold) break;
     if (usedLegacy.has(p.l.id) || usedRebuilt.has(p.r.id)) continue;
-    const runnerUp = pairs.find(
-      (q) =>
-        q !== p &&
-        ((q.l.id === p.l.id && !usedRebuilt.has(q.r.id)) || (q.r.id === p.r.id && !usedLegacy.has(q.l.id))),
-    );
+    const runnerUp = Math.max(top.get(`l:${p.l.id}`)?.[1] ?? 0, top.get(`r:${p.r.id}`)?.[1] ?? 0);
     matches.push({
       legacy: p.l,
       rebuilt: p.r,
       score: Number(p.score.toFixed(3)),
       via: "score",
-      ambiguous: runnerUp !== undefined && p.score - runnerUp.score < gap,
+      ambiguous: runnerUp >= threshold && p.score - runnerUp < gap,
     });
     usedLegacy.add(p.l.id);
     usedRebuilt.add(p.r.id);

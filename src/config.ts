@@ -15,6 +15,8 @@ const Env = z.object({
   PARITY_CDP_URL: z.string().optional(),
   PARITY_PORT: z.coerce.number().int().positive().default(8787),
   PARITY_DB: z.string().default("runs/parity.sqlite"),
+  /** Fixed API token; a random one is generated per launch when unset. */
+  PARITY_TOKEN: z.string().min(16).optional(),
 });
 
 export type Config = z.infer<typeof Env>;
