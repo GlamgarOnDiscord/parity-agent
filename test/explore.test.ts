@@ -18,6 +18,15 @@ const elsewhere = Bun.serve({
 });
 const PAGES: Record<string, string> = {
   "/": `<label>Customer <input value="Donald"></label>${link("/prices", 100, "Price list")}${link(`http://127.0.0.1:${elsewhere.port}/`, 200, "Vendor site")}`,
+  // Every way a page can reach another origin besides its own requests: a popup, a WebSocket, a worker, an image.
+  "/leaky": `<script>
+    const away = "127.0.0.1:${elsewhere.port}";
+    window.open("http://" + away + "/popup");
+    try { new WebSocket("ws://" + away + "/socket"); } catch {}
+    const code = "fetch('http://" + away + "/worker').catch(() => {})";
+    new Worker(URL.createObjectURL(new Blob([code], { type: "text/javascript" })));
+    new Image().src = "http://localhost:${elsewhere.port}/image";
+  </script>`,
   "/prices": `<label>Item <input value="101"></label><label>Unit price <input value="300.00"></label><label>Tax rate <input value="5%"></label>`,
 };
 
@@ -73,6 +82,16 @@ function scripted(batches: ComputerAction[][], final = "done"): ComputerClient &
 }
 
 const known = [{ id: "home", app: "a", fields: [{ id: "c", label: "Customer", value: "Donald" }] }];
+
+describe("egress", () => {
+  test("popups, WebSockets, workers and other hostnames cannot reach another origin", async () => {
+    const before = outside;
+    await driver.reset();
+    await driver.perform({ do: "open", path: "/leaky" });
+    await new Promise((r) => setTimeout(r, 1500));
+    expect(outside - before).toBe(0);
+  });
+});
 
 describe("exploration", () => {
   test("a screen with new fields is kept as a finding, and the model's stop ends the run", async () => {
