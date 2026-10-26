@@ -184,6 +184,40 @@ class BrowserDriver implements AppDriver {
  */
 async function confine(page: Page, appUrl: string) {
   const origin = new URL(appUrl).origin;
+  // WebRTC sends UDP, which no proxy sees: remove it from every document and frame before any script runs.
+  await page.evaluateOnNewDocument(() => {
+    for (const name of [
+      "RTCPeerConnection",
+      "webkitRTCPeerConnection",
+      "RTCDataChannel",
+      "RTCIceCandidate",
+    ]) {
+      try {
+        Object.defineProperty(window, name, { value: undefined, writable: false, configurable: false });
+      } catch {}
+    }
+    // No second window: a popup is a new page this script does not reach. Links and forms open in place.
+    try {
+      Object.defineProperty(window, "open", { value: () => null, writable: false, configurable: false });
+    } catch {}
+    document.addEventListener(
+      "click",
+      (event) => {
+        const target = (event.target as Element | null)?.closest?.("a[target], area[target]");
+        if (target) target.removeAttribute("target");
+      },
+      true,
+    );
+    document.addEventListener(
+      "submit",
+      (event) => (event.target as HTMLFormElement).removeAttribute("target"),
+      true,
+    );
+  });
+  // A popup that still gets through is closed at once.
+  page.on("popup", (popup) => {
+    popup?.close().catch(() => {});
+  });
   await page.setRequestInterception(true);
   page.on("request", (request) => {
     if (request.isInterceptResolutionHandled()) return;
@@ -252,6 +286,8 @@ async function launchChrome(
   const profile = mkdtempSync(join(tmpdir(), "parity-chrome-"));
   const guard = await deadEnd();
   const app = new URL(appUrl);
+  // Always with a port: a bare host would let every port of it through.
+  const appHost = `${app.hostname}:${app.port || (app.protocol === "https:" ? "443" : "80")}`;
   const proc = Bun.spawn(
     [
       executablePath,
@@ -265,7 +301,9 @@ async function launchChrome(
       "--disable-background-networking",
       "--disable-sync",
       `--proxy-server=http://127.0.0.1:${guard.port}`,
-      `--proxy-bypass-list=<-loopback>;${app.host}`,
+      `--proxy-bypass-list=<-loopback>;${appHost}`,
+      // UDP is never proxied, so WebRTC may only use proxied UDP: none.
+      "--force-webrtc-ip-handling-policy=disable_non_proxied_udp",
       "about:blank",
     ],
     { stdout: "ignore", stderr: "pipe" },
