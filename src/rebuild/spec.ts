@@ -2,7 +2,7 @@ import type { Capture } from "../capture/capture";
 import type { Proof } from "../proof/schema";
 import type { Rule } from "../rules/extract";
 
-const PRICE_LIKE = /price|rate|cost/i;
+const PRICE_LIKE = /^(unit price|price|rate|cost)\b/i;
 const CODE_LIKE = /item|product|sku|code|article|ref/i;
 
 /**
@@ -21,17 +21,31 @@ export function writeSpec(c: Capture, proof: Proof, rules: Rule[]): string {
   const outputs = (checkpoint?.screen.fields ?? []).filter((f) => !inputs.includes(f.label));
   const title = checkpoint?.screen.title ?? c.frames[0]?.screen.title ?? "Screen";
 
-  // Reference data the screens revealed, for example the unit price shown for an item code.
+  // Reference data the screens revealed, for example the unit price shown for an item code. On a grid the
+  // n-th code goes with the n-th price, so values are paired by their order on the frame.
   const lookups = new Map<string, Set<string>>();
   for (const frame of c.frames) {
     const fields = frame.screen.fields;
-    for (const key of fields.filter((f) => inputs.includes(f.label) && CODE_LIKE.test(f.label) && f.value)) {
-      for (const val of fields.filter(
-        (f) => PRICE_LIKE.test(f.label) && f.value && !inputs.includes(f.label),
-      )) {
-        const k = `${key.label} "${key.value}" -> ${val.label}`;
-        if (!lookups.has(k)) lookups.set(k, new Set());
-        lookups.get(k)?.add(val.value);
+    const keyLabels = [
+      ...new Set(
+        fields.filter((f) => inputs.includes(f.label) && CODE_LIKE.test(f.label)).map((f) => f.label),
+      ),
+    ];
+    const valLabels = [
+      ...new Set(
+        fields.filter((f) => PRICE_LIKE.test(f.label) && !inputs.includes(f.label)).map((f) => f.label),
+      ),
+    ];
+    for (const kl of keyLabels) {
+      const keys = fields.filter((f) => f.label === kl && f.value);
+      for (const vl of valLabels) {
+        const vals = fields.filter((f) => f.label === vl && f.value);
+        if (keys.length !== vals.length) continue;
+        keys.forEach((key, i) => {
+          const k = `${key.label} "${key.value}" -> ${vl}`;
+          if (!lookups.has(k)) lookups.set(k, new Set());
+          lookups.get(k)?.add(vals[i]?.value ?? "");
+        });
       }
     }
   }
