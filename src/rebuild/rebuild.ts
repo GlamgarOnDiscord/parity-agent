@@ -1,4 +1,13 @@
-import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  realpathSync,
+  rmSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import type { Config } from "../config";
@@ -27,7 +36,12 @@ export interface RebuildResult {
 
 const TEMPLATE = resolve("templates/generated-app");
 
-/** Copy regular files only: a symlink written by the model is never followed. */
+const SERVED = /\.(html|css|js|json|png|svg|ico|woff2?)$/i;
+
+/**
+ * Copy the files the app serves, and nothing that could point outside the model's workspace: no symbolic link
+ * or junction, no hard link, only known web file types.
+ */
 function copyRegular(from: string, to: string, depth = 0): void {
   if (depth > 8) return;
   mkdirSync(to, { recursive: true });
@@ -35,9 +49,26 @@ function copyRegular(from: string, to: string, depth = 0): void {
     const src = join(from, name);
     const st = lstatSync(src);
     if (st.isSymbolicLink()) continue;
-    if (st.isDirectory()) copyRegular(src, join(to, name), depth + 1);
-    else if (st.isFile() && st.size <= 5_000_000) cpSync(src, join(to, name));
+    if (st.isDirectory()) {
+      if (realpathSync(src) === join(realpathSync(from), name)) copyRegular(src, join(to, name), depth + 1);
+    } else if (st.isFile() && st.nlink === 1 && st.size <= 5_000_000 && SERVED.test(name)) {
+      cpSync(src, join(to, name));
+    }
   }
+}
+
+/** The public/ directory of the app, only if it is a real directory inside the app. */
+function publicDirOf(appDir: string): string {
+  const dir = join(appDir, "public");
+  const st = lstatSync(dir);
+  if (
+    st.isSymbolicLink() ||
+    !st.isDirectory() ||
+    realpathSync(dir) !== join(realpathSync(appDir), "public")
+  ) {
+    throw new Error("public/ must be a real directory inside the app");
+  }
+  return dir;
 }
 
 /**
@@ -47,7 +78,7 @@ function copyRegular(from: string, to: string, depth = 0): void {
 async function startApp(appDir: string): Promise<{ url: string; stop: () => void }> {
   const stage = mkdtempSync(join(tmpdir(), "parity-app-"));
   cpSync(join(TEMPLATE, "server.ts"), join(stage, "server.ts"));
-  copyRegular(join(appDir, "public"), join(stage, "public"));
+  copyRegular(publicDirOf(appDir), join(stage, "public"));
   const proc = Bun.spawn([process.execPath, join(stage, "server.ts")], {
     env: { PATH: process.env.PATH ?? "", PORT: "0" },
     stdout: "pipe",
