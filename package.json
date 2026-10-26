@@ -15,6 +15,7 @@
     "rebuild": "bun scripts/rebuild.ts",
     "record:replay": "bun scripts/record-replay.ts",
     "export:playwright": "bun scripts/export-playwright.ts",
+    "record:reference": "bun scripts/record-reference.ts",
     "sample:recording": "bun scripts/make-sample-recording.ts"
   },
   "dependencies": {
