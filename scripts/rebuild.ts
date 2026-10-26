@@ -16,8 +16,8 @@ const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
     "all-rules": { type: "boolean", default: false },
-    max: { type: "string", default: "3" },
-    steps: { type: "string", default: "40" },
+    max: { type: "string", default: "2" },
+    steps: { type: "string", default: "20" },
   },
 });
 const runDir = positionals[0] ?? "runs/recording";

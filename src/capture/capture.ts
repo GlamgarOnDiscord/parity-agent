@@ -97,6 +97,8 @@ export async function capture(
       prompt: READ_PROMPT,
       images: [image],
       runId: options.runId,
+      effort: "minimal",
+      maxOutputTokens: 4000,
     });
     const seen = new Map<string, number>();
     const screen: Screen = {

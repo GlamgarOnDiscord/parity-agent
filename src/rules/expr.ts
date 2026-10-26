@@ -1,7 +1,8 @@
 /**
  * A tiny arithmetic language for computation rules, evaluated in plain code (never `eval`):
  *   numbers, field references in braces like {Sub Total}, + - * / and parentheses,
- *   round(x, digits) half up, min(a, b), max(a, b), abs(x).
+ *   round(x, digits) half up, min(a, b), max(a, b), abs(x), and sum({Label}) over every field with that
+ *   label on the screen (the lines of an invoice, for example).
  * Example: round(({Sub Total} + {GST (5%)}) * 0.09975, 2)
  */
 export type Expr =
@@ -9,7 +10,8 @@ export type Expr =
   | { kind: "field"; label: string }
   | { kind: "neg"; arg: Expr }
   | { kind: "bin"; op: "+" | "-" | "*" | "/"; left: Expr; right: Expr }
-  | { kind: "call"; name: "round" | "min" | "max" | "abs"; args: Expr[] };
+  | { kind: "call"; name: "round" | "min" | "max" | "abs"; args: Expr[] }
+  | { kind: "sum"; label: string };
 
 const MAX_LENGTH = 500;
 const FUNCTIONS = new Set(["round", "min", "max", "abs"]);
@@ -52,6 +54,14 @@ export function parseExpr(source: string): Expr {
       return { kind: "num", value: Number(num[0]) };
     }
     const name = /^[a-z]+/.exec(source.slice(i));
+    if (name?.[0] === "sum") {
+      i += 3;
+      expect("(");
+      const inner = primary();
+      if (inner.kind !== "field") throw new Error(`sum() takes one field reference in: ${source}`);
+      expect(")");
+      return { kind: "sum", label: inner.label };
+    }
     if (name && FUNCTIONS.has(name[0])) {
       i += name[0].length;
       expect("(");
@@ -92,6 +102,7 @@ export function fieldsOf(e: Expr): string[] {
     case "num":
       return [];
     case "field":
+    case "sum":
       return [e.label];
     case "neg":
       return fieldsOf(e.arg);
@@ -108,8 +119,20 @@ export function roundHalfUp(x: number, digits: number): number {
   return (Math.sign(x) * Math.round(Number((Math.abs(x) * f).toPrecision(12)))) / f;
 }
 
-export function evaluate(e: Expr, values: (label: string) => number | undefined): number {
+export function evaluate(
+  e: Expr,
+  values: (label: string) => number | undefined,
+  all: (label: string) => number[] = (label) => {
+    const v = values(label);
+    return v === undefined ? [] : [v];
+  },
+): number {
   switch (e.kind) {
+    case "sum": {
+      const vs = all(e.label);
+      if (vs.length === 0) throw new Error(`no value for {${e.label}}`);
+      return vs.reduce((a, b) => a + b, 0);
+    }
     case "num":
       return e.value;
     case "field": {
@@ -118,15 +141,15 @@ export function evaluate(e: Expr, values: (label: string) => number | undefined)
       return v;
     }
     case "neg":
-      return -evaluate(e.arg, values);
+      return -evaluate(e.arg, values, all);
     case "bin": {
-      const a = evaluate(e.left, values);
-      const b = evaluate(e.right, values);
+      const a = evaluate(e.left, values, all);
+      const b = evaluate(e.right, values, all);
       if (e.op === "/" && b === 0) throw new Error("division by zero");
       return e.op === "+" ? a + b : e.op === "-" ? a - b : e.op === "*" ? a * b : a / b;
     }
     case "call": {
-      const args = e.args.map((a) => evaluate(a, values));
+      const args = e.args.map((a) => evaluate(a, values, all));
       switch (e.name) {
         case "round":
           return roundHalfUp(args[0] ?? Number.NaN, args[1] ?? 0);

@@ -1,4 +1,5 @@
-// Capture a screen recording and extract its rules: bun run capture [video] [--out dir] [--sam "button,input box"]
+// Capture a screen recording and extract its rules: bun run capture [video] [--out dir] [--sam "button"]
+// SAM is off by default to save credits; pass --sam for the demo overlays.
 import { basename, extname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { capture } from "../src/capture/capture";
@@ -11,7 +12,11 @@ import { openDb } from "../src/store/db";
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
-  options: { out: { type: "string" }, sam: { type: "string", default: "button,input box" } },
+  options: {
+    out: { type: "string" },
+    sam: { type: "string", default: "" },
+    wonder: { type: "boolean", default: false },
+  },
 });
 const video = positionals[0] ?? "runs/sample/recording.mp4";
 const out = values.out ?? join("runs", basename(video, extname(video)));
@@ -43,7 +48,7 @@ if (last) console.log(`  last frame: ${last.screen.fields.map((f) => `${f.label}
 const rulesFile = join(out, "rules.json");
 const rules = (await Bun.file(rulesFile).exists())
   ? await Bun.file(rulesFile).json()
-  : await extractRules(c, models, runId);
+  : await extractRules(c, models, runId, { wonder: values.wonder });
 await Bun.write(rulesFile, JSON.stringify(rules, null, 2));
 new RuleStore(db).save(runId, rules);
 

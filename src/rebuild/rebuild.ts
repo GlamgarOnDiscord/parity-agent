@@ -211,14 +211,14 @@ export async function rebuild(
     }
   }
 
-  for (let n = 1; n <= (options.maxIterations ?? 3); n++) {
+  for (let n = 1; n <= (options.maxIterations ?? 2); n++) {
     const run = await runMuseCode(
       {
         apiKey,
         model: config.PARITY_MODEL_STRUCTURED,
         workspace: appDir,
         prompt,
-        maxSteps: options.maxSteps ?? 40,
+        maxSteps: options.maxSteps ?? 20,
         runId: options.runId,
       },
       ledger,
