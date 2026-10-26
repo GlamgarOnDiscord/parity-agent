@@ -230,6 +230,13 @@ describe("exploration", () => {
     expect(run.found.map((f) => f.location)).toEqual([`${origin}/prices`]);
   });
 
+  test("a browser Parity did not launch is refused for exploration", async () => {
+    const remote = Object.assign(Object.create(Object.getPrototypeOf(driver)), driver, { confined: false });
+    await expect(
+      explore(remote, scripted([]), { setup: [], known, goal: "x", maxSteps: 1, maxCostUsd: 1, origin }),
+    ).rejects.toThrow("needs a browser Parity launched itself");
+  });
+
   test("acknowledging is refused for an app that is not on this machine", async () => {
     await expect(
       explore(driver, scripted([]), {
