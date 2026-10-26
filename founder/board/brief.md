@@ -26,7 +26,7 @@ Free for now. Open source; no paid tier decided.
 
 ## Founder and constraints
 
-One developer, a French BTS SIO (IT) student, building solo for the Meta Global AI Developer Hackathon, indie track, Oct 27 to Nov 4, 2026 (9 days). 150 USD of Meta API credits; one laptop with little free RAM and disk. Must use Meta models. Only work built during the hackathon can be shown. Submission: a public repo and a 3-minute video. Judging weights: impact 30 %, use of Meta tooling 25 %, technical depth 20 %, demo 25 %. Indie prizes from 150k to 25k USD; bonus prizes include most viral on X and best use of open weights.
+One developer, a French BTS SIO (IT) student, building solo for a nine-day AI hackathon, Oct 27 to Nov 4, 2026 (9 days). 150 USD of Meta API credits; one laptop with little free RAM and disk. Must use Meta models. Only work built during the hackathon can be shown. Submission: a public repo and a 3-minute video. Judging weights: impact 30 %, use of Meta tooling 25 %, technical depth 20 %, demo 25 %.
 
 Already done before the hackathon (allowed: setup only): two test targets run in sandboxes, an old Windows sales app (Virtual Salesman 3, under Wine, about 165 MB of RAM) where 15 business rules were observed by hand, including a one-cent rounding difference on a tax-on-tax total; and FrontAccounting, an open-source PHP accounting app (about 205 MB). Brand and UI mockups exist.
 

@@ -23,7 +23,7 @@
 - Who it is for: as many people as possible. Developers and teams who change software they did not write or cannot fully read (AI agents, migrations, upgrades); IT service providers who rebuild old business apps; non-technical owners of an old app who need to know the new one does the same thing.
 - What it sells, at what price: free for now. Open-source tool; no paid tier decided.
 - Where and how: online, open source on GitHub. Runs locally or in a sandbox (Docker, Wine for old Windows apps, a browser for web apps); uses Meta's AI models through the Meta Model API. Found through GitHub, developer communities and the hackathon.
-- Budget and constraints: one developer (a BTS SIO student, France), building solo during the Meta Global AI Developer Hackathon, Oct 27 to Nov 4, 2026, indie track. 150 USD of Meta API credits; low RAM and disk on one laptop. Must use Meta models (Muse Spark, SAM 3.1, Muse Voice Transcribe, Muse Code, Muse Wonder, Muse Spark Open on Baseten). Only work built during the hackathon may be shown; the submission is a public repo and a 3-minute video. Judging: impact 30 %, use of Meta tooling 25 %, technical depth 20 %, demo 25 %.
+- Budget and constraints: one developer (a BTS SIO student, France), building solo during a nine-day AI hackathon, Oct 27 to Nov 4, 2026. 150 USD of Meta API credits; low RAM and disk on one laptop. Must use Meta models (Muse Spark, SAM 3.1, Muse Voice Transcribe, Muse Code, Muse Wonder, Muse Spark Open on Baseten). Only work built during the hackathon may be shown; the submission is a public repo and a 3-minute video. Judging: impact 30 %, use of Meta tooling 25 %, technical depth 20 %, demo 25 %.
 
 ## Summary
 
@@ -469,7 +469,7 @@ Watch out: Keploy's headline is already "AI writes code. Keploy catches what bre
 | channel | why it fits | cost | how we know it worked |
 |---|---|---|---|
 | **GitHub README with a 60-second demo** | every panel "yes" came from a README showing a real bug caught | founder time | stars, clones, issues opened by strangers |
-| **X, short demo clips** | Most Viral prize (20k USD) is judged on X; devs share "tests passed, bug shipped" stories | founder time | views, reposts, quote posts by developers |
+| **X, short demo clips** | Most Viral prize is judged on X; devs share "tests passed, bug shipped" stories | founder time | views, reposts, quote posts by developers |
 | **Hacker News (Show HN), after submission** | the audience that wrote the competitor complaints (noise, lock-in, PII) | founder time | front page, comments asking to try it |
 | Not now: Reddit (blocked during research, rules vary per sub), paid ads (no budget), LinkedIn (wrong audience for a CLI) | | | |
 

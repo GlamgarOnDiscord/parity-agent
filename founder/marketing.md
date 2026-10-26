@@ -17,7 +17,7 @@ Watch out: Keploy's headline is already "AI writes code. Keploy catches what bre
 | channel | why it fits | cost | how we know it worked |
 |---|---|---|---|
 | **GitHub README with a 60-second demo** | every panel "yes" came from a README showing a real bug caught | founder time | stars, clones, issues opened by strangers |
-| **X, short demo clips** | Most Viral prize (20k USD) is judged on X; devs share "tests passed, bug shipped" stories | founder time | views, reposts, quote posts by developers |
+| **X, short demo clips** | Most Viral prize is judged on X; devs share "tests passed, bug shipped" stories | founder time | views, reposts, quote posts by developers |
 | **Hacker News (Show HN), after submission** | the audience that wrote the competitor complaints (noise, lock-in, PII) | founder time | front page, comments asking to try it |
 | Not now: Reddit (blocked during research, rules vary per sub), paid ads (no budget), LinkedIn (wrong audience for a CLI) | | | |
 
