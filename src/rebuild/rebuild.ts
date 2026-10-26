@@ -1,12 +1,17 @@
 import {
+  closeSync,
   cpSync,
   existsSync,
+  fstatSync,
   lstatSync,
   mkdirSync,
   mkdtempSync,
+  openSync,
   readdirSync,
+  readFileSync,
   realpathSync,
   rmSync,
+  writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -52,7 +57,17 @@ function copyRegular(from: string, to: string, depth = 0): void {
     if (st.isDirectory()) {
       if (realpathSync(src) === join(realpathSync(from), name)) copyRegular(src, join(to, name), depth + 1);
     } else if (st.isFile() && st.nlink === 1 && st.size <= 5_000_000 && SERVED.test(name)) {
-      cpSync(src, join(to, name));
+      // Read through the descriptor that was checked: same inode as the lstat above, so a link swapped in
+      // between the two calls is refused instead of followed.
+      const fd = openSync(src, "r");
+      try {
+        const opened = fstatSync(fd);
+        if (opened.isFile() && opened.ino === st.ino && opened.dev === st.dev && opened.nlink === 1) {
+          writeFileSync(join(to, name), readFileSync(fd));
+        }
+      } finally {
+        closeSync(fd);
+      }
     }
   }
 }
