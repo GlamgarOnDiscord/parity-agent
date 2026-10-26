@@ -13,6 +13,8 @@ export interface AppDriver {
   /** A raw computer-use action, for exploration. */
   act(action: ComputerAction): Promise<void>;
   screenshot(): Promise<DataUrl>;
+  /** Where the app is now: the page URL, or the window title on a desktop. */
+  location(): Promise<string>;
   /** The fields visible on the current screen, read without AI when the platform allows it. */
   readScreen(screenId: string): Promise<Screen>;
   close(): Promise<void>;

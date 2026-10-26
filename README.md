@@ -61,7 +61,8 @@ Every line looks right; the total is one cent off. `bun run prove --fixed` repla
 | Coverage map: checked, explained by a rule only, never tested            | done                                       |
 | Playwright export of a proof (`bun run export:playwright`)               | done                                       |
 | Second app nobody here wrote: FrontAccounting 2.4.20, noise measured     | done ([benchmarks](docs/benchmarks.md))    |
-| Autonomous exploration, one-page proof report                            | next                                       |
+| Autonomous exploration with Muse Spark computer use, confined to the app | done: 4 unseen screens, $0.15              |
+| One-page proof report                                                    | next                                       |
 
 Plan and exit checks: [docs/sprints.md](docs/sprints.md).
 
