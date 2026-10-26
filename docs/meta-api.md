@@ -11,3 +11,5 @@ Verified 2026-10-26 with `bun run models:check` (5 calls, $0.04). Base URL `http
 | `muse-voice-transcribe-1.0`   | `POST /asr/transcribe`, multipart: a JSON part `request` = `{ model, audioEncoding: "WAV" }` and a part `audio`             | `{ transcript, audioDurationMs, turns, sessionId }`. WAV must be mono s16le at 16000 or 24000 Hz; 22050 Hz is refused                                                                   |
 
 Not verified yet: Muse Spark Open on Baseten (`BASETEN_API_KEY` not set), Muse Code (`muse exec`, not installed).
+
+Structured outputs are strict: every property of the JSON schema must be listed as required. Use `.nullable()` in Zod for fields that may be absent, never `.optional()` (verified 2026-10-26, 400 "'required' is required to be supplied").

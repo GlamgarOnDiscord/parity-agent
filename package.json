@@ -10,7 +10,9 @@
     "check": "biome check .",
     "format": "biome check --write .",
     "models:check": "bun scripts/check-models.ts",
-    "prove": "bun scripts/prove.ts"
+    "prove": "bun scripts/prove.ts",
+    "capture": "bun scripts/capture.ts",
+    "sample:recording": "bun scripts/make-sample-recording.ts"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.78",
