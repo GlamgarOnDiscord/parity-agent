@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Legacy migrations are exactly my job, so I'd star the repo and maybe try it on a toy app. I can't point it at a client's app though: it records their screens and sends them to Meta's models, and I'd need sign-off I won't get in a normal week.",
+  "objection": "Screen recordings of client business apps, with real customer data on screen, go to an AI API. It's not clear whether that stays on my machine. On top of that, my tests and CI already catch most regressions, and I don't trust an AI to write the business rules for me.",
+  "would_change_my_mind": "A documented fully offline mode, with local Llama weights and no network calls that I can verify, plus a real migration case study where it caught a difference our tests missed.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 100,
+  "price_too_expensive": 300
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "The README demo is literally the bug that got a customer on the phone with us last month, and it's free, so I'd install it and point it at our staging app one afternoon. If it chokes on our auth flow or seeded data, I uninstall it the same day.",
+  "objection": "Replaying recorded sessions on a real app with logins, background jobs and a shared database usually falls apart with flaky diffs. Masking timestamps and ids won't cover all our nondeterminism, and if I spend more time triaging false differences than reading real ones, my team won't keep it.",
+  "would_change_my_mind": "",
+  "price_too_cheap": 3,
+  "price_cheap": 10,
+  "price_expensive": 35,
+  "price_too_expensive": 80
+}

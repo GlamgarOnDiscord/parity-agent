@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "The problem is real for me, we migrate old apps and nobody can say for sure what the old one did. But 'one command' and 'ready-made sandbox' still means someone technical has to install and run it, and that is not me. Free and open source does not help when I cannot set it up myself.",
+  "objection": "Setting up Docker or Wine sandboxes is too heavy for me, and I would not know whether I recorded the right scenarios or how to read a coverage map. If it misses something, I am the one who told the client nothing broke.",
+  "would_change_my_mind": "Our IT provider or a dev on my team setting it up and handing me a simple report I can show the client, or a hosted version where I just click through the app and get a plain yes/no per scenario.",
+  "price_too_cheap": 10,
+  "price_cheap": 50,
+  "price_expensive": 300,
+  "price_too_expensive": 800
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "This is exactly my problem on legacy migrations, but I can't put an unknown tool on a client's app this month. Security would ask what gets sent to Meta's models and whether recordings of client screens leave the machine, and I have no answer to show them.",
+  "objection": "I don't believe it handles a real legacy app with logins, flaky data and weird old Windows screens. An AI-inferred list of business rules looks great in a demo and misses the edge cases that actually break in production.",
+  "would_change_my_mind": "A published case study or a reproducible demo on a messy real-world legacy app, plus a clear statement that capture can run on local models with nothing leaving the machine, so I can get it past our security review.",
+  "price_too_cheap": 0,
+  "price_cheap": 30,
+  "price_expensive": 150,
+  "price_too_expensive": 500
+}

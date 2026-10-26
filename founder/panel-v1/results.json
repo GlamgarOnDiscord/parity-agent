@@ -1,0 +1,167 @@
+{
+ "business": "Parity (free, open-source behavior proof for software changes)",
+ "seed": 26,
+ "dealt": 20,
+ "answered": 20,
+ "skipped": [],
+ "buys": 3,
+ "passes": 17,
+ "buy_rate": 0.15,
+ "by_segment": [
+  [
+   "Owner or office manager of a small business running an old Windows app",
+   3,
+   0.3333333333333333
+  ],
+  [
+   "Developer in a product team that uses AI coding agents daily",
+   7,
+   0.2857142857142857
+  ],
+  [
+   "Consultant at an IT services firm doing legacy migrations",
+   4,
+   0.0
+  ],
+  [
+   "IT staff in a public body (city, hospital, school district)",
+   2,
+   0.0
+  ],
+  [
+   "Solo developer or freelancer maintaining client apps",
+   4,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Tries new GitHub tools",
+   4,
+   0.75
+  ],
+  [
+   "Needs approval to adopt",
+   3,
+   0.0
+  ],
+  [
+   "Firefighter with no time",
+   3,
+   0.0
+  ],
+  [
+   "Already has a test suite",
+   3,
+   0.0
+  ],
+  [
+   "Non-technical, relies on a provider",
+   3,
+   0.0
+  ],
+  [
+   "Skeptical of AI tools",
+   4,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "$112,000 and up",
+   7,
+   0.2857142857142857
+  ],
+  [
+   "under $62,000",
+   6,
+   0.16666666666666666
+  ],
+  [
+   "$62,000 to $112,000",
+   7,
+   0.0
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   10,
+   [
+    "This is exactly my problem on legacy migrations, but I can't put an unknown tool on a client's app this month. Security would ask what gets sent to Meta's models and whether recordings of client screens leave the machine, and I have no answer to show them.",
+    "I do need something like this, since I'm merging AI-written changes into an old app I can't fully check myself. But I can't take a free student project to my manager and security people and ask them to let it record screens of our business app and send them to Meta's AI."
+   ],
+   [
+    "P002",
+    "P005"
+   ]
+  ],
+  [
+   "convenience",
+   5,
+   [
+    "I'm not rewriting my old app this month, and if I ever do, whoever I pay to migrate it should be the one proving it works. Recording, sandboxing and confirming a list of business rules on my own machine is way more than an hour I don't have.",
+    "Free is nice, but I don't have an afternoon to install a local tool, set up a sandbox, record every workflow and then check a list of business rules some AI wrote. I just eyeball the agent's PRs, run what tests we have, and move on."
+   ],
+   [
+    "P003",
+    "P004"
+   ]
+  ],
+  [
+   "need",
+   1,
+   [
+    "Our unit and end-to-end tests in CI already catch what the agent breaks in the PRs I merge, so I don't have a painful gap this would fill. Recording sessions and then reviewing a list of business rules an AI guessed sounds like a second test suite I'd have to babysit."
+   ],
+   [
+    "P007"
+   ]
+  ],
+  [
+   "habit",
+   1,
+   [
+    "I already have unit tests, end-to-end tests and CI catching regressions, and recording scenarios then checking AI-written business rules sounds like a second test suite to babysit. Free doesn't help much when the real cost is my time in the middle of a migration I've already put off for a year."
+   ],
+   [
+    "P008"
+   ]
+  ]
+ ],
+ "why_yes": [
+  [
+   "need",
+   3,
+   [
+    "It's free, it runs locally, and I'm merging AI-written PRs every week, so I'll clone it and try it once on the old Windows app. My tests cover the code I know about. They don't cover the business rules nobody ever wrote down.",
+    "It's free and runs locally, and I'm merging agent-written PRs I don't fully read, so I'd clone it and try it once on a side project. Whether it stays installed depends on the first run, not the pitch."
+   ],
+   [
+    "P001",
+    "P006"
+   ]
+  ]
+ ],
+ "flip": [
+  "A published case study or a reproducible demo on a messy real-world legacy app, plus a clear statement that capture can run on local models with nothing leaving the machine, so I can get it past our security review.",
+  "My IT provider running it on the migration and handing me a one-page diff I can check in ten minutes, with the evidence for every difference.",
+  "Watching it catch a real regression on one of our own apps in under an hour of setup, fully offline, with no data leaving the box.",
+  "A named company or maintainer offering a paid support plan, plus a one-page security answer showing the recordings and data stay on our machine.",
+  "An agent PR that passes all our tests and still breaks something in production, plus proof that Parity would have caught it with near-zero false positives on a repo like ours.",
+  "Seeing it catch a real regression on a migration like mine that our existing test suite missed, with setup taking under an hour.",
+  "Someone else running it for me, like a provider or a one-click app, plus seeing it catch a real regression on an app like mine that my own clicking around missed.",
+  "A README with a 60-second demo catching a real changed total on a sample web app, installable in one command, plus visible commit activity and more than one maintainer.",
+  "Running it on one small client app during the migration and having it catch a real regression my tests missed, with no noise, in under an hour of setup.",
+  "A demo on a real app where it catches a seeded regression like a changed invoice total, plus proof that capture can run fully offline or that recordings never leave the machine, so I can show security a deterministic diff report and not an AI opinion.",
+  "A clear statement that the Meta models run fully local with no network calls, plus a one-command install that gives me a first diff on a client web app in under an hour.",
+  "Our IT provider offering it as a service: they install it, record the app with me, and hand me the plain-language rules and the list of differences after a migration.",
+  "A documented fully offline mode, with local Llama weights and no network calls that I can verify, plus a real migration case study where it caught a difference our tests missed.",
+  "Running it on one of our real agent-written PRs and having it catch a regression our test suite missed, with a diff I can verify myself.",
+  "A one-click hosted or packaged version that our IT provider sets up, where I just upload a screen recording and get the diff report back.",
+  "Seeing it run on a real legacy app, ideally one of ours, and flag a real regression like a changed invoice total that our tests missed, with low noise and setup in under an hour.",
+  "Seeing it catch a real regression on an old Windows app like ours, run fully offline, plus a year of steady commits and issues getting answered."
+ ],
+ "purchases_first_month_per_buyer": 1.0,
+ "price_answers": 20
+}

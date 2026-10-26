@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "Free and open source on GitHub, running on my own machine, with sandboxes, means I'd have to install and run it myself, and I don't do that. If it isn't something our provider sets up for us or a simple app I just open, it won't get used.",
+  "objection": "Sandboxes and replaying an old Windows app sound like Docker or Wine work, which is too heavy for me, and I'm not convinced it would really understand our business app when nobody here fully does.",
+  "would_change_my_mind": "Our IT provider offering it as a service: they install it, record the app with me, and hand me the plain-language rules and the list of differences after a migration.",
+  "price_too_cheap": 20,
+  "price_cheap": 150,
+  "price_expensive": 800,
+  "price_too_expensive": 2500
+}

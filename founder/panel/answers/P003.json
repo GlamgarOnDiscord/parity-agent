@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "Free is nice, but recording scenarios and standing up a Windows sandbox for our old app is not an under-an-hour job, and nobody is changing that app this month anyway. I'd star it on GitHub and forget it.",
+  "objection": "Getting our old Windows app running in their sandbox and recording it properly is a weekend I don't have, and if it half-works I won't know what it missed.",
+  "would_change_my_mind": "Our IT provider telling me they're replacing or upgrading the app and running this for me as part of the job.",
+  "price_too_cheap": 0,
+  "price_cheap": 15,
+  "price_expensive": 60,
+  "price_too_expensive": 200
+}

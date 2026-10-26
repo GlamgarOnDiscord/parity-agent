@@ -1,0 +1,23 @@
+{
+  "business": "Parity, SCENARIO ONLY: a possible hosted Team tier after the hackathon (the product is free today)",
+  "unit": "app-month (one app watched by hosted Parity for a month)",
+  "price": 29.0,
+  "variable": [
+    {"label": "Meta credits: 2 re-captures per app-month, no code generation (estimate, see cfo-sources.md)", "cost": 1.80},
+    {"label": "Meta credits: diff explanations (estimate)", "cost": 0.40},
+    {"label": "Replay compute on a shared VM (estimate)", "cost": 3.00},
+    {"label": "Card fees, 2.9% + 0.30 (typical published processor rate)", "cost": 1.14}
+  ],
+  "fixed_monthly": [
+    {"label": "Cloud VM for the hosted runner (estimate)", "cost": 40},
+    {"label": "Domain and email (estimate)", "cost": 6},
+    {"label": "Founder salary", "cost": 0}
+  ],
+  "startup": [
+    {"label": "Domain registration (estimate)", "cost": 15},
+    {"label": "Landing page and waitlist (founder time, no cash)", "cost": 0}
+  ],
+  "days_per_month": 1,
+  "plan_per_day": 40,
+  "ramp_per_day": [0, 0, 2, 4, 7, 10, 14, 18, 23, 28, 34, 40]
+}

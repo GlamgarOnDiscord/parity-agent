@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "I don't install and babysit tools myself, and recording scenarios, masking ids and reading coverage maps sounds like a second project on top of the migration I've already put off for a year. If my provider ran it for me I'd look, but on my own I'll skip it.",
+  "objection": "They say the comparison is plain code, but an AI still proposes the business rules and explains the differences, so in practice I'm trusting it to tell me what matters, and I can't check that myself.",
+  "would_change_my_mind": "My provider or a client running it on my actual migration and handing me a short report showing it caught a real break that our tests missed.",
+  "price_too_cheap": 0,
+  "price_cheap": 5,
+  "price_expensive": 20,
+  "price_too_expensive": 40
+}

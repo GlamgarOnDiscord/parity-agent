@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The invoice bug is exactly the kind of thing I want caught, but a model watching a screen recording and deciding what the business rules are is not something I can sign off on, let alone defend to security. Free and local gets it past procurement. It does not get it past me this month.",
+  "objection": "An AI decides what counts as the same behavior and which rules matter. If it misses the invoice rounding rule, I get a green diff and false confidence, which is worse than having no tool. On top of that, those recordings show customer data and get read by Meta's models, and security will ask whether anything leaves the machine.",
+  "would_change_my_mind": "A demo on a real app where it catches a seeded regression like a changed invoice total, plus proof that capture can run fully offline or that recordings never leave the machine, so I can show security a deterministic diff report and not an AI opinion.",
+  "price_too_cheap": 0,
+  "price_cheap": 10,
+  "price_expensive": 40,
+  "price_too_expensive": 120
+}

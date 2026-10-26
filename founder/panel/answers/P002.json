@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The idea matches my job, but a one-cent invoice demo is exactly the toy case I distrust, and I can't put a new tool on a client's legacy migration without security and my manager signing off. Free doesn't help with that, the approval is the cost, and I won't start it for something I haven't seen work on a messy real app.",
+  "objection": "Will recording and replaying hold up on our actual legacy apps, with their auth, flaky state, batch jobs and odd Windows clients, or does it only work on clean web demos? And the moment someone turns on the Meta API option, I have client data questions I have to answer to security.",
+  "would_change_my_mind": "A credible case study or a quick run on one of our own legacy apps, done in an afternoon, that catches a real regression, plus a written statement I can hand to security showing it runs fully offline with the AI turned off.",
+  "price_too_cheap": 0,
+  "price_cheap": 20,
+  "price_expensive": 150,
+  "price_too_expensive": 400
+}

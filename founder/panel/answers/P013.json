@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "Free and offline is nice, but recording scenarios for each client app is setup I don't have time for this week; I'd star the repo on GitHub and forget it until something breaks.",
+  "objection": "It's my clients' data, not mine. Even if it's optional, 'through Meta's API' is enough to make me nervous, and I doubt recording and masking will just work in under an hour on a messy client app.",
+  "would_change_my_mind": "A client upgrade landing on my desk, plus proof I can go from install to a first diff on a real app in under an hour with AI fully off by default.",
+  "price_too_cheap": 3,
+  "price_cheap": 10,
+  "price_expensive": 30,
+  "price_too_expensive": 60
+}

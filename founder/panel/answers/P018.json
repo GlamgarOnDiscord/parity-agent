@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "The invoice total that broke last month is exactly the bug this claims to catch, and it is free, offline, and the comparison is plain code, so trying it costs me an afternoon, not money. I would run it on one real legacy migration and drop it fast if it does not hold up.",
+  "objection": "I expect the diff to drown me in false positives on a messy old app, beyond timestamps and ids, and that recording enough scenarios to cover the business paths ends up being more work than just writing the tests myself.",
+  "would_change_my_mind": "If on my own client app the first run takes more than a day to get to a clean, low-noise diff, I am out.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 80,
+  "price_too_expensive": 200
+}

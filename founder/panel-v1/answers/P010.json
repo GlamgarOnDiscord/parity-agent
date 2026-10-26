@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The invoice bug last month means I actually feel this pain, so I'd star the repo. But a screen recording plus an AI exploring my client apps in a sandbox is a heavy setup, not a one-minute CLI, and I'm not wiring a student side project into client work until I see it survive a few months.",
+  "objection": "Will this still be maintained next year? If I build my regression checks on it and the author graduates and walks away, I'm stuck with broken tooling right when a client update goes out. I also don't know what running Meta's models locally costs me in setup, keys or hardware.",
+  "would_change_my_mind": "A README with a 60-second demo catching a real changed total on a sample web app, installable in one command, plus visible commit activity and more than one maintainer.",
+  "price_too_cheap": 3,
+  "price_cheap": 10,
+  "price_expensive": 30,
+  "price_too_expensive": 60
+}

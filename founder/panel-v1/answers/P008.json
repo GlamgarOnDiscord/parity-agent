@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I already have unit tests, end-to-end tests and CI catching regressions, and recording scenarios then checking AI-written business rules sounds like a second test suite to babysit. Free doesn't help much when the real cost is my time in the middle of a migration I've already put off for a year.",
+  "objection": "I don't trust an AI to infer the business rules correctly, and a field-by-field diff between old and new will flag a pile of intentional changes and noise that I then have to triage by hand.",
+  "would_change_my_mind": "Seeing it catch a real regression on a migration like mine that our existing test suite missed, with setup taking under an hour.",
+  "price_too_cheap": 3,
+  "price_cheap": 10,
+  "price_expensive": 40,
+  "price_too_expensive": 100
+}

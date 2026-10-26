@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "It's free, it runs locally, and I'm merging AI-written PRs every week, so I'll clone it and try it once on the old Windows app. My tests cover the code I know about. They don't cover the business rules nobody ever wrote down.",
+  "objection": "My tests already catch most regressions, and I doubt screen-recording replay on an old Windows app holds up. I expect flaky UI automation, false diffs on every run, and some setup cost for the Meta models before I see anything useful.",
+  "would_change_my_mind": "If the first run on my Windows app takes more than about 15 minutes to set up, or floods me with false differences, I uninstall it and go back to my tests.",
+  "price_too_cheap": 3,
+  "price_cheap": 10,
+  "price_expensive": 40,
+  "price_too_expensive": 100
+}

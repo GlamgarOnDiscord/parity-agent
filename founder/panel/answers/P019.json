@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd probably star it on GitHub and move on. I can't put a student's side project into a public body's workflow, and I'm not spending my evenings testing it on our old apps when it could be abandoned by next year.",
+  "objection": "Who keeps maintaining this once the student graduates? On top of that, a one-cent invoice catch in a README is a demo they picked themselves. I'd need to see it on my own messy legacy app before I believed any of it.",
+  "would_change_my_mind": "A year of steady commits and releases with more than one maintainer, plus a write-up from another public-sector or IT shop that ran it on a real legacy migration.",
+  "price_too_cheap": 0,
+  "price_cheap": 50,
+  "price_expensive": 300,
+  "price_too_expensive": 1000
+}

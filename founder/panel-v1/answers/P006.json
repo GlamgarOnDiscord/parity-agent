@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "It's free and runs locally, and I'm merging agent-written PRs I don't fully read, so I'd clone it and try it once on a side project. Whether it stays installed depends on the first run, not the pitch.",
+  "objection": "Recording scenarios sounds like more work than writing tests, and a diff of every field that changed will probably flag timestamps and IDs and bury me in noise. I also don't know what running Meta's models locally costs me in setup and GPU.",
+  "would_change_my_mind": "A README demo where it catches a real regression an AI agent introduced that our existing tests missed, set up in under 10 minutes with no noisy diffs.",
+  "price_too_cheap": 1,
+  "price_cheap": 5,
+  "price_expensive": 20,
+  "price_too_expensive": 40
+}

@@ -1,0 +1,104 @@
+{
+ "n": 20,
+ "seed": 26,
+ "customer": {
+  "business": "Parity (free, open-source behavior proof for software changes)",
+  "target": "People who change or replace software they did not write and need to know nothing broke: developers using AI coding agents, IT service providers migrating old business apps, and owners of an old business app",
+  "where": "Online, worldwide; found on GitHub, Hacker News, Reddit, X, dev newsletters",
+  "age": [
+   22,
+   58
+  ],
+  "segments": [
+   {
+    "name": "Developer in a product team that uses AI coding agents daily",
+    "share": 0.35,
+    "income": [
+     45000,
+     160000
+    ]
+   },
+   {
+    "name": "Solo developer or freelancer maintaining client apps",
+    "share": 0.2,
+    "income": [
+     25000,
+     110000
+    ]
+   },
+   {
+    "name": "Consultant at an IT services firm doing legacy migrations",
+    "share": 0.2,
+    "income": [
+     40000,
+     130000
+    ]
+   },
+   {
+    "name": "Owner or office manager of a small business running an old Windows app",
+    "share": 0.15,
+    "income": [
+     30000,
+     120000
+    ]
+   },
+   {
+    "name": "IT staff in a public body (city, hospital, school district)",
+    "share": 0.1,
+    "income": [
+     35000,
+     95000
+    ]
+   }
+  ],
+  "behaviours": [
+   {
+    "name": "Tries new GitHub tools",
+    "share": 0.2,
+    "how": "Stars repos weekly, installs a CLI if the README convinces them in a minute."
+   },
+   {
+    "name": "Skeptical of AI tools",
+    "share": 0.18,
+    "how": "Has been burned by AI hype; wants proof on their own code before trusting anything."
+   },
+   {
+    "name": "Already has a test suite",
+    "share": 0.16,
+    "how": "Relies on unit and end-to-end tests and CI; adds tools only when tests miss something painful."
+   },
+   {
+    "name": "Firefighter with no time",
+    "share": 0.16,
+    "how": "Too busy to set anything up; adopts only what works in under an hour."
+   },
+   {
+    "name": "Needs approval to adopt",
+    "share": 0.15,
+    "how": "Has to justify any new tool to a manager, security team or procurement."
+   },
+   {
+    "name": "Non-technical, relies on a provider",
+    "share": 0.15,
+    "how": "Does not install tools; would use it only if their IT provider or a simple app does it for them."
+   }
+  ],
+  "objections": [
+   "My tests already catch regressions",
+   "Recording scenarios sounds like more work than writing tests",
+   "Will it work on my stack, or only on toy demos?",
+   "I don't trust an AI to decide what counts as the same behavior",
+   "Sending screenshots of our app to an AI API is a data risk",
+   "A free project from a student: will it still be maintained next year?",
+   "Setting up Docker or Wine sandboxes is too heavy for me"
+  ],
+  "habits": [
+   "you merged three pull requests written by an AI agent this week",
+   "a customer called last month because an update broke an invoice total",
+   "your company still runs a business app nobody fully understands",
+   "you skim GitHub trending and Hacker News most mornings",
+   "you are planning a migration you have been postponing for a year"
+  ]
+ },
+ "pitch": "Parity: proof that your software still does the same thing after a change.\nRecord your app in use once (a screen recording, optionally narrated). Parity explores the rest on its own in a sandbox and writes the business rules it found in plain language for you to confirm.\nAfter any change (a refactor by an AI coding agent, a framework upgrade, a full rewrite of an old app), Parity replays the same scenarios on the old and new versions and shows every field that differs, with the evidence.\nWorks on web apps and old Windows apps. Uses Meta's AI models to capture and explain; the replays themselves run without AI.\nFree and open source on GitHub. Runs on your machine."
+}

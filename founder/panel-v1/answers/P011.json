@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Free and local takes the money out of it, but my time is the real cost. I'm not going to spend a billable afternoon recording sessions and checking business rules an AI wrote about my client's app when my test suite already covers the parts I care about.",
+  "objection": "It uses AI to decide what the app is supposed to do. If it gets one rule wrong, or buries me in diffs that don't matter, I've lost more time than I saved, and then I'm the one telling the client the migration is safe.",
+  "would_change_my_mind": "Running it on one small client app during the migration and having it catch a real regression my tests missed, with no noise, in under an hour of setup.",
+  "price_too_cheap": 0,
+  "price_cheap": 10,
+  "price_expensive": 40,
+  "price_too_expensive": 100
+}

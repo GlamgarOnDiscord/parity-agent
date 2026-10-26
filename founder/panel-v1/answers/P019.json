@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Free costs me nothing, but my time and a production app don't. I'd star it on GitHub and wait, I'm not pointing an AI that 'explores on its own' at a city system based on a landing page.",
+  "objection": "It's a student project with AI writing the business rules. If it misses a rule, I get a false 'nothing changed' and that's worse than no tool. And who maintains it next year when our migration is still running?",
+  "would_change_my_mind": "Seeing it catch a real regression on an old Windows app like ours, run fully offline, plus a year of steady commits and issues getting answered.",
+  "price_too_cheap": 0,
+  "price_cheap": 20,
+  "price_expensive": 150,
+  "price_too_expensive": 500
+}

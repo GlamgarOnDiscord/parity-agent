@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Diego",
+  "age": 31,
+  "segment": "Owner or office manager of a small business running an old Windows app",
+  "income": 114000,
+  "behaviour": "Tries new GitHub tools",
+  "behaviour_how": "Stars repos weekly, installs a CLI if the README convinces them in a minute.",
+  "objection": "My tests already catch regressions",
+  "habit": "you merged three pull requests written by an AI agent this week"
+ },
+ {
+  "id": "P002",
+  "name": "Mei",
+  "age": 31,
+  "segment": "Consultant at an IT services firm doing legacy migrations",
+  "income": 76000,
+  "behaviour": "Needs approval to adopt",
+  "behaviour_how": "Has to justify any new tool to a manager, security team or procurement.",
+  "objection": "Will it work on my stack, or only on toy demos?",
+  "habit": "you merged three pull requests written by an AI agent this week"
+ },
+ {
+  "id": "P003",
+  "name": "Wes",
+  "age": 34,
+  "segment": "Owner or office manager of a small business running an old Windows app",
+  "income": 55000,
+  "behaviour": "Firefighter with no time",
+  "behaviour_how": "Too busy to set anything up; adopts only what works in under an hour.",
+  "objection": "I don't trust an AI to decide what counts as the same behavior",
+  "habit": "you skim GitHub trending and Hacker News most mornings"
+ },
+ {
+  "id": "P004",
+  "name": "Luis",
+  "age": 35,
+  "segment": "IT staff in a public body (city, hospital, school district)",
+  "income": 74000,
+  "behaviour": "Firefighter with no time",
+  "behaviour_how": "Too busy to set anything up; adopts only what works in under an hour.",
+  "objection": "Recording scenarios sounds like more work than writing tests",
+  "habit": "you merged three pull requests written by an AI agent this week"
+ },
+ {
+  "id": "P005",
+  "name": "Rohan",
+  "age": 55,
+  "segment": "Owner or office manager of a small business running an old Windows app",
+  "income": 112000,
+  "behaviour": "Needs approval to adopt",
+  "behaviour_how": "Has to justify any new tool to a manager, security team or procurement.",
+  "objection": "A free project from a student: will it still be maintained next year?",
+  "habit": "you merged three pull requests written by an AI agent this week"
+ },
+ {
+  "id": "P006",
+  "name": "Ana",
+  "age": 28,
+  "segment": "Developer in a product team that uses AI coding agents daily",
+  "income": 48000,
+  "behaviour": "Tries new GitHub tools",
+  "behaviour_how": "Stars repos weekly, installs a CLI if the README convinces them in a minute.",
+  "objection": "Recording scenarios sounds like more work than writing tests",
+  "habit": "you merged three pull requests written by an AI agent this week"
+ },
+ {
+  "id": "P007",
+  "name": "Isla",
+  "age": 31,
+  "segment": "Developer in a product team that uses AI coding agents daily",
+  "income": 109000,
+  "behaviour": "Already has a test suite",
+  "behaviour_how": "Relies on unit and end-to-end tests and CI; adds tools only when tests miss something painful.",
+  "objection": "Recording scenarios sounds like more work than writing tests",
+  "habit": "you merged three pull requests written by an AI agent this week"
+ },
+ {
+  "id": "P008",
+  "name": "Nora",
+  "age": 56,
+  "segment": "Developer in a product team that uses AI coding agents daily",
+  "income": 64000,
+  "behaviour": "Already has a test suite",
+  "behaviour_how": "Relies on unit and end-to-end tests and CI; adds tools only when tests miss something painful.",
+  "objection": "Recording scenarios sounds like more work than writing tests",
+  "habit": "you are planning a migration you have been postponing for a year"
+ },
+ {
+  "id": "P009",
+  "name": "Kai",
+  "age": 25,
+  "segment": "Solo developer or freelancer maintaining client apps",
+  "income": 30000,
+  "behaviour": "Non-technical, relies on a provider",
+  "behaviour_how": "Does not install tools; would use it only if their IT provider or a simple app does it for them.",
+  "objection": "I don't trust an AI to decide what counts as the same behavior",
+  "habit": "you are planning a migration you have been postponing for a year"
+ },
+ {
+  "id": "P010",
+  "name": "Zara",
+  "age": 29,
+  "segment": "Solo developer or freelancer maintaining client apps",
+  "income": 60000,
+  "behaviour": "Tries new GitHub tools",
+  "behaviour_how": "Stars repos weekly, installs a CLI if the README convinces them in a minute.",
+  "objection": "A free project from a student: will it still be maintained next year?",
+  "habit": "a customer called last month because an update broke an invoice total"
+ },
+ {
+  "id": "P011",
+  "name": "Talia",
+  "age": 43,
+  "segment": "Solo developer or freelancer maintaining client apps",
+  "income": 39000,
+  "behaviour": "Skeptical of AI tools",
+  "behaviour_how": "Has been burned by AI hype; wants proof on their own code before trusting anything.",
+  "objection": "My tests already catch regressions",
+  "habit": "you are planning a migration you have been postponing for a year"
+ },
+ {
+  "id": "P012",
+  "name": "Kira",
+  "age": 22,
+  "segment": "Developer in a product team that uses AI coding agents daily",
+  "income": 80000,
+  "behaviour": "Needs approval to adopt",
+  "behaviour_how": "Has to justify any new tool to a manager, security team or procurement.",
+  "objection": "I don't trust an AI to decide what counts as the same behavior",
+  "habit": "a customer called last month because an update broke an invoice total"
+ },
+ {
+  "id": "P013",
+  "name": "Emma",
+  "age": 55,
+  "segment": "Solo developer or freelancer maintaining client apps",
+  "income": 62000,
+  "behaviour": "Firefighter with no time",
+  "behaviour_how": "Too busy to set anything up; adopts only what works in under an hour.",
+  "objection": "Sending screenshots of our app to an AI API is a data risk",
+  "habit": "you skim GitHub trending and Hacker News most mornings"
+ },
+ {
+  "id": "P014",
+  "name": "Emil",
+  "age": 42,
+  "segment": "Consultant at an IT services firm doing legacy migrations",
+  "income": 127000,
+  "behaviour": "Non-technical, relies on a provider",
+  "behaviour_how": "Does not install tools; would use it only if their IT provider or a simple app does it for them.",
+  "objection": "Setting up Docker or Wine sandboxes is too heavy for me",
+  "habit": "your company still runs a business app nobody fully understands"
+ },
+ {
+  "id": "P015",
+  "name": "Mateo",
+  "age": 40,
+  "segment": "Consultant at an IT services firm doing legacy migrations",
+  "income": 127000,
+  "behaviour": "Already has a test suite",
+  "behaviour_how": "Relies on unit and end-to-end tests and CI; adds tools only when tests miss something painful.",
+  "objection": "Sending screenshots of our app to an AI API is a data risk",
+  "habit": "you skim GitHub trending and Hacker News most mornings"
+ },
+ {
+  "id": "P016",
+  "name": "Oscar",
+  "age": 25,
+  "segment": "Developer in a product team that uses AI coding agents daily",
+  "income": 141000,
+  "behaviour": "Skeptical of AI tools",
+  "behaviour_how": "Has been burned by AI hype; wants proof on their own code before trusting anything.",
+  "objection": "I don't trust an AI to decide what counts as the same behavior",
+  "habit": "you merged three pull requests written by an AI agent this week"
+ },
+ {
+  "id": "P017",
+  "name": "Adrian",
+  "age": 25,
+  "segment": "Developer in a product team that uses AI coding agents daily",
+  "income": 160000,
+  "behaviour": "Non-technical, relies on a provider",
+  "behaviour_how": "Does not install tools; would use it only if their IT provider or a simple app does it for them.",
+  "objection": "Setting up Docker or Wine sandboxes is too heavy for me",
+  "habit": "your company still runs a business app nobody fully understands"
+ },
+ {
+  "id": "P018",
+  "name": "Ava",
+  "age": 33,
+  "segment": "Consultant at an IT services firm doing legacy migrations",
+  "income": 94000,
+  "behaviour": "Skeptical of AI tools",
+  "behaviour_how": "Has been burned by AI hype; wants proof on their own code before trusting anything.",
+  "objection": "Recording scenarios sounds like more work than writing tests",
+  "habit": "a customer called last month because an update broke an invoice total"
+ },
+ {
+  "id": "P019",
+  "name": "Raj",
+  "age": 58,
+  "segment": "IT staff in a public body (city, hospital, school district)",
+  "income": 50000,
+  "behaviour": "Skeptical of AI tools",
+  "behaviour_how": "Has been burned by AI hype; wants proof on their own code before trusting anything.",
+  "objection": "A free project from a student: will it still be maintained next year?",
+  "habit": "you skim GitHub trending and Hacker News most mornings"
+ },
+ {
+  "id": "P020",
+  "name": "Rosa",
+  "age": 23,
+  "segment": "Developer in a product team that uses AI coding agents daily",
+  "income": 115000,
+  "behaviour": "Tries new GitHub tools",
+  "behaviour_how": "Stars repos weekly, installs a CLI if the README convinces them in a minute.",
+  "objection": "Will it work on my stack, or only on toy demos?",
+  "habit": "a customer called last month because an update broke an invoice total"
+ }
+]

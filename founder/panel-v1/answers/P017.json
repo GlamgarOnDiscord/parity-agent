@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "Free is nice, but \"runs on your machine\" with a sandbox for old Windows apps means me setting up Docker or Wine, and I don't install that kind of tooling myself. If our IT provider ran it for us I'd look, but I'm not doing it in a normal week.",
+  "objection": "Setup weight. A sandbox that explores the app on its own sounds like a weekend of config before I see one diff, and I have no proof it understands our business app better than nobody does today.",
+  "would_change_my_mind": "A one-click hosted or packaged version that our IT provider sets up, where I just upload a screen recording and get the diff report back.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 80,
+  "price_too_expensive": 200
+}

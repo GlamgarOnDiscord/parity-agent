@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "An agent refactor broke an invoice total last month and a customer caught it before we did, so a free local tool that diffs every field between old and new is worth an afternoon. I'd install it once and point it at our billing flow; if it chokes there I'd drop it and leave a star.",
+  "objection": "Our app has auth, a real database, background jobs and third-party payment calls. I doubt a sandbox explorer built from one screen recording gets past login, seeds realistic data and handles nondeterministic fields like timestamps and IDs without burying me in false diffs. Toy demos always look clean.",
+  "would_change_my_mind": "If the README can't show it running on a real messy app with auth and a database in under a minute, or if capturing means sending our screen recordings to an outside AI API, I don't install it at all. I just star it.",
+  "price_too_cheap": 3,
+  "price_cheap": 10,
+  "price_expensive": 40,
+  "price_too_expensive": 100
+}

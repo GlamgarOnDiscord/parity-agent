@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "I don't install and babysit tools, and this is a GitHub project I'd have to set up and run on my own machine with a sandbox. Free doesn't help if it's on me to get it working right before the migration I've already put off a year.",
+  "objection": "I don't trust an AI to decide what counts as the same behavior. If it writes the business rules and I just click confirm, I'm still the one on the hook when the client finds the thing it missed.",
+  "would_change_my_mind": "Someone else running it for me, like a provider or a one-click app, plus seeing it catch a real regression on an app like mine that my own clicking around missed.",
+  "price_too_cheap": 0,
+  "price_cheap": 10,
+  "price_expensive": 40,
+  "price_too_expensive": 80
+}

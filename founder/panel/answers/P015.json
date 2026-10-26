@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "Legacy migrations are literally my job, and proving the new app behaves like the old one is the part my unit and e2e tests never fully cover because the old app barely had any. It is free and runs offline, so I would try it on one migration and keep it only if it catches something my suite missed.",
+  "objection": "I cannot put this near a client codebase until I know for sure nothing leaves the machine, and a brand-new open source project with a Meta API option in the loop is a hard sell to a client's security team. I also doubt the recording holds up on a messy old Windows app instead of a clean demo invoice.",
+  "would_change_my_mind": "If the first run on a real client app drowned me in false differences that I had to mask by hand, I would drop it and stay with my existing tests.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 100,
+  "price_too_expensive": 300
+}

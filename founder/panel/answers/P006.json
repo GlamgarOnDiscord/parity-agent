@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I merged three agent-written PRs this week and only trusted them because the tests were green, so the one-cent invoice bug the tests missed is exactly what scares me. It's free, one command, and I keep the Playwright tests, so I'll try it on one app this week.",
+  "objection": "Recording scenarios still sounds like more work than writing tests, and if the masking misses half our dynamic fields I'll drown in false diffs and drop it after a day.",
+  "would_change_my_mind": "If the first run on our real app floods me with noise diffs, or recording a flow takes longer than writing the Playwright test myself, I uninstall.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 20,
+  "price_too_expensive": 40
+}

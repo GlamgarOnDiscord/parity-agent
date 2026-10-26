@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "A client called me last month over a broken invoice total, and the README shows that exact bug being caught. It's free and it's one command, so I'll try it on one client app this week. Whether I keep it depends on how much work the recording turns out to be.",
+  "objection": "Who maintains this next year? If the replays break on my clients' apps or the repo goes quiet, I'm left with a recording format nobody supports. The Playwright export helps, but only if those tests actually run without me fixing them by hand.",
+  "would_change_my_mind": "If the first run on a real client app gives me a wall of false diffs or takes more than an hour to set up, I drop it.",
+  "price_too_cheap": 0,
+  "price_cheap": 5,
+  "price_expensive": 25,
+  "price_too_expensive": 60
+}

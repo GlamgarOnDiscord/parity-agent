@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The one-cent invoice catch is exactly what keeps me up after merging AI pull requests, but I can't put a free student project on the machine that runs our billing app and then defend it to whoever signs off. If it's abandoned next year, I'm the one explaining why our checks depend on it.",
+  "objection": "Who maintains this in a year, and who do I call when the Windows sandbox doesn't work with our old app? Free with no company behind it is a harder sell to approval than a paid tool with a name on it.",
+  "would_change_my_mind": "A company or a paid support plan behind it with a maintenance commitment, plus a short security write-up I could hand straight to the person who approves tools.",
+  "price_too_cheap": 5,
+  "price_cheap": 30,
+  "price_expensive": 150,
+  "price_too_expensive": 400
+}

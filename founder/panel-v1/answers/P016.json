@@ -1,0 +1,13 @@
+{
+  "id": "P016",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Free and local is nice, but I'm not spending an afternoon recording flows and babysitting a sandbox explorer so an AI can tell me what my business rules are. We already have tests and code review for the PRs the agent writes.",
+  "objection": "The model decides what the scenarios and rules are, so a field it never explored or a rule it misread just won't show up in the diff, and a clean report gives me false confidence.",
+  "would_change_my_mind": "Running it on one of our real agent-written PRs and having it catch a regression our test suite missed, with a diff I can verify myself.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 60,
+  "price_too_expensive": 150
+}

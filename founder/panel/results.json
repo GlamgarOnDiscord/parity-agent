@@ -1,0 +1,164 @@
+{
+ "business": "Parity (free, open-source behavior proof for software changes)",
+ "seed": 26,
+ "dealt": 20,
+ "answered": 20,
+ "skipped": [],
+ "buys": 8,
+ "passes": 12,
+ "buy_rate": 0.4,
+ "by_segment": [
+  [
+   "Consultant at an IT services firm doing legacy migrations",
+   4,
+   0.5
+  ],
+  [
+   "Solo developer or freelancer maintaining client apps",
+   4,
+   0.5
+  ],
+  [
+   "Developer in a product team that uses AI coding agents daily",
+   7,
+   0.42857142857142855
+  ],
+  [
+   "Owner or office manager of a small business running an old Windows app",
+   3,
+   0.3333333333333333
+  ],
+  [
+   "IT staff in a public body (city, hospital, school district)",
+   2,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Tries new GitHub tools",
+   4,
+   1.0
+  ],
+  [
+   "Skeptical of AI tools",
+   4,
+   0.75
+  ],
+  [
+   "Already has a test suite",
+   3,
+   0.3333333333333333
+  ],
+  [
+   "Needs approval to adopt",
+   3,
+   0.0
+  ],
+  [
+   "Firefighter with no time",
+   3,
+   0.0
+  ],
+  [
+   "Non-technical, relies on a provider",
+   3,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "$112,000 and up",
+   7,
+   0.5714285714285714
+  ],
+  [
+   "under $62,000",
+   6,
+   0.5
+  ],
+  [
+   "$62,000 to $112,000",
+   7,
+   0.14285714285714285
+  ]
+ ],
+ "why_not": [
+  [
+   "convenience",
+   6,
+   [
+    "Free is nice, but recording scenarios and standing up a Windows sandbox for our old app is not an under-an-hour job, and nobody is changing that app this month anyway. I'd star it on GitHub and forget it.",
+    "I do merge AI-written PRs and it does make me nervous, but I'm putting out fires all week and recording every scenario of our apps is a project, not a one-hour install. I'd star the repo and never get back to it."
+   ],
+   [
+    "P003",
+    "P004"
+   ]
+  ],
+  [
+   "trust",
+   4,
+   [
+    "The idea matches my job, but a one-cent invoice demo is exactly the toy case I distrust, and I can't put a new tool on a client's legacy migration without security and my manager signing off. Free doesn't help with that, the approval is the cost, and I won't start it for something I haven't seen work on a messy real app.",
+    "The one-cent invoice catch is exactly what keeps me up after merging AI pull requests, but I can't put a free student project on the machine that runs our billing app and then defend it to whoever signs off. If it's abandoned next year, I'm the one explaining why our checks depend on it."
+   ],
+   [
+    "P002",
+    "P005"
+   ]
+  ],
+  [
+   "habit",
+   2,
+   [
+    "We already have unit tests, Playwright end-to-end tests and CI gating every AI pull request, and nothing has slipped through badly enough to make me add another tool. Being free doesn't change that: setting up recordings and keeping them current costs time I'd rather spend writing the tests directly.",
+    "We already have unit tests, end-to-end tests and CI, and nothing has slipped through badly enough to make me add another tool. Recording scenarios and triaging diffs sounds like more work than writing the missing test, especially when I'm finally starting a migration I've put off for a year and don't want new moving parts."
+   ],
+   [
+    "P007",
+    "P008"
+   ]
+  ]
+ ],
+ "why_yes": [
+  [
+   "need",
+   7,
+   [
+    "I merged three AI-written PRs this week and only trusted them because CI was green, and the one-cent invoice bug that got past passing tests is exactly the kind of thing that scares me. It's free and a single command, so I'll install it on a weekend and point it at the old app.",
+    "I merged three agent-written PRs this week and only trusted them because the tests were green, so the one-cent invoice bug the tests missed is exactly what scares me. It's free, one command, and I keep the Playwright tests, so I'll try it on one app this week."
+   ],
+   [
+    "P001",
+    "P006"
+   ]
+  ],
+  [
+   "timing",
+   1,
+   [
+    "I'm about to start the migration I've been dodging for a year, and it's free and runs offline, so one afternoon pointing it at a client app before and after costs me nothing but time. If it shows me a diff my tests missed, it stays; if it buries me in noise, it's gone the same day."
+   ],
+   [
+    "P011"
+   ]
+  ]
+ ],
+ "flip": [
+  "A credible case study or a quick run on one of our own legacy apps, done in an afternoon, that catches a real regression, plus a written statement I can hand to security showing it runs fully offline with the AI turned off.",
+  "Our IT provider telling me they're replacing or upgrading the app and running this for me as part of the job.",
+  "Seeing it catch a real regression on one of our own apps in under an hour, from one command, with no scenario-writing on my side.",
+  "A company or a paid support plan behind it with a maintenance commitment, plus a short security write-up I could hand straight to the person who approves tools.",
+  "An AI-written PR that passes our whole suite and still ships a real regression to production. After that I'd try it on that exact flow.",
+  "Seeing it catch a real difference on our own app during the migration, within an hour of setup, that our existing suite missed.",
+  "My provider or a client running it on my actual migration and handing me a short report showing it caught a real break that our tests missed.",
+  "A fully offline mode with the AI parts switched off by default, plus proof it caught a real regression on a codebase like ours, so I can show my manager a concrete case instead of a README demo.",
+  "A client upgrade landing on my desk, plus proof I can go from install to a first diff on a real app in under an hour with AI fully off by default.",
+  "Our IT provider or a dev on my team setting it up and handing me a simple report I can show the client, or a hosted version where I just click through the app and get a plain yes/no per scenario.",
+  "Our IT provider or platform team turning it on for us as a hosted or one-click thing, so I just open a report after the AI agent's change and see what differs.",
+  "A year of steady commits and releases with more than one maintainer, plus a write-up from another public-sector or IT shop that ran it on a real legacy migration."
+ ],
+ "purchases_first_month_per_buyer": 1.0,
+ "price_answers": 20
+}

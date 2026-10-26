@@ -1,0 +1,13 @@
+{
+  "id": "P004",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "Free is nice, but I don't have an afternoon to install a local tool, set up a sandbox, record every workflow and then check a list of business rules some AI wrote. I just eyeball the agent's PRs, run what tests we have, and move on.",
+  "objection": "Recording scenarios and confirming rules sounds like more work than writing tests, and I doubt it works on our old Windows apps without hours of fiddling. Running Meta's models on internal public-sector app data is also something I'd have to clear with security first.",
+  "would_change_my_mind": "Watching it catch a real regression on one of our own apps in under an hour of setup, fully offline, with no data leaving the box.",
+  "price_too_cheap": 0,
+  "price_cheap": 10,
+  "price_expensive": 40,
+  "price_too_expensive": 100
+}

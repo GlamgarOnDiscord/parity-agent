@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The invoice bug is exactly the kind of thing I want caught, but \"AI explores your app and writes the business rules\" is the pitch I've heard before and it never held up on a real legacy client app. Free doesn't make it free for me: setting it up on a client's old app eats billable hours, and I'd rather write a few targeted tests on the totals I know matter.",
+  "objection": "I don't believe AI-inferred business rules will catch the subtle stuff, like a rounding or tax change on an invoice total. I'll either drown in false-positive diffs or miss the one field that matters, and either way I'd end up checking everything by hand anyway.",
+  "would_change_my_mind": "Seeing it run on a real legacy app, ideally one of ours, and flag a real regression like a changed invoice total that our tests missed, with low noise and setup in under an hour.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 100,
+  "price_too_expensive": 300
+}

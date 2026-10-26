@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I do need something like this, since I'm merging AI-written changes into an old app I can't fully check myself. But I can't take a free student project to my manager and security people and ask them to let it record screens of our business app and send them to Meta's AI.",
+  "objection": "Nobody stands behind it. If it says nothing changed and it's wrong, I'm the one who signed off on it, and next year there may be no one maintaining it at all. I also can't tell exactly where my recordings go once Meta's models are involved.",
+  "would_change_my_mind": "A named company or maintainer offering a paid support plan, plus a one-page security answer showing the recordings and data stay on our machine.",
+  "price_too_cheap": 10,
+  "price_cheap": 40,
+  "price_expensive": 150,
+  "price_too_expensive": 400
+}
