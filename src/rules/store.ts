@@ -35,7 +35,11 @@ export class RuleStore {
       `INSERT INTO rules (run_id, rule_id, body) VALUES (?, ?, ?)
        ON CONFLICT (run_id, rule_id) DO UPDATE SET body = excluded.body`,
     );
+    // Pending rules that a new extraction no longer proposes are dropped; decided ones are kept.
+    const drop = this.db.query("DELETE FROM rules WHERE run_id = ? AND rule_id = ? AND status = 'pending'");
     this.db.transaction(() => {
+      const ids = new Set(rules.map((r) => r.id));
+      for (const old of this.list(runId)) if (!ids.has(old.id)) drop.run(runId, old.id);
       for (const r of rules) upsert.run(runId, r.id, JSON.stringify(r));
     })();
   }

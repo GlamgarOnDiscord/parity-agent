@@ -13,6 +13,7 @@
     "prove": "bun scripts/prove.ts",
     "capture": "bun scripts/capture.ts",
     "rebuild": "bun scripts/rebuild.ts",
+    "record:replay": "bun scripts/record-replay.ts",
     "sample:recording": "bun scripts/make-sample-recording.ts"
   },
   "dependencies": {
