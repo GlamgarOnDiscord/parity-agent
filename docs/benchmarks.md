@@ -26,3 +26,23 @@ How noise is named: a bare label masks that label everywhere (`Reference:`). Whe
 ## Reading old table layouts
 
 FrontAccounting labels its fields with table cells, not `<label>` elements. The page reader (`src/drivers/read-fields.ts`, shared with the Playwright export) takes a label from a `td.label` cell, the text cell before a value, or the column header of a grid, numbers grid rows among data rows, and reads totals rows under a grid by their own text. Nothing is specific to FrontAccounting.
+
+## Autonomous exploration of FrontAccounting (2026-10-26)
+
+`bun run explore fixtures/proofs/frontaccounting-invoice.json --url http://127.0.0.1:8080/ --steps 12 --max-usd 0.5 --ack computer_action_requires_confirmation`
+
+The driver logs in from the proof's first steps, then Muse Spark computer use drives alone. The browser can reach 127.0.0.1:8080 and nothing else. After every step Parity reads the screen without AI and keeps it when at least half of its labels are new to the proof.
+
+| measure | value |
+|---|---|
+| Model steps | 12 (13 clicks, no typing) |
+| Cost | $0.153 |
+| Safety checks | 12, all `computer_action_requires_confirmation`, acknowledged under `--ack` |
+| New screens the recording never showed | 4 |
+
+| step | screen | rule-bearing fields |
+|---|---|---|
+| 2 | Inventory Item Sales prices | price per sales type and currency |
+| 4 | Supplier Purchasing Data | supplier price, unit conversion factor |
+| 9 | System and General GL Setup | tax algorithm, past due days |
+| 11 | Tax Types | default rate (5.0 %), GL accounts |

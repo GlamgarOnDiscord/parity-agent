@@ -57,6 +57,7 @@ class BrowserDriver implements AppDriver {
     this.context = await this.browser.createBrowserContext();
     this.page = await this.context.newPage();
     await this.page.setViewport(this.options.viewport ?? { width: 1280, height: 800 });
+    await confine(this.page, this.options.url);
   }
 
   private async find(fn: (text: string) => unknown, text: string, what: string) {
@@ -146,6 +147,10 @@ class BrowserDriver implements AppDriver {
     }
   }
 
+  async location() {
+    return this.page.url();
+  }
+
   async screenshot(): Promise<DataUrl> {
     const png = await this.page.screenshot({ type: "png", encoding: "base64" });
     return `data:image/png;base64,${png}`;
@@ -170,6 +175,25 @@ class BrowserDriver implements AppDriver {
     await this.browser.disconnect().catch(() => {});
     await this.cleanup();
   }
+}
+
+/**
+ * Local by default, also for the page: requests to any origin other than the app's are refused, so neither the
+ * app nor an exploring model can reach the network through the browser.
+ */
+async function confine(page: Page, appUrl: string) {
+  const origin = new URL(appUrl).origin;
+  await page.setRequestInterception(true);
+  page.on("request", (request) => {
+    if (request.isInterceptResolutionHandled()) return;
+    const url = request.url();
+    let allowed = url.startsWith("data:") || url.startsWith("blob:");
+    try {
+      allowed ||= new URL(url).origin === origin;
+    } catch {}
+    if (allowed) request.continue();
+    else request.abort("blockedbyclient");
+  });
 }
 
 /** CDP over Bun's native WebSocket (the `ws` package bundled in browser libraries hangs under Bun). */
@@ -202,6 +226,7 @@ async function attach(
   const context = await browser.createBrowserContext();
   const page = await context.newPage();
   await page.setViewport(options.viewport ?? { width: 1280, height: 800 });
+  await confine(page, options.url);
   return new BrowserDriver(name, browser, context, page, options, cleanup);
 }
 
