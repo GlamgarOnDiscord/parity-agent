@@ -1,5 +1,5 @@
-/** The rule review screen. Served only on 127.0.0.1; the per-launch token is embedded for its API calls. */
-export function reviewPage(runId: string, token: string): string {
+/** The rule review screen. Holds no secret: its API calls ride on the HttpOnly session cookie. */
+export function reviewPage(runId: string): string {
   const safe = (s: string) => s.replace(/[<>&"']/g, (c) => `&#${c.charCodeAt(0)};`);
   return `<!doctype html>
 <html lang="en">
@@ -48,7 +48,7 @@ export function reviewPage(runId: string, token: string): string {
 </main>
 <script>
   const RUN = ${JSON.stringify(runId)};
-  const AUTH = { authorization: "Bearer " + ${JSON.stringify(token)} };
+  const AUTH = {};
   const el = (tag, attrs = {}, ...children) => {
     const e = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs)) k === "class" ? (e.className = v) : e.setAttribute(k, v);

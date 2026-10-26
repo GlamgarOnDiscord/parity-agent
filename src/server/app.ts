@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { Hono } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
 import { z } from "zod";
 import { matchScreens } from "../fields/match";
 import type { Ledger } from "../models/ledger";
@@ -15,8 +16,10 @@ const MatchBody = z.object({
 });
 
 export interface AppOptions {
-  /** Per-launch secret required on /api/*. */
+  /** Per-launch secret for scripts on /api/*. */
   token: string;
+  /** One-time key that opens a browser session (/open?k=...). */
+  launchKey?: string;
   port: number;
   rules: RuleStore;
   /** Where captures live: runs/<run>/frames/frame-0001.png */
@@ -42,9 +45,24 @@ export function createApp(ledger: Ledger, options: AppOptions) {
     }
     await next();
   });
+  // Browser sessions: a one-time launch key, printed at startup, is exchanged for an HttpOnly cookie.
+  const session = crypto.randomUUID();
+  let launchKey: string | null = options.launchKey ?? null;
+  const SESSION_COOKIE = "parity_session";
+
+  app.get("/open", (c) => {
+    if (!launchKey || c.req.query("k") !== launchKey)
+      return c.text("This link was already used or is wrong.", 403);
+    launchKey = null;
+    setCookie(c, SESSION_COOKIE, session, { httpOnly: true, sameSite: "Strict", path: "/" });
+    const run = c.req.query("run");
+    return c.redirect(run && RUN.test(run) ? `/review/${run}` : "/");
+  });
+
   app.use("/api/*", async (c, next) => {
-    if (c.req.header("authorization") !== `Bearer ${options.token}`)
-      return c.json({ error: "unauthorized" }, 401);
+    const bearer = c.req.header("authorization") === `Bearer ${options.token}`;
+    const cookie = getCookie(c, SESSION_COOKIE) === session;
+    if (!bearer && !cookie) return c.json({ error: "unauthorized" }, 401);
     if (c.req.method === "POST" && !c.req.header("content-type")?.startsWith("application/json")) {
       return c.json({ error: "expected application/json" }, 415);
     }
@@ -56,7 +74,9 @@ export function createApp(ledger: Ledger, options: AppOptions) {
   app.get("/review/:run", (c) => {
     const run = c.req.param("run");
     if (!RUN.test(run)) return c.text("bad run", 400);
-    return c.html(reviewPage(run, options.token));
+    if (getCookie(c, SESSION_COOKIE) !== session)
+      return c.text("Open the link printed by the server first.", 401);
+    return c.html(reviewPage(run));
   });
 
   app.get("/api/runs", (c) => c.json(options.rules.runs()));
