@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Invoice (rebuilt)</title>
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 32px; color: #111; }
+  form { display: grid; grid-template-columns: 160px 220px; gap: 8px 12px; max-width: 420px; }
+  output { font-variant-numeric: tabular-nums; }
+  .totals { margin-top: 20px; display: grid; grid-template-columns: 220px 120px; gap: 6px 12px; }
+  .meta { margin-top: 20px; color: #555; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Invoice</h1>
+<form id="f">
+  <label for="billto">Bill to</label><input id="billto" />
+  <label for="item">Item</label><input id="item" />
+  <label for="qty">Quantity</label><input id="qty" inputmode="decimal" />
+  <label for="deposit">Deposit paid</label><input id="deposit" inputmode="decimal" />
+  <span></span><button type="button" id="compute">Compute</button>
+</form>
+<div class="totals" data-group="totals">
+  <span>Unit price</span><output data-field="Unit price" id="price"></output>
+  <span>Subtotal</span><output data-field="Subtotal" id="sub"></output>
+  <span>Federal tax (GST 5%)</span><output data-field="Federal tax (GST 5%)" id="gst"></output>
+  <span>Provincial tax (QST 9.975%)</span><output data-field="Provincial tax (QST 9.975%)" id="qst"></output>
+  <span>Total</span><output data-field="Total" id="total"></output>
+  <span>Balance due</span><output data-field="Balance due" id="balance"></output>
+</div>
+<div class="meta">
+  <span data-field="Printed at" id="printed"></span> ·
+  <span data-field="Reference" id="ref"></span>
+</div>
+<script>
+  // Prices as Virtual Salesman 3 stores them: cost and markup, rounded half up to the cent.
+  const CATALOG = { HW001: { cost: 8.5, markup: 1.35 } };
+  const roundCents = (x) => Math.round(Number((x * 100).toPrecision(12))) / 100;
+  const money = (x) => `$${x.toFixed(2)}`;
+  // Set by the fixture server: true reproduces the legacy behaviour, false is the naive rebuild.
+  // Virtual Salesman 3 adds the unrounded taxes and rounds the total once. Change this and the proof fails.
+  const ROUND_ONCE = true;
+
+  document.getElementById("compute").addEventListener("click", () => {
+    const item = CATALOG[document.getElementById("item").value.trim()];
+    const qty = Number(document.getElementById("qty").value) || 0;
+    const deposit = Number(document.getElementById("deposit").value) || 0;
+    if (!item) return;
+    const price = roundCents(item.cost * (1 + item.markup));
+    const sub = roundCents(price * qty);
+    const gstRaw = sub * 0.05;
+    const qstRaw = (sub + gstRaw) * 0.09975;
+    const total = ROUND_ONCE ? roundCents(sub + gstRaw + qstRaw) : sub + roundCents(gstRaw) + roundCents(qstRaw);
+    document.getElementById("price").value = money(price);
+    document.getElementById("sub").value = money(sub);
+    document.getElementById("gst").value = money(roundCents(gstRaw));
+    document.getElementById("qst").value = money(roundCents(qstRaw));
+    document.getElementById("total").value = money(roundCents(total));
+    document.getElementById("balance").value = money(roundCents(total - deposit));
+    document.getElementById("printed").textContent = new Date().toISOString();
+    document.getElementById("ref").textContent = crypto.randomUUID();
+  });
+</script>
+</body>
+</html>

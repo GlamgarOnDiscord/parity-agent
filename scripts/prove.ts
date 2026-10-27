@@ -1,8 +1,11 @@
-// Replay a proof on a candidate app and print every field: bun run prove [--proof file] [--url url | --fixed]
+// Replay a proof on a candidate app and print every field:
+// parity prove [--proof file] [--url url | --app dir | --fixed] [--json]. Exits 1 when a field differs.
+import { resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
 import { ProofSchema } from "../src/proof/schema";
+import { startApp } from "../src/rebuild/rebuild";
 import { prove } from "../src/replay/prove";
 import { serveFixture } from "./fixture-server";
 
@@ -10,14 +13,17 @@ const { values } = parseArgs({
   options: {
     proof: { type: "string", default: "fixtures/proofs/vs3-invoice.json" },
     url: { type: "string" },
+    app: { type: "string" },
     fixed: { type: "boolean", default: false },
     json: { type: "boolean", default: false },
   },
 });
 
 const proof = ProofSchema.parse(await Bun.file(values.proof).json());
-const fixture = values.url ? null : serveFixture(values.fixed);
-const url = values.url ?? `http://127.0.0.1:${fixture?.port}/`;
+// A rebuilt app folder is served the way rebuilds are; without --url or --app, the one-cent fixture.
+const served = values.app && !values.url ? await startApp(resolve(values.app)) : null;
+const fixture = values.url || served ? null : serveFixture(values.fixed);
+const url = values.url ?? served?.url ?? `http://127.0.0.1:${fixture?.port}/`;
 const driver = await openBrowser(loadConfig(), { url });
 const started = performance.now();
 
@@ -47,4 +53,5 @@ try {
 } finally {
   await driver.close();
   fixture?.stop(true);
+  served?.stop();
 }
