@@ -337,9 +337,16 @@ async function launchChrome(
   const reader = proc.stderr.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
-  const deadline = Date.now() + 20_000;
+  // A cold start on a CI runner can take tens of seconds; each read races the deadline so a silent Chrome
+  // cannot hang the replay.
+  const deadline = Date.now() + 60_000;
   while (Date.now() < deadline) {
-    const { value, done } = await reader.read();
+    const next = await Promise.race([
+      reader.read(),
+      new Promise<null>((r) => setTimeout(() => r(null), Math.max(0, deadline - Date.now()))),
+    ]);
+    if (next === null) break;
+    const { value, done } = next;
     if (done) break;
     buffer += decoder.decode(value);
     const match = /DevTools listening on (ws:\/\/\S+)/.exec(buffer);
@@ -349,7 +356,7 @@ async function launchChrome(
     }
   }
   await cleanup();
-  throw new Error(`Chrome did not open a debugging port: ${buffer.slice(0, 300)}`);
+  throw new Error(`Chrome did not open a debugging port within 60 s: ${buffer.slice(-300)}`);
 }
 
 registerBrowser("chromium", async (options) => {
