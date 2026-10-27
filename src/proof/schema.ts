@@ -33,6 +33,19 @@ export const StepSchema = z.discriminatedUnion("do", [
   z.object({ do: z.literal("check"), screen: Text, note: Text.optional() }),
 ]);
 
+/**
+ * How the reference app differs in reaching the same screen: steps it needs first (logging in) and where a path of
+ * the scenario lives on it. The scenario itself stays the same for both apps.
+ */
+export const AdapterSchema = z.object({
+  prelude: z
+    .array(StepSchema)
+    .max(50)
+    .refine((steps) => steps.every((s) => s.do !== "check"), "a prelude has no check step")
+    .default([]),
+  paths: z.record(z.string().max(256), Text.regex(/^\/(?![/\\])[^\\]*$/)).default({}),
+});
+
 export const ScenarioSchema = z.object({
   id: z.string().min(1).max(128),
   name: Text,
@@ -51,7 +64,11 @@ export const ProofSchema = z.object({
   format: z.literal("parity-proof"),
   version: z.literal(1),
   createdAt: z.string(),
-  reference: z.object({ app: Text, source: z.enum(["replay", "capture", "manual"]) }),
+  reference: z.object({
+    app: Text,
+    source: z.enum(["replay", "capture", "manual"]),
+    adapter: AdapterSchema.optional(),
+  }),
   scenarios: z.array(ScenarioSchema).max(200),
   checkpoints: z.array(CheckpointSchema).max(5000),
   /** Per checkpoint screen: legacy field id to rebuilt field id, confirmed by a person. */
@@ -64,3 +81,4 @@ export type Step = z.infer<typeof StepSchema>;
 export type Scenario = z.infer<typeof ScenarioSchema>;
 export type Checkpoint = z.infer<typeof CheckpointSchema>;
 export type Proof = z.infer<typeof ProofSchema>;
+export type Adapter = z.infer<typeof AdapterSchema>;

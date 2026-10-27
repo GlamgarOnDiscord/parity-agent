@@ -46,3 +46,32 @@ The driver logs in from the proof's first steps, then Muse Spark computer use dr
 | 4 | Supplier Purchasing Data | supplier price, unit conversion factor |
 | 9 | System and General GL Setup | tax algorithm, past due days |
 | 11 | Tax Types | default rate (5.0 %), GL accounts |
+
+## FrontAccounting end to end (2026-10-27)
+
+The whole pipeline on an app nobody here wrote, with the legacy side replayed live rather than recorded.
+
+| step | result | spend |
+|---|---|---|
+| Narrated tour filmed in the sandbox (`parity tour`, Windows speech) | 39 s, 5 scenes | none |
+| Capture: transcript, 4 key frames, fields per frame, rules | 4 rules | $0.10 |
+| Reference recorded live through an adapter (login prelude, path map) | 65 fields, 0 noisy over 3 runs | none |
+| Rebuild by Muse Code, 3 iterations with self-check over MCP | all fields but one row pairing | $6.73 as logged |
+| Targeted repair: row groups (contract rule 7) | parity, 65 of 65 fields | $0.32 |
+
+The rebuild cost is logged at the full input price; Muse Code reports about 1.7 million input tokens per self-checking iteration, part of them likely served from its cache. The self-check loop is the expensive part: one short targeted repair cost 20 times less than one self-checking iteration.
+
+### Rules extracted against rules observed by hand
+
+Rules observable on this invoice screen, written down by hand from FrontAccounting's behaviour, compared with what capture proposed from the recording:
+
+| rule observed by hand | extracted |
+|---|---|
+| Line total = quantity × price × (1 − discount % / 100) | R-01, formula checked on 2 frames |
+| Sub-total = sum of the line totals | R-02 |
+| Retail prices include the tax | R-03 states it ("already included") |
+| Included tax = sub-total × 5 / 105, to the cent | R-03, formula checked on 2 frames; never said in the narration |
+| Amount total = sub-total + shipping | R-04, formula checked on 4 frames |
+| After Add Item the entry row resets to the default item, quantity 1 | missed |
+
+Five of six rules found, no wrong rule proposed. Two formulas show contradictions on some frames: the capture read the empty entry row as a line, so its 250.00 entered the sums. The live proof has no such confusion: grid rows and the entry row are grouped by the page reader.

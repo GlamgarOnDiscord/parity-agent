@@ -5,7 +5,7 @@ import { parseArgs } from "node:util";
 import { loadConfig } from "../src/config";
 import { detectVolatile } from "../src/diff/volatile";
 import { openBrowser } from "../src/drivers";
-import { type Checkpoint, type Proof, ProofSchema, ScenarioSchema } from "../src/proof/schema";
+import { AdapterSchema, type Checkpoint, type Proof, ProofSchema, ScenarioSchema } from "../src/proof/schema";
 import { replay } from "../src/replay/replay";
 
 const { values, positionals } = parseArgs({
@@ -25,7 +25,10 @@ if (!file || !values.url) {
   process.exit(1);
 }
 const runs = Math.max(2, Number(values.runs));
-const scenario = ScenarioSchema.parse(await Bun.file(file).json());
+// A scenario file may carry how the reference app reaches the screen (login, its own paths): `reference.adapter`.
+const raw = await Bun.file(file).json();
+const scenario = ScenarioSchema.parse(raw);
+const adapter = raw.reference?.adapter ? AdapterSchema.parse(raw.reference.adapter) : undefined;
 const driver = await openBrowser(loadConfig(), { url: values.url });
 
 const results: Checkpoint[][] = [];
@@ -33,7 +36,7 @@ const times: number[] = [];
 try {
   for (let i = 0; i < runs; i++) {
     const started = performance.now();
-    results.push(await replay(driver, scenario));
+    results.push(await replay(driver, scenario, undefined, adapter));
     times.push(Math.round(performance.now() - started));
   }
 } finally {
@@ -57,7 +60,7 @@ const proof: Proof = ProofSchema.parse({
   format: "parity-proof",
   version: 1,
   createdAt: new Date().toISOString(),
-  reference: { app: values.app, source: "replay" },
+  reference: { app: values.app, source: "replay", adapter },
   scenarios: [scenario],
   checkpoints: first,
   volatile,
