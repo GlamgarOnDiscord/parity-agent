@@ -1,12 +1,91 @@
 # Sprints
 
-Building opens 2026-10-27 00:00 ET (05:00 Paris). Internal deadline 2026-11-04 20:00 Paris; official deadline 21:00 ET (Nov 5, 03:00 Paris). One sprint per day, each a GitHub milestone with the same name. A sprint is done when its exit check passes; the next one starts then.
+Building opens 2026-10-27 00:00 ET (05:00 Paris). Internal deadline 2026-11-04 20:00 Paris; official deadline 21:00 ET (Nov 5, 03:00 Paris). Each day is a GitHub milestone with the same name; a day is done when its exit check passes.
 
-Never cut: field matching, deterministic replay, volatile-field masking, the one-cent catch, the proof report. Cut first if a day slips: autonomous exploration, then FrontAccounting, then Playwright export. The cut list is frozen at the end of S3.
+Judging: impact 30 %, Meta tooling 25 %, technical depth 20 %, demo 25 %.
 
-Judging: impact 30 %, Meta tooling 25 %, technical depth 20 %, demo 25 %. Every Meta model in [pitch.md](pitch.md) runs for real by S6.
+Never cut: field matching, deterministic replay, volatile-field masking, the one-cent catch, the proof report.
 
-## S1 Foundations and field matching (Oct 27)
+## Plan v2 (2026-10-27)
+
+The first plan held one sprint per day and S1 to S8 landed on the first day (PRs #31 to #55). Plan v2 at least doubles the work per day. Each day names its exit check and its model spend; the credit line is the $150 of Meta credits, about $3.6 spent so far. The video moves to the end, once the product it shows is final.
+
+### D2 Keep proving (Oct 27)
+
+- Offline proof: replay, diff and report run with the network cut, checked by a test (S5 exit, still open)
+- One `parity` command with subcommands (`prove`, `report`, `explore`, `capture`, `rebuild`, `dev`) instead of loose scripts
+- GitHub Action: `parity prove` on every pull request, the report attached and the verdict commented, no model call
+- MCP server: `prove`, `diff`, `rules` and `report` as tools, so a coding agent (Claude Code, Muse Code) checks its own change before it opens a pull request
+- Muse Code repair runs with the Parity MCP server attached and proves its own fix
+
+Exit: a pull request that breaks the cent fails its check with the report attached; an agent calls `prove` through MCP. Spend: one repair run, about $0.6.
+
+### D3 The legacy app you can replay (Oct 28)
+
+- FrontAccounting end to end: a narrated recording made in the sandbox, capture, rules, review, Muse Code rebuild, proof against the live FrontAccounting (both sides replayed, not a recording)
+- Sales invoice with discounts, tax-included prices and two items, the screen that carries most rules
+- Rule extraction scored against hand-observed FrontAccounting rules (precision and recall in `docs/benchmarks.md`)
+- Diff screen and report for the FrontAccounting run
+
+Exit: the rebuilt FrontAccounting invoice replays against the real FrontAccounting with every field equal or a named difference. Spend: capture about $1, rebuild and repairs about $2.
+
+### D4 Find more than one cent (Oct 29)
+
+- Differential fuzzing: generated invoices (quantities, prices, discounts, items) replayed on FrontAccounting and on its rebuild, seeded and reproducible
+- Shrinking: a failing invoice is reduced to the smallest one that still differs
+- Each new difference becomes a scenario in the proof, so it is never lost
+- Repair loop on fuzz failures until a fuzz budget of N invoices passes
+
+Exit: fuzzing finds at least one difference the recording did not show, shrinks it, and the repair closes it. Spend: repairs about $2.
+
+### D5 Differences people decide (Oct 30)
+
+- Accept a difference: the expert marks it as a legacy bug kept on purpose or a change accepted, with who and why, stored in the proof and shown in the report
+- "Send to Muse Code" from the diff screen: one click starts a repair with the difference as evidence, progress shown live
+- Repair history per run: iterations, cost, fields equal over time (the parity card of the mockups)
+- Muse Spark Open on Baseten for rule extraction, if a key is available (open-weights bonus)
+
+Exit: from the diff screen, one difference is accepted with a reason and another is repaired by Muse Code in one click. Spend: about $1.
+
+### D6 Exploration that writes tests (Oct 31)
+
+- Exploration traces become scenarios: each new screen found by Muse Spark computer use is turned into replayable steps with label-based targets and recorded as reference
+- Coverage map counts explored screens and scenarios; the diff shows what exploration added
+- Desktop replay of Virtual Salesman 3 under Wine with Muse Spark computer use, so the Windows app can be re-captured on a new scenario without a person
+
+Exit: one scenario that no person wrote is replayed on both FrontAccounting and its rebuild; VS3 is driven by the agent through one invoice. Spend: about $1.
+
+### D7 Proof for strangers (Nov 1)
+
+- Landing page with the one-cent story, the GIF and a two-minute start (GitHub Pages, no tracking)
+- Benchmarks: replay time and flakiness per browser driver (Puppeteer, Lightpanda), model cost and accuracy per role, noise per app
+- Security pass over the whole repository and the threat model written down
+- Network-cut demo and the send log as a short clip
+
+Exit: a stranger lands on the page, runs the two-minute start and gets the cent. Spend: none.
+
+### D8 Video (Nov 2)
+
+- Script for 3:00 from the final product; every shot real
+- Screen recordings: recording to rules, rules to rebuild, the one-cent diff, fuzzing, the pull-request check, the agent calling Parity
+- Voice and music, captions, export under 3:00
+- X thread drafted around the one-cent story (Most Viral on X bonus)
+
+Exit: the final video is exported under 3:00.
+
+### D9 Buffer and polish (Nov 3)
+
+- Fixes from a full clean-clone run on Windows and in a Linux container
+- README, decisions and benchmarks final; issues closed or labelled
+- Submission form fields drafted
+
+### D10 Submit (Nov 4)
+
+- Clean-clone check at 09:00; video uploaded by 12:00; submission sent by 16:00, before the 20:00 internal deadline
+
+## Plan v1 (done on 2026-10-26)
+
+### S1 Foundations and field matching (Oct 27)
 
 - Scaffold: Bun, TypeScript, Hono on 127.0.0.1, bun:sqlite, Zod, Biome, tests
 - `ModelClient` by role and `BrowserDriver` / `DesktopDriver` interfaces, chosen by config ([decisions.md](decisions.md) D1)
@@ -16,7 +95,7 @@ Judging: impact 30 %, Meta tooling 25 %, technical depth 20 %, demo 25 %. Every 
 
 Exit: the VS3 invoice screen and a hand-made web invoice screen are matched field by field, and the run shows its cost.
 
-## S2 Replay, diff and noise (Oct 28)
+### S2 Replay, diff and noise (Oct 28)
 
 - Scenario format (steps, expected fields), versioned JSON proof format
 - Deterministic replay on VS3 (DesktopDriver) and on a web app (BrowserDriver)
@@ -25,7 +104,7 @@ Exit: the VS3 invoice screen and a hand-made web invoice screen are matched fiel
 
 Exit: the one-cent difference is caught on a hand-written scenario, with zero false differences.
 
-## S3 Capture and rules (Oct 29)
+### S3 Capture and rules (Oct 29)
 
 - Recording ingestion: key frames on scene changes
 - Narration transcribed (Muse Voice Transcribe), aligned to frames
@@ -35,7 +114,7 @@ Exit: the one-cent difference is caught on a hand-written scenario, with zero fa
 
 Exit: from one VS3 recording, the tax-on-tax rule is extracted with evidence and accepted in a click; count how many of the 15 hand-observed rules come out.
 
-## S4 Rebuild and repair (Oct 30)
+### S4 Rebuild and repair (Oct 30)
 
 - Generated-app skeleton (Hono, SQLite, HTML)
 - Muse Code builds the invoice screen from accepted rules and the field model
@@ -43,7 +122,7 @@ Exit: from one VS3 recording, the tax-on-tax rule is extracted with evidence and
 
 Exit: the rebuilt invoice screen replays the VS3 scenarios with every field equal.
 
-## S5 Trust features (Oct 31)
+### S5 Trust features (Oct 31)
 
 - Coverage map: what was recorded, explored and never tested
 - Local by default: replays and diffs offline; the send log shown in the UI
@@ -52,14 +131,14 @@ Exit: the rebuilt invoice screen replays the VS3 scenarios with every field equa
 
 Exit: a run works with the network cut except for capture, and the UI shows every call that left.
 
-## S6 Second app and exploration (Nov 1)
+### S6 Second app and exploration (Nov 1)
 
 - FrontAccounting as the second target, an app the founder did not write; noise measured (done: [benchmarks.md](benchmarks.md))
 - Autonomous exploration with Muse Spark computer use finds a screen the recording missed (done: 4 screens, $0.15)
 
 Exit: one FrontAccounting scenario replays with a clean diff; noise figures recorded.
 
-## S7 Proof report and README (Nov 2)
+### S7 Proof report and README (Nov 2)
 
 - One-page proof report (light document style): verdict, each difference with evidence, sign-off (done: `bun run report`)
 - README with real numbers only, demo GIF, licence chosen (done: Apache-2.0; a clean clone gets the one-cent diff without a key)
@@ -67,14 +146,14 @@ Exit: one FrontAccounting scenario replays with a clean diff; noise figures reco
 
 Exit: a stranger can follow the README on a clean clone and get a diff.
 
-## S8 Polish and video (Nov 3)
+### S8 Polish and video (Nov 3)
 
 - Craft on the two screens that matter: rule review and diff (done: `/review/<run>` and `/diff/<run>`, reviewed until ship)
 - Record the 3-minute video from the script in [pitch.md](pitch.md); every second real
 
 Exit: final video exported, under 3:00.
 
-## S9 Submit (Nov 4)
+### S9 Submit (Nov 4)
 
 - Buffer for fixes; clean-clone check at 09:00
 - Video uploaded by 12:00; submission sent by 16:00, before the 20:00 internal deadline
