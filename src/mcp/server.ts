@@ -16,6 +16,12 @@ export interface ParityMcpOptions {
   rules: RuleStore;
   /** The parity command, for the replays (each runs in its own process with its own browser). */
   parityBin: string;
+  /**
+   * Pinned mode, for an agent repairing one app: `prove` only accepts this proof and this app folder, no URL, and
+   * the other tools are not offered. The agent cannot point the browser at another local service or at a proof
+   * it wrote itself.
+   */
+  pinned?: { proof: string; app: string };
 }
 
 const RUN = /^[\w.-]{1,64}$/;
@@ -53,6 +59,13 @@ export function createParityMcp(o: ParityMcpOptions) {
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
     async ({ proof, url, app }) => {
+      if (o.pinned) {
+        const same = (a: string | undefined, b: string) => a !== undefined && resolve(root, a) === resolve(b);
+        if (url || !same(proof, o.pinned.proof) || !same(app, o.pinned.app))
+          return refuse(
+            `This session proves one app only: proof = "${relative(root, o.pinned.proof).replaceAll("\\", "/")}", app = "${relative(root, o.pinned.app).replaceAll("\\", "/")}".`,
+          );
+      }
       const proofPath = inside(proof);
       if (!proofPath || !existsSync(proofPath)) return refuse(`No proof at ${proof} inside the project.`);
       if (
@@ -96,6 +109,8 @@ export function createParityMcp(o: ParityMcpOptions) {
       return text(`${await summary.text()}\nReport: ${join(out, "report.html")}\nExit code: ${code}`);
     },
   );
+
+  if (o.pinned) return server;
 
   server.registerTool(
     "runs",
