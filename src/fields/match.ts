@@ -86,7 +86,9 @@ function positionScore(a: Field, b: Field): number {
  * never because they happen to hold the same value. Otherwise a regression could hide a mismatch.
  */
 export function pairScore(a: Field, b: Field): number {
-  const groupBonus = a.group && b.group && a.group === b.group ? 0.05 : 0;
+  // When both apps say which line or block a field sits in, that decides between fields with the same label (the
+  // Total of line 1 and the Total of line 2). Without groups on both sides, position decides as before.
+  const groupBonus = a.group && b.group ? (a.group === b.group ? 0.15 : -0.15) : 0;
   return Math.min(
     1,
     WEIGHTS.label * labelSimilarity(a.label, b.label) +

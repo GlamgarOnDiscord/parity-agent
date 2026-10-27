@@ -1,0 +1,44 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "setup": [
+    { "do": "open", "path": "/" },
+    { "do": "fill", "field": "User name", "value": "admin" },
+    { "do": "fill", "field": "Password", "value": "password" },
+    { "do": "click", "target": "Login" }
+  ],
+  "scenes": [
+    {
+      "steps": [{ "do": "open", "path": "/sales/sales_order_entry.php?NewInvoice=0" }],
+      "say": "I open a new direct sales invoice for Donald Easter, on the retail price list. Prices on this list already include the tax.",
+      "seconds": 8
+    },
+    {
+      "steps": [
+        { "do": "fill", "field": "Item Code", "value": "101" },
+        { "do": "fill", "field": "Quantity", "value": "3" },
+        { "do": "fill", "field": "Discount %", "value": "10" }
+      ],
+      "say": "Three iPad Air at three hundred each, and he gets ten percent off this line.",
+      "seconds": 6
+    },
+    {
+      "steps": [{ "do": "click", "target": "Add Item" }],
+      "say": "The line total is the quantity times the price, less the discount percentage. Three times three hundred is nine hundred, minus ten percent, eight hundred and ten.",
+      "seconds": 10
+    },
+    {
+      "steps": [
+        { "do": "fill", "field": "Item Code", "value": "103" },
+        { "do": "fill", "field": "Quantity", "value": "2" },
+        { "do": "click", "target": "Add Item" }
+      ],
+      "say": "Two cover cases at fifty, with no discount, make one hundred.",
+      "seconds": 6
+    },
+    {
+      "steps": [],
+      "say": "The sub-total adds up the lines. Shipping is zero here, so the amount total is the sub-total plus shipping: nine hundred and ten.",
+      "seconds": 9
+    }
+  ]
+}

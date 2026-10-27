@@ -164,7 +164,8 @@ function repairPrompt(result: ProveResult): string {
   }
   lines.push(
     "",
-    "Re-read the business rules and their formulas in SPEC.md, especially where rounding happens.",
+    "Re-read the business rules and their formulas in SPEC.md, especially where rounding happens, and check every",
+    "rule of CONTRACT.md, including the data-group on each line of a grid: Parity pairs repeated labels by line.",
   );
   return lines.join("\n");
 }

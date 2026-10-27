@@ -36,6 +36,11 @@ const COMMANDS: Record<string, { script: string; about: string; models: boolean 
     models: false,
   },
   export: { script: "export-playwright.ts", about: "write a Playwright test from a proof", models: false },
+  tour: {
+    script: "film-tour.ts",
+    about: "film a narrated tour of a web app, as input for capture",
+    models: false,
+  },
   film: {
     script: "record-replay.ts",
     about: "film the rebuilt app next to the legacy recording",

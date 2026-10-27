@@ -144,6 +144,18 @@ export function scanPage(find?: string): RawField[] | Element | null {
             return;
           }
         }
+        // A totals line under a grid that writes its amount inside its own label cell, the value cells after it
+        // left empty: "Included Tax (5%) 43.33".
+        if (!grid && head && cell.colSpan > 1 && !VALUE.test(text)) {
+          const split = /^(.*\S)\s+(\S+)$/.exec(text);
+          const after = cells.slice(i + 1);
+          const empty =
+            after.length > 0 && after.every((c) => clean(c.textContent) === "" && !c.querySelector(CONTROLS));
+          if (split?.[1] && split[2] && VALUE.test(split[2]) && empty) {
+            push(cell, split[1], split[2], undefined);
+            return;
+          }
+        }
         // A grid row under a header row: every cell is a field, grouped by row.
         if (grid) {
           const label = headerOf(cell);
