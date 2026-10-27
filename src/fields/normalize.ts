@@ -100,7 +100,8 @@ export function inferKind(raw: string): FieldKind {
   if (ISO_DATE.test(s) || SLASH_DATE.test(s)) return "date";
   if (/^(true|false|yes|no|checked|unchecked)$/i.test(s)) return "bool";
   if (/[$€£]/.test(s) && MONEY.test(s)) return "money";
-  if (/^[-+(]?\d{1,3}([ ,. ]\d{3})*[.,]\d{2}\)?$/.test(s)) return "money";
+  // Two decimals is money, with or without thousands separators: 1,200.00 and 1200.00 are the same amount.
+  if (/^[-+(]?(?:\d{1,3}(?:[ ,. ]\d{3})+|\d+)[.,]\d{2}\)?$/.test(s)) return "money";
   if (PLAIN_NUMBER.test(s)) return "number";
   return "text";
 }
