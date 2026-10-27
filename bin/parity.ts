@@ -42,6 +42,7 @@ const COMMANDS: Record<string, { script: string; about: string; models: boolean 
     models: false,
   },
   models: { script: "check-models.ts", about: "one real call per Meta model", models: true },
+  mcp: { script: "mcp.ts", about: "Parity as tools for coding agents (MCP on stdio)", models: false },
 };
 
 const ROOT = resolve(import.meta.dir, "..");
