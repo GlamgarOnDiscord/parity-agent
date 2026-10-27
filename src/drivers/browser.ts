@@ -341,10 +341,15 @@ async function launchChrome(
   // cannot hang the replay.
   const deadline = Date.now() + 60_000;
   while (Date.now() < deadline) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const next = await Promise.race([
       reader.read(),
-      new Promise<null>((r) => setTimeout(() => r(null), Math.max(0, deadline - Date.now()))),
+      new Promise<null>((r) => {
+        timer = setTimeout(() => r(null), Math.max(0, deadline - Date.now()));
+      }),
     ]);
+    // A pending timer would keep the whole process alive until the deadline.
+    clearTimeout(timer);
     if (next === null) break;
     const { value, done } = next;
     if (done) break;
