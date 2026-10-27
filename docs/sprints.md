@@ -22,7 +22,7 @@ Exit: a pull request that breaks the cent fails its check with the report attach
 
 ### D3 The legacy app you can replay (Oct 28)
 
-- FrontAccounting end to end: a narrated recording made in the sandbox, capture, rules, review, Muse Code rebuild, proof against the live FrontAccounting (both sides replayed, not a recording)
+- FrontAccounting end to end: a narrated recording made in the sandbox, capture, rules, review, Muse Code rebuild, proof against the live FrontAccounting (both sides replayed, not a recording) (done: parity on 65 fields)
 - Sales invoice with discounts, tax-included prices and two items, the screen that carries most rules
 - Rule extraction scored against hand-observed FrontAccounting rules (precision and recall in `docs/benchmarks.md`)
 - Diff screen and report for the FrontAccounting run

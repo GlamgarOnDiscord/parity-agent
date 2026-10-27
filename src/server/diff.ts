@@ -11,6 +11,8 @@ export interface SavedResult {
   at: string;
   /** Candidate screenshot file names under runs/<run>/evidence, by `scenario:step`. */
   evidence: Record<string, string>;
+  /** Reference app screenshots under runs/<run>/evidence, when the reference was replayed rather than recorded. */
+  reference?: Record<string, string>;
 }
 
 export interface DiffInput {
@@ -141,12 +143,12 @@ function strip(src: string, b: Box, verdict: FieldDiff["verdict"], alt: string, 
 }
 
 /** The signature: one screen over the other, split by a knob, set by default between the two fields. */
-function compare(f: FieldDiff, run: string, frameNo: number, shot: string, appName: string) {
+function compare(f: FieldDiff, run: string, legacySrc: string, shot: string, appName: string) {
   const legacy = {
-    src: `/api/runs/${run}/frames/${frameNo}`,
+    src: legacySrc,
     box: f.legacy.box,
     name: "Legacy",
-    alt: `${appName}, recorded frame ${frameNo}`,
+    alt: `${appName}, reference screen`,
   };
   const rebuilt = {
     src: `/api/runs/${run}/evidence/${encodeURIComponent(shot)}`,
@@ -304,11 +306,21 @@ ${ticks(
     result.checkpoints.flatMap((c) =>
       c.diff.fields.filter((f) => f.verdict === "different").map((f) => ({ c, f })),
     )[0] ?? result.checkpoints.flatMap((c) => c.diff.fields.slice(0, 1).map((f) => ({ c, f })))[0];
+  const safeName = (name: string | undefined) =>
+    name && /^[\w.-]{1,96}\.png$/.test(name) ? name : undefined;
+  const shot = focus ? safeName(evidence[`${focus.c.scenario}:${focus.c.step}`]) : undefined;
+  // The reference screen: a key frame of the recording, or the reference app's own screenshot when it was replayed.
   const frameNo = focus ? Number(/^frame-(\d+)$/.exec(focus.c.screen)?.[1]) : Number.NaN;
-  const shotName = focus ? evidence[`${focus.c.scenario}:${focus.c.step}`] : undefined;
-  const shot = shotName && /^[\w.-]{1,96}\.png$/.test(shotName) ? shotName : undefined;
+  const referenceShot = focus
+    ? safeName(d.saved.reference?.[`${focus.c.scenario}:${focus.c.step}`])
+    : undefined;
+  const legacySrc = Number.isInteger(frameNo)
+    ? `/api/runs/${run}/frames/${frameNo}`
+    : referenceShot
+      ? `/api/runs/${run}/evidence/${encodeURIComponent(referenceShot)}`
+      : undefined;
   let both = "";
-  if (focus && Number.isInteger(frameNo) && shot) {
+  if (focus && legacySrc && shot) {
     const { c, f } = focus;
     const differs = f.verdict === "different";
     // One scale for both strips, from the smaller field box: the text inside a tall control is no taller.
@@ -316,7 +328,7 @@ ${ticks(
     const strips =
       f.legacy.box && f.rebuilt.box
         ? `<div class="strips" data-view="field" hidden>
-  <figure><figcaption>Legacy</figcaption>${strip(`/api/runs/${run}/frames/${frameNo}`, f.legacy.box, f.verdict, `Legacy, ${f.legacy.label}`, scale)}</figure>
+  <figure><figcaption>Legacy</figcaption>${strip(legacySrc, f.legacy.box, f.verdict, `Legacy, ${f.legacy.label}`, scale)}</figure>
   <figure><figcaption>Rebuilt</figcaption>${strip(`/api/runs/${run}/evidence/${encodeURIComponent(shot)}`, f.rebuilt.box, f.verdict, `Rebuilt, ${f.rebuilt.label}`, scale)}</figure>
 </div>`
         : "";
@@ -328,7 +340,7 @@ ${ticks(
         : ""
     }</header>
 <div class="body">
-${compare(f, run, frameNo, shot, d.proof.reference.app)}
+${compare(f, run, legacySrc, shot, d.proof.reference.app)}
 ${strips}
 <div class="caption">${
       differs

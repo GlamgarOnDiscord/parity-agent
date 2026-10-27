@@ -1,9 +1,12 @@
-import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from "bun:test";
 import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
 import type { AppDriver } from "../src/drivers/types";
 import { explore } from "../src/explore/explore";
 import type { ComputerAction, ComputerClient, ComputerRequest, ComputerStep } from "../src/models/types";
+
+// Chrome starts cold on CI runners; hooks that launch it need more than the default 5 s.
+setDefaultTimeout(60_000);
 
 const link = (href: string, top: number, text: string) =>
   `<a href="${href}" style="position:absolute;left:20px;top:${top}px;width:200px;height:30px">${text}</a>`;

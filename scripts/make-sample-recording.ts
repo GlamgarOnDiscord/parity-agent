@@ -2,6 +2,7 @@
 // recording. Windows only (narration uses the built-in speech synthesizer). Output: runs/sample/recording.mp4
 import { mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { speak } from "../src/capture/speak";
 import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
 import type { Step } from "../src/proof/schema";
@@ -42,18 +43,6 @@ async function run(args: string[]) {
   const code = await proc.exited;
   if (code !== 0)
     throw new Error(`${args[0]} failed: ${(await new Response(proc.stderr).text()).slice(-300)}`);
-}
-
-async function speak(text: string, wav: string) {
-  const ps = [
-    "Add-Type -AssemblyName System.Speech",
-    "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer",
-    "$f = New-Object System.Speech.AudioFormat.SpeechAudioFormatInfo(16000, [System.Speech.AudioFormat.AudioBitsPerSample]::Sixteen, [System.Speech.AudioFormat.AudioChannel]::Mono)",
-    `$s.SetOutputToWaveFile('${wav.replace(/'/g, "''")}', $f)`,
-    `$s.Speak('${text.replace(/'/g, "''")}')`,
-    "$s.Dispose()",
-  ].join("; ");
-  await run(["powershell.exe", "-NoProfile", "-Command", ps]);
 }
 
 const fixture = serveFixture(true);
