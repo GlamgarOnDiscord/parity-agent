@@ -16,6 +16,7 @@ import { ProofSchema } from "../src/proof/schema";
 import { startApp } from "../src/rebuild/rebuild";
 import { prove } from "../src/replay/prove";
 import { renderReport } from "../src/report/report";
+import { summaryOf } from "../src/report/summary";
 import { RuleStore } from "../src/rules/store";
 import { openDb } from "../src/store/db";
 import { serveFixture } from "./fixture-server";
@@ -29,6 +30,8 @@ const { values, positionals } = parseArgs({
     fixture: { type: "boolean", default: false },
     fixed: { type: "boolean", default: false },
     out: { type: "string" },
+    // Markdown verdict for a pull request comment or a CI step summary.
+    summary: { type: "string" },
   },
 });
 
@@ -135,5 +138,6 @@ if (runDir) {
 }
 const out = values.out ?? (runDir ? join(runDir, "report.html") : "runs/report.html");
 await Bun.write(out, html);
+if (values.summary) await Bun.write(values.summary, summaryOf(proof.reference.app, candidate, result));
 console.log(`${result.equal ? "PARITY" : "NO PARITY"}. Report: ${out}`);
 process.exitCode = result.equal ? 0 : 1;
