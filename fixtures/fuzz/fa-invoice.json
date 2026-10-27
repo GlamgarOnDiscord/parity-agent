@@ -1,0 +1,12 @@
+{
+  "id": "fa-invoice",
+  "name": "Direct sales invoice",
+  "open": "/",
+  "line": [
+    { "field": "Item Code", "oneOf": ["101", "103", "102", "201", "202", "301"] },
+    { "field": "Quantity", "int": [1, 999] },
+    { "field": "Discount %", "oneOf": ["0", "10", "5", "12.5", "33.3", "50"], "optional": 0.7 }
+  ],
+  "add": "Add Item",
+  "lines": [1, 4]
+}

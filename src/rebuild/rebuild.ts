@@ -144,16 +144,31 @@ async function proveApp(config: Config, appDir: string, proof: Proof): Promise<P
   }
 }
 
-function repairPrompt(result: ProveResult): string {
+/** What the user typed and clicked before a checkpoint: without it, a wrong value cannot be traced to its input. */
+function inputsBefore(proof: Proof, scenarioId: string, step: number): string {
+  const scenario = proof.scenarios.find((s) => s.id === scenarioId);
+  return (scenario?.steps.slice(0, step) ?? [])
+    .map((s) => (s.do === "fill" ? `${s.field} = ${s.value}` : s.do === "click" ? `click ${s.target}` : null))
+    .filter(Boolean)
+    .join("; ");
+}
+
+export function repairPrompt(result: ProveResult, proof: Proof): string {
   const lines = [
-    "The rebuilt app does not match the legacy app yet. Parity replayed the scenario from SPEC.md and compared",
-    "every field in plain code. Fix public/ so every field below matches exactly; keep CONTRACT.md.",
-    "",
+    "The rebuilt app does not match the legacy app yet. Parity replayed the scenarios below on both apps and",
+    "compared every field in plain code. Fix public/ so every field matches exactly; keep CONTRACT.md.",
   ];
   for (const c of result.checkpoints) {
-    for (const f of c.diff.fields.filter((x) => x.verdict === "different")) {
+    const different = c.diff.fields.filter((x) => x.verdict === "different");
+    if (different.length === 0 && c.diff.missingInRebuilt.length === 0) continue;
+    lines.push(
+      "",
+      `Scenario \`${c.scenario}\`, after: ${inputsBefore(proof, c.scenario, c.step) || "opening"}`,
+    );
+    for (const f of different) {
+      const at = f.legacy.group ? ` (line ${f.legacy.group})` : "";
       lines.push(
-        `- \`${f.legacy.label}\`: the legacy app shows \`${f.legacy.value}\`, the rebuilt app shows \`${f.rebuilt.value}\``,
+        `- \`${f.legacy.label}\`${at}: the legacy app shows \`${f.legacy.value}\`, the rebuilt app shows \`${f.rebuilt.value}\``,
       );
     }
     for (const f of c.diff.missingInRebuilt) {
@@ -164,6 +179,8 @@ function repairPrompt(result: ProveResult): string {
   }
   lines.push(
     "",
+    "A value tied to one input (the description or price of one item code) is data of the legacy app: take it",
+    "from the scenario that shows it, never guess it. Keep every case that already matches.",
     "Re-read the business rules and their formulas in SPEC.md, especially where rounding happens, and check every",
     "rule of CONTRACT.md, including the data-group on each line of a grid: Parity pairs repeated labels by line.",
   );
@@ -215,7 +232,7 @@ export async function rebuild(
       final = first;
       iterations.push({ n: 0, kind: "repair", costUsd: 0, equal: first.equal, ...counts(first) });
       if (first.equal) return { appDir, iterations, final };
-      prompt = repairPrompt(first);
+      prompt = repairPrompt(first, options.proof);
     }
   }
 
@@ -283,7 +300,7 @@ export async function rebuild(
     it.equal = final.equal;
     Object.assign(it, counts(final));
     if (final.equal) break;
-    prompt = repairPrompt(final);
+    prompt = repairPrompt(final, options.proof);
   }
   return { appDir, iterations, final };
 }

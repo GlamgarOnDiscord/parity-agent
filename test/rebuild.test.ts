@@ -82,3 +82,43 @@ describe("proofFromCapture", () => {
     expect(spec).not.toContain('Quantity "3" -> Unit price');
   });
 });
+
+describe("repair prompt", () => {
+  test("ties every difference to the inputs that produced it and to its line", async () => {
+    const { repairPrompt } = await import("../src/rebuild/rebuild");
+    const { diffScreens } = await import("../src/diff/diff");
+    const { matchScreens } = await import("../src/fields/match");
+    const proof = ProofSchema.parse({
+      format: "parity-proof",
+      version: 1,
+      createdAt: "2026-10-28T00:00:00Z",
+      reference: { app: "ref", source: "replay" },
+      scenarios: [
+        {
+          id: "inv-fuzz-a1",
+          name: "one service line",
+          steps: [
+            { do: "open", path: "/" },
+            { do: "fill", field: "Item Code", value: "202" },
+            { do: "click", target: "Add Item" },
+            { do: "check", screen: "inv-fuzz-a1" },
+          ],
+        },
+      ],
+      checkpoints: [],
+    });
+    const line = (value: string) => ({ id: "d", label: "Item Description", value, group: "row-1" });
+    const diff = diffScreens(
+      matchScreens(
+        { id: "s", app: "a", fields: [line("Maintenance")] },
+        { id: "s", app: "b", fields: [line("iPhone 6 64GB")] },
+      ),
+    );
+    const prompt = repairPrompt(
+      { volatile: [], equal: false, checkpoints: [{ scenario: "inv-fuzz-a1", step: 3, screen: "s", diff }] },
+      proof,
+    );
+    expect(prompt).toContain("after: Item Code = 202; click Add Item");
+    expect(prompt).toContain("`Item Description` (line row-1): the legacy app shows `Maintenance`");
+  });
+});

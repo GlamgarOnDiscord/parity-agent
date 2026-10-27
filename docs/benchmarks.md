@@ -75,3 +75,21 @@ Rules observable on this invoice screen, written down by hand from FrontAccounti
 | After Add Item the entry row resets to the default item, quantity 1 | missed |
 
 Five of six rules found, no wrong rule proposed. Two formulas show contradictions on some frames: the capture read the empty entry row as a line, so its 250.00 entered the sums. The live proof has no such confusion: grid rows and the entry row are grouped by the page reader.
+
+## Differential fuzzing of the FrontAccounting rebuild (2026-10-27)
+
+`parity fuzz fixtures/fuzz/fa-invoice.json --proof runs/fa/proof.json --reference-url http://127.0.0.1:8080/ --app generated/fa/app --seed 1 --count 12 --repair`
+
+The spec draws 1 to 4 lines per invoice from the six items of the demo data, quantities from 1 to 999 and six discounts. Each case is played on live FrontAccounting and on the rebuild at the same time, and compared field by field. A case that differs is shrunk: lines dropped, optional inputs left out, values moved toward the simplest one, and a case is only kept if every label that first differed still differs.
+
+| step | result | spend |
+|---|---|---|
+| 12 cases, seed 1, on the rebuild that had parity on the recorded scenario | 9 of 12 differ: items 201, 202 and 301, never shown in the recording, came out as the default item at 250.00 | none |
+| Shrinking | each kind of difference, first seen on invoices of up to 3 lines and quantities up to 918, reduced to quantity 1 on one line, or two when the tax difference needs a priced line beside the free one; 7 to 20 replays each | none |
+| First two repairs, prompt without the inputs | no fix: Muse Code got the expected descriptions but not which item code showed them, and swapped 201 and 202 | $1.22 |
+| Repair prompt now names the inputs and the line of each difference | parity on the 7 scenarios of the proof | $0.46 |
+| Seed 1 again, then seeds 2 and 3 never used before | 52 cases, parity on every one | none |
+
+What it found was data, not arithmetic: line totals, the included tax and thousands formatting held on every case, and the item master was missing. A first run also caught two faults in Parity itself, now fixed and tested: `1200.00` was read as a plain number and compared as text against `1,200.00`, and shrinking drifted from one difference to another one already reported.
+
+Not covered yet: item codes that do not exist. The rebuild still falls back to a default item where FrontAccounting refuses the line; adding an unknown code to the spec is the next case to find.
