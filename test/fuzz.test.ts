@@ -156,7 +156,9 @@ describe("differential fuzzing on two live apps", () => {
       checkpoints: [],
     });
     const once = addFailures(proof, small, report);
-    expect(once.added).toEqual([`inv-fuzz-3-${f?.index}`]);
+    expect(once.added).toHaveLength(1);
+    expect(once.added[0]).toMatch(/^inv-fuzz-[0-9a-f]{1,10}$/);
+    expect(once.proof.scenarios[0]?.name).toContain(`seed 3, case ${f?.index}`);
     expect(once.proof.checkpoints[0]?.screen.id).toBe(once.added[0] as string);
     expect(once.proof.checkpoints[0]?.screen.fields.find((x) => x.label === "Sub-total")?.value).toBe("0.00");
     expect(addFailures(once.proof, small, report).added).toEqual([]);

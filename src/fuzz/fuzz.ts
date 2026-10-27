@@ -142,8 +142,10 @@ export function addFailures(
   const next: Proof = { ...proof, scenarios: [...proof.scenarios], checkpoints: [...proof.checkpoints] };
   const added: string[] = [];
   for (const f of report.failures) {
-    const id = `${spec.id}-fuzz-${report.seed}-${f.index}`;
-    const scenario = caseScenario(spec, f.case, id, `${spec.name}: ${describeCase(spec, f.case)}`);
+    // Named after the case itself: a later round with the same seed may shrink another case at the same index.
+    const id = `${spec.id}-fuzz-${Bun.hash(JSON.stringify(f.case)).toString(16).slice(0, 10)}`;
+    const name = `${spec.name}: ${describeCase(spec, f.case)} (seed ${report.seed}, case ${f.index})`;
+    const scenario = caseScenario(spec, f.case, id, name);
     const steps = JSON.stringify(scenario.steps.slice(0, -1));
     if (next.scenarios.some((s) => s.id === id || JSON.stringify(s.steps.slice(0, -1)) === steps)) continue;
     next.scenarios.push(scenario);
