@@ -98,6 +98,12 @@ describe("Parity MCP server", () => {
       "not a Parity proof",
     );
     expect((await call("rules", { run: "../x" })).error).toBe(true);
+    const file = await call("prove", {
+      proof: "examples/invoice/parity.proof.json",
+      url: "file://localhost/C:/Windows/win.ini",
+    });
+    expect(file.error).toBe(true);
+    expect(file.text).toContain("web apps");
   });
 
   test("prove replays the example and returns the verdict", async () => {

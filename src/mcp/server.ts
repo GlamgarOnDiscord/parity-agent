@@ -65,13 +65,17 @@ export function createParityMcp(o: ParityMcpOptions) {
         return refuse(`${proof} is not a Parity proof.`);
       const args = ["report", "--proof", proofPath];
       if (url) {
-        let host = "";
+        let target: URL | undefined;
         try {
-          host = new URL(url).hostname;
+          target = new URL(url);
         } catch {}
-        if (!LOOPBACK.has(host))
-          return refuse("Parity only proves apps running on this machine (127.0.0.1 or localhost).");
-        args.push("--url", url);
+        // Web apps only: a file: or other scheme on "localhost" would let a replay read local files.
+        const web = target && (target.protocol === "http:" || target.protocol === "https:");
+        if (!target || !web || !LOOPBACK.has(target.hostname))
+          return refuse(
+            "Parity only proves web apps running on this machine (http://127.0.0.1 or localhost).",
+          );
+        args.push("--url", target.href);
       } else if (app) {
         const dir = inside(app);
         if (!dir || !existsSync(dir)) return refuse(`No app folder at ${app} inside the project.`);

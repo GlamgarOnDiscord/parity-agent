@@ -1,5 +1,5 @@
 // Rebuild an app from a capture with Muse Code and prove it: bun run rebuild [run] [--all-rules] [--max 3]
-import { basename, join } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import type { Capture } from "../src/capture/capture";
 import { proofFromCapture } from "../src/capture/scenario";
@@ -18,6 +18,10 @@ const { values, positionals } = parseArgs({
     "all-rules": { type: "boolean", default: false },
     max: { type: "string", default: "2" },
     steps: { type: "string", default: "20" },
+    // Another app folder to repair, for example a variant someone changed by hand.
+    app: { type: "string" },
+    // Attach Parity as an MCP server so Muse Code proves its own change before it stops.
+    "self-check": { type: "boolean", default: false },
   },
 });
 const runDir = positionals[0] ?? "runs/recording";
@@ -54,10 +58,13 @@ console.log(`Rebuilding ${runId} from ${rules.length} rules, up to ${values.max}
 const result = await rebuild(config, ledger, {
   proof,
   spec,
-  appDir: join("generated", runId, "app"),
+  appDir: values.app ?? join("generated", runId, "app"),
   runId: `rebuild-${runId}`,
   maxIterations: Number(values.max),
   maxSteps: Number(values.steps),
+  selfCheck: values["self-check"]
+    ? { root: resolve(import.meta.dir, ".."), proofPath: resolve(runDir, "proof.json") }
+    : undefined,
 });
 for (const it of result.iterations) {
   const state = it.error
@@ -65,7 +72,8 @@ for (const it of result.iterations) {
     : it.equal
       ? "PARITY"
       : `${it.different} different, ${it.missing} missing`;
-  console.log(`  ${it.n}. ${it.kind.padEnd(6)} $${it.costUsd.toFixed(3)}  ${state}`);
+  const self = it.selfChecks ? `  (proved itself ${it.selfChecks}x through Parity MCP)` : "";
+  console.log(`  ${it.n}. ${it.kind.padEnd(6)} $${it.costUsd.toFixed(3)}  ${state}${self}`);
 }
 for (const c of result.final?.checkpoints ?? []) {
   for (const f of c.diff.fields) {
