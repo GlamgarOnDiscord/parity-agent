@@ -40,7 +40,7 @@
   const money = (x) => `$${x.toFixed(2)}`;
   // Set by the fixture server: true reproduces the legacy behaviour, false is the naive rebuild.
   // Virtual Salesman 3 adds the unrounded taxes and rounds the total once. Change this and the proof fails.
-  const ROUND_ONCE = true;
+  const ROUND_ONCE = false;
 
   document.getElementById("compute").addEventListener("click", () => {
     const item = CATALOG[document.getElementById("item").value.trim()];
