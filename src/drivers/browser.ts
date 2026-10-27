@@ -255,6 +255,12 @@ async function attach(
   cleanup: () => Promise<void>,
   confined: boolean,
 ) {
+  // The app under test is a web app: a file: or data: URL would let a replay read this machine.
+  const scheme = new URL(options.url).protocol;
+  if (scheme !== "http:" && scheme !== "https:") {
+    await cleanup();
+    throw new Error(`refusing to drive a ${scheme} URL; web apps only`);
+  }
   const browser = await puppeteer.connect({
     transport: await webSocketTransport(wsUrl),
     defaultViewport: null,

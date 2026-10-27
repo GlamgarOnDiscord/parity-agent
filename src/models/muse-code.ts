@@ -8,6 +8,8 @@ export interface MuseCodeRun {
   exitCode: number;
   models: { model: string; inputTokens: number; outputTokens: number; calls: number }[];
   costUsd: number;
+  /** How many times the agent called Parity's prove tool during the run. */
+  selfChecks: number;
   stderr: string;
 }
 
@@ -20,6 +22,10 @@ export interface MuseCodeOptions {
   maxSteps?: number;
   runId?: string;
   timeoutMs?: number;
+  /** MCP servers on stdio attached to this run only, by name (for example Parity itself, to prove a fix). */
+  mcpServers?: Record<string, { command: string; args: string[] }>;
+  /** Where to keep the run's JSONL events, for audit. */
+  eventsFile?: string;
 }
 
 /**
@@ -78,6 +84,13 @@ export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Pro
       options.workspace,
       "--max-model-steps",
       String(options.maxSteps ?? 20),
+      ...Object.entries(options.mcpServers ?? {}).flatMap(([name, s]) => {
+        if (!/^[a-z][a-z0-9_-]{0,31}$/.test(name)) throw new Error(`bad MCP server name ${name}`);
+        return [
+          "-c",
+          `mcpServers.${name}=${JSON.stringify({ transport: "stdio", command: s.command, args: s.args })}`,
+        ];
+      }),
       "--json",
       "--prompt-file",
       promptFile,
@@ -94,6 +107,7 @@ export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Pro
   ]);
   clearTimeout(timer);
   rmSync(promptDir, { recursive: true, force: true });
+  if (options.eventsFile) writeFileSync(options.eventsFile, stdout, "utf-8");
 
   const models: UsageModel[] = [];
   for (const line of stdout.split("\n")) {
@@ -121,6 +135,13 @@ export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Pro
     costUsd += call.costUsd;
   }
 
+  // Calls the agent made to Parity's own prove tool, when Parity was attached as an MCP server.
+  const selfChecks = stdout
+    .split("\n")
+    .filter(
+      (l) => l.includes('"task_kind":"tool.mcp__parity__prove"') && l.includes('"kind":"proposed"'),
+    ).length;
+
   const contributor = models.find((m) => m.model.endsWith("-contributor"));
   if (contributor) {
     throw new Error(`Muse Code ran ${contributor.model}; refusing a contributor-tier result`);
@@ -135,6 +156,7 @@ export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Pro
       calls: m.calls,
     })),
     costUsd,
+    selfChecks,
     stderr: stderr.slice(-2000),
   };
 }

@@ -14,7 +14,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import type { Config } from "../config";
 import { requireKey } from "../config";
 import { openBrowser } from "../drivers";
@@ -30,6 +30,8 @@ export interface Iteration {
   equal: boolean;
   different: number;
   missing: number;
+  /** Times Muse Code proved its own change through the Parity MCP server. */
+  selfChecks?: number;
   error?: string;
 }
 
@@ -181,6 +183,11 @@ export async function rebuild(
     runId: string;
     maxIterations?: number;
     maxSteps?: number;
+    /**
+     * Attach Parity as an MCP server so Muse Code proves its own change before it stops: the proof file and the
+     * project root it is read from.
+     */
+    selfCheck?: { root: string; proofPath: string };
   },
 ): Promise<RebuildResult> {
   const apiKey = requireKey(config.MODEL_API_KEY, "MODEL_API_KEY");
@@ -211,15 +218,30 @@ export async function rebuild(
     }
   }
 
+  const self = options.selfCheck;
+  const selfCheckNote = self
+    ? [
+        "",
+        "Before you stop, prove your change: call the `prove` tool of the `parity` MCP server with",
+        `proof = "${relative(self.root, self.proofPath).replaceAll("\\", "/")}" and app = "${relative(self.root, appDir).replaceAll("\\", "/")}".`,
+        "It replays the legacy scenario on this app and lists every field that still differs. Fix and call it again",
+        "until it answers Parity. Do not edit the proof.",
+      ].join("\n")
+    : "";
+
   for (let n = 1; n <= (options.maxIterations ?? 2); n++) {
     const run = await runMuseCode(
       {
         apiKey,
         model: config.PARITY_MODEL_STRUCTURED,
         workspace: appDir,
-        prompt,
+        prompt: prompt + selfCheckNote,
         maxSteps: options.maxSteps ?? 20,
         runId: options.runId,
+        eventsFile: join(appDir, "..", `muse-run-${n}.jsonl`),
+        mcpServers: self
+          ? { parity: { command: process.execPath, args: [join(self.root, "bin", "parity.ts"), "mcp"] } }
+          : undefined,
       },
       ledger,
     );
@@ -227,6 +249,7 @@ export async function rebuild(
       n,
       kind: n === 1 && !built ? "build" : "repair",
       costUsd: run.costUsd,
+      selfChecks: run.selfChecks,
       equal: false,
       different: 0,
       missing: 0,
