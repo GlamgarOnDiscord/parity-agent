@@ -1,8 +1,12 @@
 {
   "name": "parity-agent",
+  "version": "0.2.0",
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
+  "bin": {
+    "parity": "bin/parity.ts"
+  },
   "scripts": {
     "dev": "bun --watch src/server/index.ts",
     "start": "bun src/server/index.ts",
@@ -19,7 +23,8 @@
     "record:reference": "bun scripts/record-reference.ts",
     "explore": "bun scripts/explore.ts",
     "report": "bun scripts/report.ts",
-    "sample:recording": "bun scripts/make-sample-recording.ts"
+    "sample:recording": "bun scripts/make-sample-recording.ts",
+    "parity": "bun bin/parity.ts"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.78",
