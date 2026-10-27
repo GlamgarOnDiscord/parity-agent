@@ -1,9 +1,12 @@
-import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from "bun:test";
 import { loadConfig } from "../src/config";
 import { detectVolatile } from "../src/diff/volatile";
 import { openBrowser } from "../src/drivers";
 import type { AppDriver } from "../src/drivers/types";
 import type { Screen } from "../src/fields/types";
+
+// Chrome starts cold on CI runners; hooks that launch it need more than the default 5 s.
+setDefaultTimeout(60_000);
 
 // The shape of a 2000s PHP business form: labels in table cells, a line grid with a header row, totals below.
 const PAGE = `<!doctype html><html><head><title>Invoice</title></head><body>

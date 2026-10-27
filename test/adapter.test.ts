@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from "bun:test";
 import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
 import type { AppDriver } from "../src/drivers/types";
@@ -6,6 +6,9 @@ import { matchScreens } from "../src/fields/match";
 import type { Screen } from "../src/fields/types";
 import { AdapterSchema, ScenarioSchema } from "../src/proof/schema";
 import { replay } from "../src/replay/replay";
+
+// Chrome starts cold on CI runners; hooks that launch it need more than the default 5 s.
+setDefaultTimeout(60_000);
 
 // A legacy app that needs a login before its invoice page, which lives at its own path.
 const PAGES: Record<string, string> = {

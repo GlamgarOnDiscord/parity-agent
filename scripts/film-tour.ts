@@ -5,6 +5,7 @@ import { mkdirSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { z } from "zod";
+import { speak } from "../src/capture/speak";
 import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
 import { StepSchema } from "../src/proof/schema";
@@ -39,24 +40,6 @@ async function run(args: string[]) {
   const proc = Bun.spawn(args, { stdout: "ignore", stderr: "pipe" });
   if ((await proc.exited) !== 0)
     throw new Error(`${args[0]} failed: ${(await new Response(proc.stderr).text()).slice(-300)}`);
-}
-
-// Single-quoted PowerShell strings expand nothing; a quote inside is doubled.
-const ps = (s: string) => `'${s.replace(/'/g, "''")}'`;
-async function speak(text: string, wav: string) {
-  await run([
-    "powershell.exe",
-    "-NoProfile",
-    "-Command",
-    [
-      "Add-Type -AssemblyName System.Speech",
-      "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer",
-      "$f = New-Object System.Speech.AudioFormat.SpeechAudioFormatInfo(16000, [System.Speech.AudioFormat.AudioBitsPerSample]::Sixteen, [System.Speech.AudioFormat.AudioChannel]::Mono)",
-      `$s.SetOutputToWaveFile(${ps(wav)}, $f)`,
-      `$s.Speak(${ps(text)})`,
-      "$s.Dispose()",
-    ].join("; "),
-  ]);
 }
 
 const driver = await openBrowser(loadConfig(), { url: tour.url, viewport: { width: 1280, height: 800 } });
