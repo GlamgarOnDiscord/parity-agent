@@ -1,9 +1,12 @@
-import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from "bun:test";
 import { loadConfig } from "../src/config";
 import { detectVolatile } from "../src/diff/volatile";
 import { openBrowser } from "../src/drivers";
 import type { AppDriver } from "../src/drivers/types";
 import type { Screen } from "../src/fields/types";
+
+// Chrome starts cold on CI runners; hooks that launch it need more than the default 5 s.
+setDefaultTimeout(60_000);
 
 // The shape of a 2000s PHP business form: labels in table cells, a line grid with a header row, totals below.
 const PAGE = `<!doctype html><html><head><title>Invoice</title></head><body>
@@ -20,7 +23,9 @@ const PAGE = `<!doctype html><html><head><title>Invoice</title></head><body>
     <td><input name="price" value="250.00"></td><td>250.00</td><td colspan="2"><button type="button">Add Item</button></td></tr>
   <tr><td colspan="4" align="right">Shipping Charge</td><td><input name="freight_cost" value="0.00"></td></tr>
   <tr><td colspan="4" align="right">Sub-total</td><td>900.00</td></tr>
+  <tr><td colspan="4" align="right">Included Tax (5%) 42.86</td><td align="right"></td><td colspan="2"></td></tr>
 </table>
+<table><tr><td colspan="2">FrontAccounting 2.4.20</td></tr></table>
 <table><tr><td>User name</td><td><input name="user_name_entry_field"></td></tr></table>
 </form></body></html>`;
 
@@ -65,6 +70,11 @@ describe("reading old table layouts", () => {
   test("a totals row under the grid labels its value with its own text", () => {
     expect(value("Sub-total")).toBe("900.00");
     expect(value("Shipping Charge")).toBe("0.00");
+  });
+
+  test("a totals line with its amount inside the label cell is split into label and value", () => {
+    expect(value("Included Tax (5%)")).toBe("42.86");
+    expect(screen.fields.some((f) => f.label.startsWith("FrontAccounting"))).toBe(false);
   });
 
   test("a plain text cell before a control labels it", () => {

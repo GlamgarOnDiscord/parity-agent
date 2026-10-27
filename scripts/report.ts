@@ -15,6 +15,7 @@ import type { DataUrl } from "../src/models/types";
 import { ProofSchema } from "../src/proof/schema";
 import { startApp } from "../src/rebuild/rebuild";
 import { prove } from "../src/replay/prove";
+import { replay } from "../src/replay/replay";
 import { renderReport } from "../src/report/report";
 import { summaryOf } from "../src/report/summary";
 import { RuleStore } from "../src/rules/store";
@@ -32,6 +33,8 @@ const { values, positionals } = parseArgs({
     out: { type: "string" },
     // Markdown verdict for a pull request comment or a CI step summary.
     summary: { type: "string" },
+    // The live reference app, when the proof was recorded by replaying it: its screens join the evidence.
+    "reference-url": { type: "string" },
   },
 });
 
@@ -90,6 +93,27 @@ for (const c of proof.checkpoints) {
   }
 }
 
+// A replayed reference has no key frames: replay it once more, through its adapter, for its screens.
+const referenceShots: Record<string, DataUrl> = {};
+if (values["reference-url"]) {
+  const ref = await openBrowser(config, { url: values["reference-url"] });
+  try {
+    for (const scenario of proof.scenarios) {
+      await replay(
+        ref,
+        scenario,
+        (c, shot) => {
+          referenceShots[`${c.scenario}:${c.step}`] = shot;
+          legacyImages[c.screen.id] = shot;
+        },
+        proof.reference.adapter,
+      );
+    }
+  } finally {
+    await ref.close();
+  }
+}
+
 const rules = runId ? new RuleStore(db).list(runId) : [];
 const captureFile = runDir ? join(runDir, "capture.json") : undefined;
 const coverage =
@@ -131,9 +155,15 @@ if (runDir) {
     await Bun.write(join(runDir, "evidence", name), Buffer.from(shot.split(",")[1] ?? "", "base64"));
     evidence[key] = name;
   }
+  const reference: Record<string, string> = {};
+  for (const [key, shot] of Object.entries(referenceShots)) {
+    const name = `reference-${key.replace(/[^\w.-]/g, "-")}.png`;
+    await Bun.write(join(runDir, "evidence", name), Buffer.from(shot.split(",")[1] ?? "", "base64"));
+    reference[key] = name;
+  }
   await Bun.write(
     join(runDir, "result.json"),
-    JSON.stringify({ result, candidate, at: new Date().toISOString(), evidence }, null, 2),
+    JSON.stringify({ result, candidate, at: new Date().toISOString(), evidence, reference }, null, 2),
   );
 }
 const out = values.out ?? (runDir ? join(runDir, "report.html") : "runs/report.html");

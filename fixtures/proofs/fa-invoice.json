@@ -1,0 +1,865 @@
+{
+  "format": "parity-proof",
+  "version": 1,
+  "createdAt": "2026-10-27T19:34:49.248Z",
+  "reference": {
+    "app": "FrontAccounting 2.4.20",
+    "source": "replay",
+    "adapter": {
+      "prelude": [
+        {
+          "do": "open",
+          "path": "/"
+        },
+        {
+          "do": "fill",
+          "field": "User name",
+          "value": "admin"
+        },
+        {
+          "do": "fill",
+          "field": "Password",
+          "value": "password"
+        },
+        {
+          "do": "click",
+          "target": "Login"
+        }
+      ],
+      "paths": {
+        "/": "/sales/sales_order_entry.php?NewInvoice=0"
+      }
+    }
+  },
+  "scenarios": [
+    {
+      "id": "fa-invoice",
+      "name": "Direct sales invoice, two lines with a discount",
+      "steps": [
+        {
+          "do": "open",
+          "path": "/"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "101"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "3"
+        },
+        {
+          "do": "fill",
+          "field": "Discount %",
+          "value": "10"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "check",
+          "screen": "invoice-one-line",
+          "note": "three iPads at 10 percent off"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "103"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "2"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "check",
+          "screen": "invoice-two-lines",
+          "note": "two covers added"
+        }
+      ]
+    }
+  ],
+  "checkpoints": [
+    {
+      "scenario": "fa-invoice",
+      "step": 5,
+      "screen": {
+        "id": "invoice-one-line",
+        "app": "chromium",
+        "title": "Direct Sales Invoice",
+        "fields": [
+          {
+            "id": "customer",
+            "label": "Customer:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.13375,
+              "w": 0.10859375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "branch",
+            "label": "Branch:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.16375,
+              "w": 0.08359375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "reference",
+            "label": "Reference:",
+            "value": "002/2022",
+            "box": {
+              "x": 0.1628662109375,
+              "y": 0.19375,
+              "w": 0.1140625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "payment",
+            "label": "Payment:",
+            "value": "Cash Only",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.13375,
+              "w": 0.1796875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "price-list",
+            "label": "Price List:",
+            "value": "Retail",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.174375,
+              "w": 0.06640625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "invoice-date",
+            "label": "Invoice Date:",
+            "value": "12/31/2022",
+            "box": {
+              "x": 0.75518798828125,
+              "y": 0.14408203125,
+              "w": 0.08125,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "dimension",
+            "label": "Dimension:",
+            "value": "",
+            "box": {
+              "x": 0.75675048828125,
+              "y": 0.185,
+              "w": 0.11875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "item-code",
+            "label": "Item Code",
+            "value": "",
+            "box": {
+              "x": 0.1469970703125,
+              "y": 0.383125,
+              "w": 0.10859375,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "item-description",
+            "label": "Item Description",
+            "value": "iPhone 6 64GB",
+            "box": {
+              "x": 0.2610595703125,
+              "y": 0.383125,
+              "w": 0.11875,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "quantity",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39822998046875,
+              "y": 0.3825,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "price-after-tax",
+            "label": "Price after Tax",
+            "value": "250.00",
+            "box": {
+              "x": 0.54241943359375,
+              "y": 0.3825,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "discount",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65882568359375,
+              "y": 0.3825,
+              "w": 0.0625,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "shipping-charge",
+            "label": "Shipping Charge",
+            "value": "0.00",
+            "box": {
+              "x": 0.72523193359375,
+              "y": 0.42375,
+              "w": 0.0625,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "deliver-from-location",
+            "label": "Deliver from Location:",
+            "value": "Default",
+            "box": {
+              "x": 0.42857666015625,
+              "y": 0.59875,
+              "w": 0.0515625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "comments",
+            "label": "Comments:",
+            "value": "",
+            "box": {
+              "x": 0.42701416015625,
+              "y": 0.66125,
+              "w": 0.21015625,
+              "h": 0.11375
+            }
+          },
+          {
+            "id": "current-credit",
+            "label": "Current Credit:",
+            "value": "1,000.00",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.131875,
+              "w": 0.04847412109375,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "customer-discount",
+            "label": "Customer Discount:",
+            "value": "0%",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.159375,
+              "w": 0.04847412109375,
+              "h": 0.05125
+            }
+          },
+          {
+            "id": "item-code-2",
+            "label": "Item Code",
+            "value": "101",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.341875,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-description-2",
+            "label": "Item Description",
+            "value": "iPad Air 2 16GB",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.341875,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "quantity-2",
+            "label": "Quantity",
+            "value": "3",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.341875,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "price-after-tax-2",
+            "label": "Price after Tax",
+            "value": "300.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "discount-2",
+            "label": "Discount %",
+            "value": "10.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "total",
+            "label": "Total",
+            "value": "810.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit-2",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.371875,
+              "w": 0.027783203125,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "total-2",
+            "label": "Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.371875,
+              "w": 0.06640625,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "sub-total",
+            "label": "Sub-total",
+            "value": "810.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.454375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "included-tax-5",
+            "label": "Included Tax (5%)",
+            "value": "38.57",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.484375,
+              "w": 0.57823486328125,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "amount-total",
+            "label": "Amount Total",
+            "value": "810.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.514375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "fa-invoice",
+      "step": 9,
+      "screen": {
+        "id": "invoice-two-lines",
+        "app": "chromium",
+        "title": "Direct Sales Invoice",
+        "fields": [
+          {
+            "id": "customer",
+            "label": "Customer:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.13375,
+              "w": 0.10859375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "branch",
+            "label": "Branch:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.16375,
+              "w": 0.08359375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "reference",
+            "label": "Reference:",
+            "value": "002/2022",
+            "box": {
+              "x": 0.1628662109375,
+              "y": 0.19375,
+              "w": 0.1140625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "payment",
+            "label": "Payment:",
+            "value": "Cash Only",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.13375,
+              "w": 0.1796875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "price-list",
+            "label": "Price List:",
+            "value": "Retail",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.174375,
+              "w": 0.06640625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "invoice-date",
+            "label": "Invoice Date:",
+            "value": "12/31/2022",
+            "box": {
+              "x": 0.75518798828125,
+              "y": 0.14408203125,
+              "w": 0.08125,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "dimension",
+            "label": "Dimension:",
+            "value": "",
+            "box": {
+              "x": 0.75675048828125,
+              "y": 0.185,
+              "w": 0.11875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "item-code",
+            "label": "Item Code",
+            "value": "",
+            "box": {
+              "x": 0.1469970703125,
+              "y": 0.413125,
+              "w": 0.10859375,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "item-description",
+            "label": "Item Description",
+            "value": "iPhone 6 64GB",
+            "box": {
+              "x": 0.2610595703125,
+              "y": 0.413125,
+              "w": 0.11875,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "quantity",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39822998046875,
+              "y": 0.4125,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "price-after-tax",
+            "label": "Price after Tax",
+            "value": "250.00",
+            "box": {
+              "x": 0.54241943359375,
+              "y": 0.4125,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "discount",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65882568359375,
+              "y": 0.4125,
+              "w": 0.0625,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "shipping-charge",
+            "label": "Shipping Charge",
+            "value": "0.00",
+            "box": {
+              "x": 0.72523193359375,
+              "y": 0.45375,
+              "w": 0.0625,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "deliver-from-location",
+            "label": "Deliver from Location:",
+            "value": "Default",
+            "box": {
+              "x": 0.42857666015625,
+              "y": 0.62875,
+              "w": 0.0515625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "comments",
+            "label": "Comments:",
+            "value": "",
+            "box": {
+              "x": 0.42701416015625,
+              "y": 0.69125,
+              "w": 0.21015625,
+              "h": 0.11375
+            }
+          },
+          {
+            "id": "current-credit",
+            "label": "Current Credit:",
+            "value": "1,000.00",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.131875,
+              "w": 0.04847412109375,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "customer-discount",
+            "label": "Customer Discount:",
+            "value": "0%",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.159375,
+              "w": 0.04847412109375,
+              "h": 0.05125
+            }
+          },
+          {
+            "id": "item-code-2",
+            "label": "Item Code",
+            "value": "101",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.341875,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-description-2",
+            "label": "Item Description",
+            "value": "iPad Air 2 16GB",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.341875,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "quantity-2",
+            "label": "Quantity",
+            "value": "3",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.341875,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "price-after-tax-2",
+            "label": "Price after Tax",
+            "value": "300.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "discount-2",
+            "label": "Discount %",
+            "value": "10.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "total",
+            "label": "Total",
+            "value": "810.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-code-3",
+            "label": "Item Code",
+            "value": "103",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.371875,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "item-description-3",
+            "label": "Item Description",
+            "value": "iPhone Cover Case",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.371875,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "quantity-3",
+            "label": "Quantity",
+            "value": "2",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.371875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "unit-2",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.371875,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "price-after-tax-3",
+            "label": "Price after Tax",
+            "value": "50.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.371875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "discount-3",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.371875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "total-2",
+            "label": "Total",
+            "value": "100.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.371875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "unit-3",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.401875,
+              "w": 0.027783203125,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "total-3",
+            "label": "Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.401875,
+              "w": 0.06640625,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "sub-total",
+            "label": "Sub-total",
+            "value": "910.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.484375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "included-tax-5",
+            "label": "Included Tax (5%)",
+            "value": "43.33",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.514375,
+              "w": 0.57823486328125,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "amount-total",
+            "label": "Amount Total",
+            "value": "910.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.544375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "mappings": {},
+  "volatile": []
+}
