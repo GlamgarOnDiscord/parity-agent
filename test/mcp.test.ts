@@ -134,3 +134,43 @@ describe("Parity MCP server", () => {
     }
   }, 60_000);
 });
+
+describe("Parity MCP server, pinned for one repair", () => {
+  test("offers prove only, and only for the pinned proof and app", async () => {
+    const pinned = createParityMcp({
+      root,
+      runsDir,
+      rules: store,
+      parityBin: join(root, "bin", "parity.ts"),
+      pinned: {
+        proof: join(root, "examples/invoice/parity.proof.json"),
+        app: join(root, "examples/invoice"),
+      },
+    });
+    const [x, y] = InMemoryTransport.createLinkedPair();
+    await pinned.connect(x);
+    const c = new Client({ name: "agent", version: "1" });
+    await c.connect(y);
+    try {
+      expect((await c.listTools()).tools.map((t) => t.name)).toEqual(["prove"]);
+      const tryProve = async (args: Record<string, unknown>) => {
+        const r = await c.callTool({ name: "prove", arguments: args });
+        return { error: Boolean(r.isError), text: (r.content as { text: string }[])[0]?.text ?? "" };
+      };
+      const viaUrl = await tryProve({
+        proof: "examples/invoice/parity.proof.json",
+        url: "http://127.0.0.1:8787/",
+      });
+      expect(viaUrl.error).toBe(true);
+      expect(viaUrl.text).toContain("proves one app only");
+      expect(
+        (await tryProve({ proof: "fixtures/proofs/vs3-invoice.json", app: "examples/invoice" })).error,
+      ).toBe(true);
+      expect((await tryProve({ proof: "examples/invoice/parity.proof.json", app: "generated" })).error).toBe(
+        true,
+      );
+    } finally {
+      await c.close();
+    }
+  });
+});

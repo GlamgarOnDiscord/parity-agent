@@ -240,7 +240,20 @@ export async function rebuild(
         runId: options.runId,
         eventsFile: join(appDir, "..", `muse-run-${n}.jsonl`),
         mcpServers: self
-          ? { parity: { command: process.execPath, args: [join(self.root, "bin", "parity.ts"), "mcp"] } }
+          ? {
+              parity: {
+                command: process.execPath,
+                // Pinned: the agent can prove this app against this proof, nothing else.
+                args: [
+                  join(self.root, "bin", "parity.ts"),
+                  "mcp",
+                  "--proof",
+                  self.proofPath,
+                  "--app",
+                  appDir,
+                ],
+              },
+            }
           : undefined,
       },
       ledger,
