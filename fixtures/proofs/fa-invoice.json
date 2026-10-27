@@ -84,6 +84,222 @@
           "note": "two covers added"
         }
       ]
+    },
+    {
+      "id": "fa-invoice-fuzz-1-3",
+      "name": "Direct sales invoice: Item Code 202, Quantity 1",
+      "steps": [
+        {
+          "do": "open",
+          "path": "/"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "202"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "1"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "check",
+          "screen": "fa-invoice-fuzz-1-3",
+          "note": "Item Code 202, Quantity 1"
+        }
+      ]
+    },
+    {
+      "id": "fa-invoice-fuzz-1-6",
+      "name": "Direct sales invoice: Item Code 202, Quantity 1 | Item Code 101, Quantity 1",
+      "steps": [
+        {
+          "do": "open",
+          "path": "/"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "202"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "1"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "101"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "1"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "check",
+          "screen": "fa-invoice-fuzz-1-6",
+          "note": "Item Code 202, Quantity 1 | Item Code 101, Quantity 1"
+        }
+      ]
+    },
+    {
+      "id": "fa-invoice-fuzz-1-8",
+      "name": "Direct sales invoice: Item Code 101, Quantity 1 | Item Code 201, Quantity 1",
+      "steps": [
+        {
+          "do": "open",
+          "path": "/"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "101"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "1"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "201"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "1"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "check",
+          "screen": "fa-invoice-fuzz-1-8",
+          "note": "Item Code 101, Quantity 1 | Item Code 201, Quantity 1"
+        }
+      ]
+    },
+    {
+      "id": "fa-invoice-fuzz-1-0",
+      "name": "Direct sales invoice: Item Code 102, Quantity 1",
+      "steps": [
+        {
+          "do": "open",
+          "path": "/"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "102"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "1"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "check",
+          "screen": "fa-invoice-fuzz-1-0",
+          "note": "Item Code 102, Quantity 1"
+        }
+      ]
+    },
+    {
+      "id": "fa-invoice-fuzz-893fe1f867",
+      "name": "Direct sales invoice: Item Code 201, Quantity 1 (seed 1, case 3)",
+      "steps": [
+        {
+          "do": "open",
+          "path": "/"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "201"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "1"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "check",
+          "screen": "fa-invoice-fuzz-893fe1f867",
+          "note": "Item Code 201, Quantity 1"
+        }
+      ]
+    },
+    {
+      "id": "fa-invoice-fuzz-2c74ccc4e5",
+      "name": "Direct sales invoice: Item Code 301, Quantity 1 | Item Code 101, Quantity 1 (seed 1, case 6)",
+      "steps": [
+        {
+          "do": "open",
+          "path": "/"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "301"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "1"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "fill",
+          "field": "Item Code",
+          "value": "101"
+        },
+        {
+          "do": "fill",
+          "field": "Quantity",
+          "value": "1"
+        },
+        {
+          "do": "click",
+          "target": "Add Item"
+        },
+        {
+          "do": "check",
+          "screen": "fa-invoice-fuzz-2c74ccc4e5",
+          "note": "Item Code 301, Quantity 1 | Item Code 101, Quantity 1"
+        }
+      ]
     }
   ],
   "checkpoints": [
@@ -849,6 +1065,2300 @@
             "id": "amount-total",
             "label": "Amount Total",
             "value": "910.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.544375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "fa-invoice-fuzz-1-3",
+      "step": 4,
+      "screen": {
+        "id": "fa-invoice-fuzz-1-3",
+        "app": "chromium",
+        "title": "Direct Sales Invoice",
+        "fields": [
+          {
+            "id": "customer",
+            "label": "Customer:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.16558837890625,
+              "y": 0.13375,
+              "w": 0.10859375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "branch",
+            "label": "Branch:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.16558837890625,
+              "y": 0.16375,
+              "w": 0.08359375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "reference",
+            "label": "Reference:",
+            "value": "002/2022",
+            "box": {
+              "x": 0.16402587890625,
+              "y": 0.19375,
+              "w": 0.1140625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "payment",
+            "label": "Payment:",
+            "value": "Cash Only",
+            "box": {
+              "x": 0.5062255859375,
+              "y": 0.13375,
+              "w": 0.1796875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "price-list",
+            "label": "Price List:",
+            "value": "Retail",
+            "box": {
+              "x": 0.5062255859375,
+              "y": 0.174375,
+              "w": 0.06640625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "invoice-date",
+            "label": "Invoice Date:",
+            "value": "12/31/2022",
+            "box": {
+              "x": 0.76563720703125,
+              "y": 0.14408203125,
+              "w": 0.08125,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "dimension",
+            "label": "Dimension:",
+            "value": "",
+            "box": {
+              "x": 0.76719970703125,
+              "y": 0.185,
+              "w": 0.11875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "item-code",
+            "label": "Item Code",
+            "value": "",
+            "box": {
+              "x": 0.15203857421875,
+              "y": 0.383125,
+              "w": 0.10859375,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "item-description",
+            "label": "Item Description",
+            "value": "iPhone 6 64GB",
+            "box": {
+              "x": 0.26610107421875,
+              "y": 0.383125,
+              "w": 0.11875,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "quantity",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.403271484375,
+              "y": 0.3825,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "price-after-tax",
+            "label": "Price after Tax",
+            "value": "250.00",
+            "box": {
+              "x": 0.5474609375,
+              "y": 0.3825,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "discount",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.66436767578125,
+              "y": 0.3825,
+              "w": 0.0625,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "shipping-charge",
+            "label": "Shipping Charge",
+            "value": "0.00",
+            "box": {
+              "x": 0.73077392578125,
+              "y": 0.42375,
+              "w": 0.0625,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "deliver-from-location",
+            "label": "Deliver from Location:",
+            "value": "Default",
+            "box": {
+              "x": 0.43358154296875,
+              "y": 0.56875,
+              "w": 0.0515625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "comments",
+            "label": "Comments:",
+            "value": "",
+            "box": {
+              "x": 0.43201904296875,
+              "y": 0.63125,
+              "w": 0.21015625,
+              "h": 0.11375
+            }
+          },
+          {
+            "id": "current-credit",
+            "label": "Current Credit:",
+            "value": "1,000.00",
+            "box": {
+              "x": 0.397509765625,
+              "y": 0.131875,
+              "w": 0.04847412109375,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "customer-discount",
+            "label": "Customer Discount:",
+            "value": "0%",
+            "box": {
+              "x": 0.397509765625,
+              "y": 0.159375,
+              "w": 0.04847412109375,
+              "h": 0.05125
+            }
+          },
+          {
+            "id": "item-code-2",
+            "label": "Item Code",
+            "value": "202",
+            "box": {
+              "x": 0.15008544921875,
+              "y": 0.341875,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-description-2",
+            "label": "Item Description",
+            "value": "Maintenance",
+            "box": {
+              "x": 0.26258544921875,
+              "y": 0.341875,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "quantity-2",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.401318359375,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit",
+            "label": "Unit",
+            "value": "hr",
+            "box": {
+              "x": 0.517724609375,
+              "y": 0.341875,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "price-after-tax-2",
+            "label": "Price after Tax",
+            "value": "0.00",
+            "box": {
+              "x": 0.5455078125,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "discount-2",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.6619140625,
+              "y": 0.341875,
+              "w": 0.06690673828125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "total",
+            "label": "Total",
+            "value": "0.00",
+            "box": {
+              "x": 0.72882080078125,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit-2",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.517724609375,
+              "y": 0.371875,
+              "w": 0.027783203125,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "total-2",
+            "label": "Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72882080078125,
+              "y": 0.371875,
+              "w": 0.06640625,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "sub-total",
+            "label": "Sub-total",
+            "value": "0.00",
+            "box": {
+              "x": 0.72882080078125,
+              "y": 0.454375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "amount-total",
+            "label": "Amount Total",
+            "value": "0.00",
+            "box": {
+              "x": 0.72882080078125,
+              "y": 0.484375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "fa-invoice-fuzz-1-6",
+      "step": 7,
+      "screen": {
+        "id": "fa-invoice-fuzz-1-6",
+        "app": "chromium",
+        "title": "Direct Sales Invoice",
+        "fields": [
+          {
+            "id": "customer",
+            "label": "Customer:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.13375,
+              "w": 0.10859375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "branch",
+            "label": "Branch:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.16375,
+              "w": 0.08359375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "reference",
+            "label": "Reference:",
+            "value": "002/2022",
+            "box": {
+              "x": 0.1628662109375,
+              "y": 0.19375,
+              "w": 0.1140625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "payment",
+            "label": "Payment:",
+            "value": "Cash Only",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.13375,
+              "w": 0.1796875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "price-list",
+            "label": "Price List:",
+            "value": "Retail",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.174375,
+              "w": 0.06640625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "invoice-date",
+            "label": "Invoice Date:",
+            "value": "12/31/2022",
+            "box": {
+              "x": 0.75518798828125,
+              "y": 0.14408203125,
+              "w": 0.08125,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "dimension",
+            "label": "Dimension:",
+            "value": "",
+            "box": {
+              "x": 0.75675048828125,
+              "y": 0.185,
+              "w": 0.11875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "item-code",
+            "label": "Item Code",
+            "value": "",
+            "box": {
+              "x": 0.1469970703125,
+              "y": 0.413125,
+              "w": 0.10859375,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "item-description",
+            "label": "Item Description",
+            "value": "iPhone 6 64GB",
+            "box": {
+              "x": 0.2610595703125,
+              "y": 0.413125,
+              "w": 0.11875,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "quantity",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39822998046875,
+              "y": 0.4125,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "price-after-tax",
+            "label": "Price after Tax",
+            "value": "250.00",
+            "box": {
+              "x": 0.54241943359375,
+              "y": 0.4125,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "discount",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65882568359375,
+              "y": 0.4125,
+              "w": 0.0625,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "shipping-charge",
+            "label": "Shipping Charge",
+            "value": "0.00",
+            "box": {
+              "x": 0.72523193359375,
+              "y": 0.45375,
+              "w": 0.0625,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "deliver-from-location",
+            "label": "Deliver from Location:",
+            "value": "Default",
+            "box": {
+              "x": 0.42857666015625,
+              "y": 0.62875,
+              "w": 0.0515625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "comments",
+            "label": "Comments:",
+            "value": "",
+            "box": {
+              "x": 0.42701416015625,
+              "y": 0.69125,
+              "w": 0.21015625,
+              "h": 0.11375
+            }
+          },
+          {
+            "id": "current-credit",
+            "label": "Current Credit:",
+            "value": "1,000.00",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.131875,
+              "w": 0.04847412109375,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "customer-discount",
+            "label": "Customer Discount:",
+            "value": "0%",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.159375,
+              "w": 0.04847412109375,
+              "h": 0.05125
+            }
+          },
+          {
+            "id": "item-code-2",
+            "label": "Item Code",
+            "value": "202",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.341875,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-description-2",
+            "label": "Item Description",
+            "value": "Maintenance",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.341875,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "quantity-2",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit",
+            "label": "Unit",
+            "value": "hr",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.341875,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "price-after-tax-2",
+            "label": "Price after Tax",
+            "value": "0.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "discount-2",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "total",
+            "label": "Total",
+            "value": "0.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-code-3",
+            "label": "Item Code",
+            "value": "101",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.371875,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "item-description-3",
+            "label": "Item Description",
+            "value": "iPad Air 2 16GB",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.371875,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "quantity-3",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.371875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "unit-2",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.371875,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "price-after-tax-3",
+            "label": "Price after Tax",
+            "value": "300.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.371875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "discount-3",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.371875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "total-2",
+            "label": "Total",
+            "value": "300.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.371875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "unit-3",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.401875,
+              "w": 0.027783203125,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "total-3",
+            "label": "Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.401875,
+              "w": 0.06640625,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "sub-total",
+            "label": "Sub-total",
+            "value": "300.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.484375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "included-tax-5",
+            "label": "Included Tax (5%)",
+            "value": "14.29",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.514375,
+              "w": 0.57823486328125,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "amount-total",
+            "label": "Amount Total",
+            "value": "300.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.544375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "fa-invoice-fuzz-1-8",
+      "step": 7,
+      "screen": {
+        "id": "fa-invoice-fuzz-1-8",
+        "app": "chromium",
+        "title": "Direct Sales Invoice",
+        "fields": [
+          {
+            "id": "customer",
+            "label": "Customer:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.18,
+              "w": 0.10859375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "branch",
+            "label": "Branch:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.21,
+              "w": 0.08359375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "reference",
+            "label": "Reference:",
+            "value": "002/2022",
+            "box": {
+              "x": 0.1628662109375,
+              "y": 0.24,
+              "w": 0.1140625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "payment",
+            "label": "Payment:",
+            "value": "Cash Only",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.18,
+              "w": 0.1796875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "price-list",
+            "label": "Price List:",
+            "value": "Retail",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.220625,
+              "w": 0.06640625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "invoice-date",
+            "label": "Invoice Date:",
+            "value": "12/31/2022",
+            "box": {
+              "x": 0.75518798828125,
+              "y": 0.19033203125,
+              "w": 0.08125,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "dimension",
+            "label": "Dimension:",
+            "value": "",
+            "box": {
+              "x": 0.75675048828125,
+              "y": 0.23125,
+              "w": 0.11875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "item-code",
+            "label": "Item Code",
+            "value": "",
+            "box": {
+              "x": 0.1469970703125,
+              "y": 0.459375,
+              "w": 0.10859375,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "item-description",
+            "label": "Item Description",
+            "value": "iPhone 6 64GB",
+            "box": {
+              "x": 0.2610595703125,
+              "y": 0.459375,
+              "w": 0.11875,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "quantity",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39822998046875,
+              "y": 0.45875,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "price-after-tax",
+            "label": "Price after Tax",
+            "value": "250.00",
+            "box": {
+              "x": 0.54241943359375,
+              "y": 0.45875,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "discount",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65882568359375,
+              "y": 0.45875,
+              "w": 0.0625,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "shipping-charge",
+            "label": "Shipping Charge",
+            "value": "0.00",
+            "box": {
+              "x": 0.72523193359375,
+              "y": 0.5,
+              "w": 0.0625,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "deliver-from-location",
+            "label": "Deliver from Location:",
+            "value": "Default",
+            "box": {
+              "x": 0.42857666015625,
+              "y": 0.675,
+              "w": 0.0515625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "comments",
+            "label": "Comments:",
+            "value": "",
+            "box": {
+              "x": 0.42701416015625,
+              "y": 0.7375,
+              "w": 0.21015625,
+              "h": 0.11375
+            }
+          },
+          {
+            "id": "current-credit",
+            "label": "Current Credit:",
+            "value": "1,000.00",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.178125,
+              "w": 0.04847412109375,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "customer-discount",
+            "label": "Customer Discount:",
+            "value": "0%",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.205625,
+              "w": 0.04847412109375,
+              "h": 0.05125
+            }
+          },
+          {
+            "id": "item-code-2",
+            "label": "Item Code",
+            "value": "101",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.388125,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-description-2",
+            "label": "Item Description",
+            "value": "iPad Air 2 16GB",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.388125,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "quantity-2",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.388125,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.388125,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "price-after-tax-2",
+            "label": "Price after Tax",
+            "value": "300.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.388125,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "discount-2",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.388125,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "total",
+            "label": "Total",
+            "value": "300.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.388125,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-code-3",
+            "label": "Item Code",
+            "value": "201",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.418125,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "item-description-3",
+            "label": "Item Description",
+            "value": "AP Surf Set",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.418125,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "quantity-3",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.418125,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "unit-2",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.418125,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "price-after-tax-3",
+            "label": "Price after Tax",
+            "value": "0.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.418125,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "discount-3",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.418125,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "total-2",
+            "label": "Total",
+            "value": "0.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.418125,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "unit-3",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.448125,
+              "w": 0.027783203125,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "total-3",
+            "label": "Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.448125,
+              "w": 0.06640625,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "sub-total",
+            "label": "Sub-total",
+            "value": "300.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.530625,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "included-tax-5",
+            "label": "Included Tax (5%)",
+            "value": "14.29",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.560625,
+              "w": 0.57823486328125,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "amount-total",
+            "label": "Amount Total",
+            "value": "300.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.590625,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "fa-invoice-fuzz-1-0",
+      "step": 4,
+      "screen": {
+        "id": "fa-invoice-fuzz-1-0",
+        "app": "chromium",
+        "title": "Direct Sales Invoice",
+        "fields": [
+          {
+            "id": "customer",
+            "label": "Customer:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.13375,
+              "w": 0.10859375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "branch",
+            "label": "Branch:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.16375,
+              "w": 0.08359375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "reference",
+            "label": "Reference:",
+            "value": "002/2022",
+            "box": {
+              "x": 0.1628662109375,
+              "y": 0.19375,
+              "w": 0.1140625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "payment",
+            "label": "Payment:",
+            "value": "Cash Only",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.13375,
+              "w": 0.1796875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "price-list",
+            "label": "Price List:",
+            "value": "Retail",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.174375,
+              "w": 0.06640625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "invoice-date",
+            "label": "Invoice Date:",
+            "value": "12/31/2022",
+            "box": {
+              "x": 0.75518798828125,
+              "y": 0.14408203125,
+              "w": 0.08125,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "dimension",
+            "label": "Dimension:",
+            "value": "",
+            "box": {
+              "x": 0.75675048828125,
+              "y": 0.185,
+              "w": 0.11875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "item-code",
+            "label": "Item Code",
+            "value": "",
+            "box": {
+              "x": 0.1469970703125,
+              "y": 0.383125,
+              "w": 0.10859375,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "item-description",
+            "label": "Item Description",
+            "value": "iPhone 6 64GB",
+            "box": {
+              "x": 0.2610595703125,
+              "y": 0.383125,
+              "w": 0.11875,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "quantity",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39822998046875,
+              "y": 0.3825,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "price-after-tax",
+            "label": "Price after Tax",
+            "value": "250.00",
+            "box": {
+              "x": 0.54241943359375,
+              "y": 0.3825,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "discount",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65882568359375,
+              "y": 0.3825,
+              "w": 0.0625,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "shipping-charge",
+            "label": "Shipping Charge",
+            "value": "0.00",
+            "box": {
+              "x": 0.72523193359375,
+              "y": 0.42375,
+              "w": 0.0625,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "deliver-from-location",
+            "label": "Deliver from Location:",
+            "value": "Default",
+            "box": {
+              "x": 0.42857666015625,
+              "y": 0.59875,
+              "w": 0.0515625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "comments",
+            "label": "Comments:",
+            "value": "",
+            "box": {
+              "x": 0.42701416015625,
+              "y": 0.66125,
+              "w": 0.21015625,
+              "h": 0.11375
+            }
+          },
+          {
+            "id": "current-credit",
+            "label": "Current Credit:",
+            "value": "1,000.00",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.131875,
+              "w": 0.04847412109375,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "customer-discount",
+            "label": "Customer Discount:",
+            "value": "0%",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.159375,
+              "w": 0.04847412109375,
+              "h": 0.05125
+            }
+          },
+          {
+            "id": "item-code-2",
+            "label": "Item Code",
+            "value": "102",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.341875,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-description-2",
+            "label": "Item Description",
+            "value": "iPhone 6 64GB",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.341875,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "quantity-2",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.341875,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "price-after-tax-2",
+            "label": "Price after Tax",
+            "value": "250.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "discount-2",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "total",
+            "label": "Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit-2",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.371875,
+              "w": 0.027783203125,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "total-2",
+            "label": "Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.371875,
+              "w": 0.06640625,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "sub-total",
+            "label": "Sub-total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.454375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "included-tax-5",
+            "label": "Included Tax (5%)",
+            "value": "11.91",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.484375,
+              "w": 0.57823486328125,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "amount-total",
+            "label": "Amount Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.514375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "fa-invoice-fuzz-893fe1f867",
+      "step": 4,
+      "screen": {
+        "id": "fa-invoice-fuzz-893fe1f867",
+        "app": "chromium",
+        "title": "Direct Sales Invoice",
+        "fields": [
+          {
+            "id": "customer",
+            "label": "Customer:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.18,
+              "w": 0.10859375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "branch",
+            "label": "Branch:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.21,
+              "w": 0.08359375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "reference",
+            "label": "Reference:",
+            "value": "002/2022",
+            "box": {
+              "x": 0.1628662109375,
+              "y": 0.24,
+              "w": 0.1140625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "payment",
+            "label": "Payment:",
+            "value": "Cash Only",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.18,
+              "w": 0.1796875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "price-list",
+            "label": "Price List:",
+            "value": "Retail",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.220625,
+              "w": 0.06640625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "invoice-date",
+            "label": "Invoice Date:",
+            "value": "12/31/2022",
+            "box": {
+              "x": 0.75518798828125,
+              "y": 0.19033203125,
+              "w": 0.08125,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "dimension",
+            "label": "Dimension:",
+            "value": "",
+            "box": {
+              "x": 0.75675048828125,
+              "y": 0.23125,
+              "w": 0.11875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "item-code",
+            "label": "Item Code",
+            "value": "",
+            "box": {
+              "x": 0.1469970703125,
+              "y": 0.429375,
+              "w": 0.10859375,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "item-description",
+            "label": "Item Description",
+            "value": "iPhone 6 64GB",
+            "box": {
+              "x": 0.2610595703125,
+              "y": 0.429375,
+              "w": 0.11875,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "quantity",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39822998046875,
+              "y": 0.42875,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "price-after-tax",
+            "label": "Price after Tax",
+            "value": "250.00",
+            "box": {
+              "x": 0.54241943359375,
+              "y": 0.42875,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "discount",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65882568359375,
+              "y": 0.42875,
+              "w": 0.0625,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "shipping-charge",
+            "label": "Shipping Charge",
+            "value": "0.00",
+            "box": {
+              "x": 0.72523193359375,
+              "y": 0.47,
+              "w": 0.0625,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "deliver-from-location",
+            "label": "Deliver from Location:",
+            "value": "Default",
+            "box": {
+              "x": 0.42857666015625,
+              "y": 0.615,
+              "w": 0.0515625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "comments",
+            "label": "Comments:",
+            "value": "",
+            "box": {
+              "x": 0.42701416015625,
+              "y": 0.6775,
+              "w": 0.21015625,
+              "h": 0.11375
+            }
+          },
+          {
+            "id": "current-credit",
+            "label": "Current Credit:",
+            "value": "1,000.00",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.178125,
+              "w": 0.04847412109375,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "customer-discount",
+            "label": "Customer Discount:",
+            "value": "0%",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.205625,
+              "w": 0.04847412109375,
+              "h": 0.05125
+            }
+          },
+          {
+            "id": "item-code-2",
+            "label": "Item Code",
+            "value": "201",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.388125,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-description-2",
+            "label": "Item Description",
+            "value": "AP Surf Set",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.388125,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "quantity-2",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.388125,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.388125,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "price-after-tax-2",
+            "label": "Price after Tax",
+            "value": "0.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.388125,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "discount-2",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.388125,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "total",
+            "label": "Total",
+            "value": "0.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.388125,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit-2",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.418125,
+              "w": 0.027783203125,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "total-2",
+            "label": "Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.418125,
+              "w": 0.06640625,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "sub-total",
+            "label": "Sub-total",
+            "value": "0.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.500625,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "amount-total",
+            "label": "Amount Total",
+            "value": "0.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.530625,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "fa-invoice-fuzz-2c74ccc4e5",
+      "step": 7,
+      "screen": {
+        "id": "fa-invoice-fuzz-2c74ccc4e5",
+        "app": "chromium",
+        "title": "Direct Sales Invoice",
+        "fields": [
+          {
+            "id": "customer",
+            "label": "Customer:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.13375,
+              "w": 0.10859375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "branch",
+            "label": "Branch:",
+            "value": "Donald Easter",
+            "box": {
+              "x": 0.1644287109375,
+              "y": 0.16375,
+              "w": 0.08359375,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "reference",
+            "label": "Reference:",
+            "value": "002/2022",
+            "box": {
+              "x": 0.1628662109375,
+              "y": 0.19375,
+              "w": 0.1140625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "payment",
+            "label": "Payment:",
+            "value": "Cash Only",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.13375,
+              "w": 0.1796875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "price-list",
+            "label": "Price List:",
+            "value": "Retail",
+            "box": {
+              "x": 0.49732666015625,
+              "y": 0.174375,
+              "w": 0.06640625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "invoice-date",
+            "label": "Invoice Date:",
+            "value": "12/31/2022",
+            "box": {
+              "x": 0.75518798828125,
+              "y": 0.14408203125,
+              "w": 0.08125,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "dimension",
+            "label": "Dimension:",
+            "value": "",
+            "box": {
+              "x": 0.75675048828125,
+              "y": 0.185,
+              "w": 0.11875,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "item-code",
+            "label": "Item Code",
+            "value": "",
+            "box": {
+              "x": 0.1469970703125,
+              "y": 0.413125,
+              "w": 0.10859375,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "item-description",
+            "label": "Item Description",
+            "value": "iPhone 6 64GB",
+            "box": {
+              "x": 0.2610595703125,
+              "y": 0.413125,
+              "w": 0.11875,
+              "h": 0.02625
+            },
+            "group": "entry"
+          },
+          {
+            "id": "quantity",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39822998046875,
+              "y": 0.4125,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "price-after-tax",
+            "label": "Price after Tax",
+            "value": "250.00",
+            "box": {
+              "x": 0.54241943359375,
+              "y": 0.4125,
+              "w": 0.1125,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "discount",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65882568359375,
+              "y": 0.4125,
+              "w": 0.0625,
+              "h": 0.0275
+            },
+            "group": "entry"
+          },
+          {
+            "id": "shipping-charge",
+            "label": "Shipping Charge",
+            "value": "0.00",
+            "box": {
+              "x": 0.72523193359375,
+              "y": 0.45375,
+              "w": 0.0625,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "deliver-from-location",
+            "label": "Deliver from Location:",
+            "value": "Default",
+            "box": {
+              "x": 0.42857666015625,
+              "y": 0.62875,
+              "w": 0.0515625,
+              "h": 0.02625
+            }
+          },
+          {
+            "id": "comments",
+            "label": "Comments:",
+            "value": "",
+            "box": {
+              "x": 0.42701416015625,
+              "y": 0.69125,
+              "w": 0.21015625,
+              "h": 0.11375
+            }
+          },
+          {
+            "id": "current-credit",
+            "label": "Current Credit:",
+            "value": "1,000.00",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.131875,
+              "w": 0.04847412109375,
+              "h": 0.0275
+            }
+          },
+          {
+            "id": "customer-discount",
+            "label": "Customer Discount:",
+            "value": "0%",
+            "box": {
+              "x": 0.3888427734375,
+              "y": 0.159375,
+              "w": 0.04847412109375,
+              "h": 0.05125
+            }
+          },
+          {
+            "id": "item-code-2",
+            "label": "Item Code",
+            "value": "301",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.341875,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-description-2",
+            "label": "Item Description",
+            "value": "Support",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.341875,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "quantity-2",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "unit",
+            "label": "Unit",
+            "value": "hr",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.341875,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "price-after-tax-2",
+            "label": "Price after Tax",
+            "value": "0.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.341875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "discount-2",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "total",
+            "label": "Total",
+            "value": "0.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.341875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-1"
+          },
+          {
+            "id": "item-code-3",
+            "label": "Item Code",
+            "value": "101",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.371875,
+              "w": 0.1125,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "item-description-3",
+            "label": "Item Description",
+            "value": "iPad Air 2 16GB",
+            "box": {
+              "x": 0.2575439453125,
+              "y": 0.371875,
+              "w": 0.13873291015625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "quantity-3",
+            "label": "Quantity",
+            "value": "1",
+            "box": {
+              "x": 0.39627685546875,
+              "y": 0.371875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "unit-2",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.371875,
+              "w": 0.027783203125,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "price-after-tax-3",
+            "label": "Price after Tax",
+            "value": "300.00",
+            "box": {
+              "x": 0.54046630859375,
+              "y": 0.371875,
+              "w": 0.11640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "discount-3",
+            "label": "Discount %",
+            "value": "0.0",
+            "box": {
+              "x": 0.65687255859375,
+              "y": 0.371875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "total-2",
+            "label": "Total",
+            "value": "300.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.371875,
+              "w": 0.06640625,
+              "h": 0.03
+            },
+            "group": "row-2"
+          },
+          {
+            "id": "unit-3",
+            "label": "Unit",
+            "value": "each",
+            "box": {
+              "x": 0.51268310546875,
+              "y": 0.401875,
+              "w": 0.027783203125,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "total-3",
+            "label": "Total",
+            "value": "250.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.401875,
+              "w": 0.06640625,
+              "h": 0.04875
+            },
+            "group": "entry"
+          },
+          {
+            "id": "sub-total",
+            "label": "Sub-total",
+            "value": "300.00",
+            "box": {
+              "x": 0.72327880859375,
+              "y": 0.484375,
+              "w": 0.06640625,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "included-tax-5",
+            "label": "Included Tax (5%)",
+            "value": "14.29",
+            "box": {
+              "x": 0.1450439453125,
+              "y": 0.514375,
+              "w": 0.57823486328125,
+              "h": 0.03
+            }
+          },
+          {
+            "id": "amount-total",
+            "label": "Amount Total",
+            "value": "300.00",
             "box": {
               "x": 0.72327880859375,
               "y": 0.544375,

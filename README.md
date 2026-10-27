@@ -73,6 +73,7 @@ Model calls need a Meta Model API key: `cp .env.example .env` and set `MODEL_API
 | `bun run report runs/<run>`                            | the one-page proof report, with both screens zoomed on each difference                              | none           |
 | `bun run record:reference <scenario.json> --url <app>` | records a web app as the reference over several runs and measures its noise                         | none           |
 | `bun run explore <proof.json> --url <app>`             | Muse Spark computer use explores the app and reports screens the proof never checked                | yes, capped    |
+| `bun run parity fuzz <spec.json> --proof <proof.json> --reference-url <legacy> --app <dir>` | generates cases from a seed, plays each on both apps, shrinks every difference and adds it to the proof; `--repair` hands them to Muse Code | none; `--repair` uses Muse Code |
 | `bun run export:playwright runs/<run>`                 | a standalone Playwright test from a proof                                                           | none           |
 | `bun run record:replay runs/<run>`                     | films the rebuilt app and puts it next to the legacy recording                                      | none           |
 
@@ -97,6 +98,7 @@ bun run prove --proof fixtures/scenarios/frontaccounting-invoice.proof.json --ur
 | FrontAccounting invoice, 5 replays                                               | 63 fields, 4 noisy, 3.3 s per run                           |
 | Exploration of FrontAccounting by Muse Spark computer use                        | 12 steps, 4 screens the recording never showed, $0.153      |
 | Report on a rebuild that adds rounded taxes                                      | 1 difference: 69.21 before, 69.22 after                     |
+| Fuzzing the FrontAccounting rebuild against the live app, 12 invoices            | 3 items the recording never showed, each shrunk to one or two lines; fixed by one $0.46 repair, then 52 fresh invoices at parity |
 
 Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behaviour: [docs/meta-api.md](docs/meta-api.md).
 
@@ -119,6 +121,8 @@ Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behav
 | Coverage map, send log per run, Playwright export            | done                                                          |
 | Second app, autonomous exploration                           | done                                                          |
 | One-page proof report                                        | done                                                          |
+| `parity` CLI, GitHub Action on pull requests, MCP server, offline proof | done                                               |
+| Differential fuzzing with shrinking, against live FrontAccounting | done                                                     |
 | Muse Spark Open on Baseten for on-premise rule extraction    | client ready, not verified (no key yet)                       |
 | Replaying the Windows app itself instead of its recording    | cut: the recording is the reference ([D3](docs/decisions.md)) |
 

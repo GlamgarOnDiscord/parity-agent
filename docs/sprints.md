@@ -36,7 +36,7 @@ Exit: the rebuilt FrontAccounting invoice replays against the real FrontAccounti
 - Each new difference becomes a scenario in the proof, so it is never lost
 - Repair loop on fuzz failures until a fuzz budget of N invoices passes
 
-Exit: fuzzing finds at least one difference the recording did not show, shrinks it, and the repair closes it. Spend: repairs about $2.
+Exit: fuzzing finds at least one difference the recording did not show, shrinks it, and the repair closes it. Spend: repairs about $2. (done: three unrecorded items found and shrunk to one line, closed by a $0.46 repair, then 52 fresh cases at parity; $1.68 in all)
 
 ### D5 Differences people decide (Oct 30)
 
