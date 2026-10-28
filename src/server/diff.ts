@@ -235,7 +235,26 @@ export function diffPage(d: DiffInput): string {
 <p class="empty">No replay for this run yet. Run <span class="mono">bun run report runs/${esc(d.run)}</span>, then reload.</p>`,
     });
   }
-  const { result, candidate, at, evidence } = d.saved;
+  const { candidate, at, evidence } = d.saved;
+  // result.json comes from a run folder: numbers and verdicts are forced to what the page expects before printing.
+  const VERDICTS = new Set(["equal", "different", "masked", "accepted"]);
+  const result = {
+    ...d.saved.result,
+    checkpoints: d.saved.result.checkpoints.map((c) => ({
+      ...c,
+      step: Number(c.step) || 0,
+      diff: {
+        ...c.diff,
+        fields: c.diff.fields.map((f) => ({
+          ...f,
+          verdict: (VERDICTS.has(f.verdict) ? f.verdict : "different") as FieldDiff["verdict"],
+        })),
+        counts: Object.fromEntries(
+          Object.entries(c.diff.counts).map(([k, v]) => [k, Number(v) || 0]),
+        ) as typeof c.diff.counts,
+      },
+    })),
+  };
   const all = result.checkpoints.flatMap((c) => c.diff.fields.map((f) => f.verdict));
   const equal = all.filter((v) => v === "equal").length;
   const different = all.filter((v) => v === "different").length;
@@ -305,7 +324,7 @@ ${ticks(
 
   const acceptForm = (c: (typeof result.checkpoints)[number], f: FieldDiff) =>
     `<div class="act"><details><summary>${icon("check")}Accept this difference</summary>
-<form class="decide" data-scenario="${esc(c.scenario)}" data-step="${c.step}" data-field="${esc(f.legacy.label)}"${
+<form class="decide" data-scenario="${esc(c.scenario)}" data-step="${Number(c.step)}" data-field="${esc(f.legacy.label)}"${
       f.legacy.group ? ` data-group="${esc(f.legacy.group)}"` : ""
     }>
   <fieldset><legend>The rebuild may show ${esc(f.rebuilt.value)} here because</legend>
@@ -424,11 +443,13 @@ ${canRepair ? `<div><button class="btn blue" type="button" id="send-repair">${ic
         .join("")}</ol></div></section>`
     : "";
 
-  // The screen to show: the first difference, or the first checkpoint when there is none.
+  // The screen to show: the first difference, else the first accepted one, else the first checkpoint.
+  const first = (v: FieldDiff["verdict"]) =>
+    result.checkpoints.flatMap((c) => c.diff.fields.filter((f) => f.verdict === v).map((f) => ({ c, f })))[0];
   const focus =
-    result.checkpoints.flatMap((c) =>
-      c.diff.fields.filter((f) => f.verdict === "different").map((f) => ({ c, f })),
-    )[0] ?? result.checkpoints.flatMap((c) => c.diff.fields.slice(0, 1).map((f) => ({ c, f })))[0];
+    first("different") ??
+    first("accepted") ??
+    result.checkpoints.flatMap((c) => c.diff.fields.slice(0, 1).map((f) => ({ c, f })))[0];
   const safeName = (name: string | undefined) =>
     name && /^[\w.-]{1,96}\.png$/.test(name) ? name : undefined;
   const shot = focus ? safeName(evidence[`${focus.c.scenario}:${focus.c.step}`]) : undefined;

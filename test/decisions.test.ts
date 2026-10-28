@@ -192,3 +192,40 @@ describe("deciding from the diff screen", () => {
     expect(repairs.commands("inv", undefined)).toContain("app folder");
   });
 });
+
+describe("a run folder from someone else", () => {
+  test("history entries that are not what Parity writes are dropped before the page prints them", async () => {
+    const { readHistory } = await import("../src/rebuild/history");
+    const file = join(dir, "inv", "history.json");
+    writeFileSync(
+      file,
+      JSON.stringify([
+        {
+          n: 0,
+          kind: "repair",
+          costUsd: 0,
+          equal: false,
+          different: "<img src=x onerror=alert(1)>",
+          missing: 0,
+          at: "2026-10-28T10:00:00.000Z",
+          source: "rebuild",
+        },
+        {
+          n: 1,
+          kind: "repair",
+          costUsd: 0.46,
+          equal: true,
+          different: 0,
+          missing: 0,
+          fieldsEqual: 258,
+          fieldsCompared: 258,
+          at: "2026-10-28T10:05:00.000Z",
+          source: "diff screen",
+        },
+      ]),
+    );
+    const history = await readHistory(file);
+    expect(history).toHaveLength(1);
+    expect(history[0]?.source).toBe("diff screen");
+  });
+});

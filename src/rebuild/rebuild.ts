@@ -33,6 +33,8 @@ export interface Iteration {
   /** Fields with the same value in both apps, out of every field compared. */
   fieldsEqual?: number;
   fieldsCompared?: number;
+  /** When this proof ran. */
+  at?: string;
   /** Times Muse Code proved its own change through the Parity MCP server. */
   selfChecks?: number;
   error?: string;
@@ -189,7 +191,10 @@ export function repairPrompt(result: ProveResult, proof: Proof): string {
   lines.push(
     "",
     "A value tied to one input (the description or price of one item code) is data of the legacy app: take it",
-    "from the scenario that shows it, never guess it. Keep every case that already matches.",
+    "from the scenario that shows it, never guess it. Keep every case that already matches: the proof replays",
+    "every scenario, and a fix that breaks one that passed is a new difference.",
+    "The values above are what the legacy app really shows. Where a formula in SPEC.md gives another value, the",
+    "formula is an approximation read from a recording; change the code to match the values, not the formula.",
     "Re-read the business rules and their formulas in SPEC.md, especially where rounding happens, and check every",
     "rule of CONTRACT.md, including the data-group on each line of a grid: Parity pairs repeated labels by line.",
   );
@@ -239,7 +244,14 @@ export async function rebuild(
       prompt = `Replaying SPEC.md on the app failed: ${first.error.slice(0, 500)}. Fix public/ to follow CONTRACT.md.`;
     } else {
       final = first;
-      iterations.push({ n: 0, kind: "repair", costUsd: 0, equal: first.equal, ...counts(first) });
+      iterations.push({
+        n: 0,
+        kind: "repair",
+        costUsd: 0,
+        equal: first.equal,
+        ...counts(first),
+        at: new Date().toISOString(),
+      });
       if (first.equal) return { appDir, iterations, final };
       prompt = repairPrompt(first, options.proof);
     }
@@ -307,6 +319,7 @@ export async function rebuild(
       continue;
     }
     it.equal = final.equal;
+    it.at = new Date().toISOString();
     Object.assign(it, counts(final));
     if (final.equal) break;
     prompt = repairPrompt(final, options.proof);
