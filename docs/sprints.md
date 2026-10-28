@@ -45,7 +45,7 @@ Exit: fuzzing finds at least one difference the recording did not show, shrinks 
 - Repair history per run: iterations, cost, fields equal over time (the parity card of the mockups)
 - Muse Spark Open on Baseten for rule extraction, if a key is available (open-weights bonus)
 
-Exit: from the diff screen, one difference is accepted with a reason and another is repaired by Muse Code in one click. Spend: about $1.
+Exit: from the diff screen, one difference is accepted with a reason and another is repaired by Muse Code in one click. Spend: about $1. (done: the VS3 cent accepted with a name and a reason; one click brought FrontAccounting item 301 back for $0.41, and the replay after it caught a tax regression the repair introduced, still open; $0.81 in all)
 
 ### D6 Exploration that writes tests (Oct 31)
 
@@ -55,14 +55,17 @@ Exit: from the diff screen, one difference is accepted with a reason and another
 
 Exit: one scenario that no person wrote is replayed on both FrontAccounting and its rebuild; VS3 is driven by the agent through one invoice. Spend: about $1.
 
-### D7 Proof for strangers (Nov 1)
+### D7 Migration mode, opt-in (Nov 1)
 
-- Landing page with the one-cent story, the GIF and a two-minute start (GitHub Pages, no tracking)
-- Benchmarks: replay time and flakiness per browser driver (Puppeteer, Lightpanda), model cost and accuracy per role, noise per app
-- Security pass over the whole repository and the threat model written down
-- Network-cut demo and the send log as a short clip
+A whole app rather than one screen, for those who pay for it: off by default, `parity migrate` prints an estimate per screen before it starts and stops at the budget given. Every Meta model has its role: Muse Spark computer use explores, Muse Spark reads screens and the data model, Muse Wonder settles the hard rules, Muse Code builds, SAM finds fields on desktop frames, voice transcription reads the narration, Muse Spark Open does extraction on premises.
 
-Exit: a stranger lands on the page, runs the two-minute start and gets the cent. Spend: none.
+- Screen inventory: exploration lists every screen with its fields and the links between screens (navigation map)
+- Data model from the legacy app: entities and fields read from its list and form screens; records migrated through its own screens, or from a dump the operator provides, into the rebuild's SQLite. No catalogue written into code (the D4 repair did exactly that)
+- Modern template for rebuilds: navigation, tables, forms, empty and error states from the design system; the proof stays on values, never on looks
+- One Muse Code build per screen on the shared data layer; each screen proved with its scenarios and fuzzed
+- Migration board: screens found, rebuilt, proved, differences accepted, spend per screen
+
+Exit: three FrontAccounting screens (customers, items, sales invoice) rebuilt in the modern template on data migrated from FrontAccounting, each at parity or with named accepted differences. Spend: about $10, above the default local cap of $20.
 
 ### D8 Video (Nov 2)
 
@@ -73,7 +76,17 @@ Exit: a stranger lands on the page, runs the two-minute start and gets the cent.
 
 Exit: the final video is exported under 3:00.
 
-### D9 Buffer and polish (Nov 3)
+### D9 Proof for strangers, buffer and polish (Nov 3)
+
+Moved from D7 when migration mode took that day:
+
+- Landing page with the one-cent story, the GIF and a two-minute start (GitHub Pages, no tracking)
+- Benchmarks: replay time and flakiness per browser driver (Puppeteer, Lightpanda), model cost and accuracy per role, noise per app
+- Security pass over the whole repository and the threat model written down
+- Network-cut demo and the send log as a short clip
+Exit: a stranger lands on the page, runs the two-minute start and gets the cent. Spend: none.
+
+Then the buffer:
 
 - Fixes from a full clean-clone run on Windows and in a Linux container
 - README, decisions and benchmarks final; issues closed or labelled

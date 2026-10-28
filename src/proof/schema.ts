@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DecisionSchema } from "../diff/decisions";
 
 const Text = z.string().max(256);
 
@@ -75,6 +76,8 @@ export const ProofSchema = z.object({
   mappings: z.record(z.string(), z.record(z.string(), z.string())).default({}),
   /** Field labels that change on every run of the same app (timestamps, generated ids). */
   volatile: z.array(Text).default([]),
+  /** Differences a person accepted, with who and why. */
+  decisions: z.array(DecisionSchema).max(1000).default([]),
 });
 
 export type Step = z.infer<typeof StepSchema>;

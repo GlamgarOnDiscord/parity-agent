@@ -4,7 +4,7 @@
 // Fuzzing and shrinking make no model call. --save adds each difference to the proof as a scenario; --repair
 // then sends the proof to Muse Code and fuzzes again with the same seed, until the cases pass or the rounds end.
 import { readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
@@ -13,6 +13,7 @@ import { describeCase, FuzzSpecSchema } from "../src/fuzz/case";
 import { addFailures, type FuzzReport, fuzz } from "../src/fuzz/fuzz";
 import { Ledger } from "../src/models/ledger";
 import { ProofSchema } from "../src/proof/schema";
+import { appendHistory } from "../src/rebuild/history";
 import { rebuild, startApp } from "../src/rebuild/rebuild";
 import { openDb } from "../src/store/db";
 
@@ -129,6 +130,7 @@ for (let round = 1; round <= rounds; round++) {
     maxIterations: 1,
     maxSteps: Number(values.steps),
   });
+  await appendHistory(join(dirname(values.proof), "history.json"), result.iterations, "fuzz");
   for (const it of result.iterations) {
     const state = it.error
       ? `error: ${it.error.slice(0, 160)}`
