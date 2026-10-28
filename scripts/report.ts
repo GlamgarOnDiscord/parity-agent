@@ -163,7 +163,23 @@ if (runDir) {
   }
   await Bun.write(
     join(runDir, "result.json"),
-    JSON.stringify({ result, candidate, at: new Date().toISOString(), evidence, reference }, null, 2),
+    JSON.stringify(
+      {
+        result,
+        candidate,
+        at: new Date().toISOString(),
+        evidence,
+        reference,
+        // How to replay this again, for a repair started from the diff screen.
+        replay: {
+          app: served && appDir ? appDir.replaceAll("\\", "/") : undefined,
+          url: values.url,
+          referenceUrl: values["reference-url"],
+        },
+      },
+      null,
+      2,
+    ),
   );
 }
 const out = values.out ?? (runDir ? join(runDir, "report.html") : "runs/report.html");

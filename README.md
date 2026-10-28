@@ -123,6 +123,8 @@ Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behav
 | One-page proof report                                        | done                                                          |
 | `parity` CLI, GitHub Action on pull requests, MCP server, offline proof | done                                               |
 | Differential fuzzing with shrinking, against live FrontAccounting | done                                                     |
+| Differences people decide: accept with who and why, repair in one click, repair history | done                       |
+| Migration mode, opt-in: whole app, data model, modern template | planned (D7)                                             |
 | Muse Spark Open on Baseten for on-premise rule extraction    | client ready, not verified (no key yet)                       |
 | Replaying the Windows app itself instead of its recording    | cut: the recording is the reference ([D3](docs/decisions.md)) |
 

@@ -7,6 +7,7 @@ import { loadConfig } from "../src/config";
 import { createModels } from "../src/models";
 import { Ledger } from "../src/models/ledger";
 import { ProofSchema } from "../src/proof/schema";
+import { appendHistory } from "../src/rebuild/history";
 import { rebuild } from "../src/rebuild/rebuild";
 import { writeSpec } from "../src/rebuild/spec";
 import { RuleStore } from "../src/rules/store";
@@ -22,6 +23,8 @@ const { values, positionals } = parseArgs({
     app: { type: "string" },
     // Attach Parity as an MCP server so Muse Code proves its own change before it stops.
     "self-check": { type: "boolean", default: false },
+    // Recorded in the run's repair history: who started this (the diff screen passes its own name).
+    source: { type: "string", default: "rebuild" },
   },
 });
 const runDir = positionals[0] ?? "runs/recording";
@@ -42,23 +45,29 @@ const proof = (await proofFile.exists())
     });
 await Bun.write(join(runDir, "proof.json"), JSON.stringify(proof, null, 2));
 
+const appDir = values.app ?? join("generated", runId, "app");
 const stored = new RuleStore(db).list(runId);
 const rules = values["all-rules"]
   ? stored.filter((r) => r.status !== "rejected")
   : stored.filter((r) => r.status === "accepted");
-if (rules.length === 0) {
+// An app already built keeps the spec it was built from when this run has no rules of its own (a copy of a run,
+// a variant changed by hand).
+const builtSpec = Bun.file(join(appDir, "SPEC.md"));
+if (rules.length === 0 && !(await builtSpec.exists())) {
   console.log(
     "No accepted rules for this run. Review them first, or pass --all-rules to use every rule not rejected.",
   );
   process.exit(1);
 }
-const spec = writeSpec(capture, proof, rules);
-console.log(`Rebuilding ${runId} from ${rules.length} rules, up to ${values.max} iterations`);
+const spec = rules.length ? writeSpec(capture, proof, rules) : await builtSpec.text();
+console.log(
+  `Rebuilding ${runId} from ${rules.length ? `${rules.length} rules` : "the spec the app was built from"}, up to ${values.max} iterations`,
+);
 
 const result = await rebuild(config, ledger, {
   proof,
   spec,
-  appDir: values.app ?? join("generated", runId, "app"),
+  appDir,
   runId: `rebuild-${runId}`,
   maxIterations: Number(values.max),
   maxSteps: Number(values.steps),
@@ -66,6 +75,7 @@ const result = await rebuild(config, ledger, {
     ? { root: resolve(import.meta.dir, ".."), proofPath: resolve(runDir, "proof.json") }
     : undefined,
 });
+await appendHistory(join(runDir, "history.json"), result.iterations, values.source);
 for (const it of result.iterations) {
   const state = it.error
     ? `error: ${it.error.slice(0, 160)}`
@@ -77,7 +87,7 @@ for (const it of result.iterations) {
 }
 for (const c of result.final?.checkpoints ?? []) {
   for (const f of c.diff.fields) {
-    const mark = f.verdict === "equal" ? "=" : f.verdict === "masked" ? "~" : "✗";
+    const mark = { equal: "=", masked: "~", accepted: "a", different: "✗" }[f.verdict];
     console.log(`    ${mark} ${f.legacy.label}: ${f.legacy.value}  |  ${f.rebuilt.value}`);
   }
 }

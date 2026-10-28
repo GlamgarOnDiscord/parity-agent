@@ -87,5 +87,6 @@ export async function proofFromCapture(
     checkpoints,
     mappings: {},
     volatile: [],
+    decisions: [],
   };
 }

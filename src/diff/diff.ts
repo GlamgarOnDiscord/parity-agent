@@ -1,8 +1,10 @@
 import type { ScreenMatch } from "../fields/match";
 import { labelTokens, normalizeValue } from "../fields/normalize";
 import type { Field } from "../fields/types";
+import type { Decision } from "./decisions";
 
-export type FieldVerdict = "equal" | "different" | "masked";
+/** `accepted`: different, and a person decided the rebuild may differ here (see decisions.ts). */
+export type FieldVerdict = "equal" | "different" | "masked" | "accepted";
 
 export interface FieldDiff {
   legacy: Field;
@@ -11,6 +13,7 @@ export interface FieldDiff {
   /** The canonical values that were compared (cents, ISO dates, folded text). */
   legacyValue: string;
   rebuiltValue: string;
+  decision?: Decision;
 }
 
 export interface ScreenDiff {
@@ -18,7 +21,14 @@ export interface ScreenDiff {
   /** Fields with no counterpart are reported, never silently dropped. */
   missingInRebuilt: Field[];
   extraInRebuilt: Field[];
-  counts: { equal: number; different: number; masked: number; missing: number; extra: number };
+  counts: {
+    equal: number;
+    different: number;
+    masked: number;
+    missing: number;
+    extra: number;
+    accepted: number;
+  };
 }
 
 // `Total` masks every Total; `Total @ row-3` only the one in that group; `Total @ none` only the ungrouped one.
@@ -65,6 +75,7 @@ export function diffScreens(match: ScreenMatch, volatileLabels: string[] = []): 
       masked: count("masked"),
       missing: missing.length,
       extra: extra.length,
+      accepted: 0,
     },
   };
 }
