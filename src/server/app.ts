@@ -5,12 +5,16 @@ import { getCookie, setCookie } from "hono/cookie";
 import { z } from "zod";
 import type { Capture } from "../capture/capture";
 import { coverageOf } from "../coverage/coverage";
+import { type Decision, reapplyDecisions } from "../diff/decisions";
 import { matchScreens } from "../fields/match";
 import type { Ledger } from "../models/ledger";
 import { ProofSchema, ScreenSchema } from "../proof/schema";
+import { readHistory } from "../rebuild/history";
+import { isEqual } from "../replay/prove";
 import { workedExample } from "../rules/extract";
 import type { RuleStore } from "../rules/store";
 import { type DiffInput, diffPage, type SavedResult } from "./diff";
+import type { RepairJobs } from "./repair";
 import { reviewPage } from "./review";
 
 const MatchBody = z.object({
@@ -28,15 +32,31 @@ export interface AppOptions {
   rules: RuleStore;
   /** Where captures live: runs/<run>/frames/frame-0001.png */
   runsDir: string;
+  /** Repairs started from the diff screen; without it the button is not offered. */
+  repairs?: RepairJobs;
 }
 
 const RUN = /^[\w.-]{1,64}$/;
 const EVIDENCE = /^[\w.-]{1,96}\.png$/;
 const FONTS = new Set(["Geist-Variable.woff2", "GeistMono-Variable.woff2"]);
 const FONT_DIR = join(import.meta.dir, "assets", "fonts");
-const Decision = z.object({
+const RuleDecision = z.object({
   status: z.enum(["accepted", "rejected"]),
   note: z.string().max(1000).optional(),
+});
+const AcceptBody = z.object({
+  scenario: z.string().min(1).max(128),
+  step: z.number().int().min(0).max(100_000),
+  field: z.string().min(1).max(256),
+  group: z.string().max(256).optional(),
+  kind: z.enum(["legacy-bug", "change"]),
+  by: z.string().trim().min(1).max(80),
+  why: z.string().trim().min(3).max(1000),
+});
+const RevokeBody = z.object({
+  screen: z.string().min(1).max(128),
+  field: z.string().min(1).max(256),
+  group: z.string().max(256).optional(),
 });
 
 export function createApp(ledger: Ledger, options: AppOptions) {
@@ -113,6 +133,10 @@ export function createApp(ledger: Ledger, options: AppOptions) {
     const totals = ids.map((id) => ledger.total(id));
     const input: DiffInput = {
       run,
+      history: await readHistory(join(dir, "history.json")),
+      repair: options.repairs
+        ? { available: true, status: options.repairs.status(run) ?? undefined }
+        : { available: false },
       proof: proof.data,
       saved: await json<SavedResult>("result.json"),
       coverage: Array.isArray(capture?.frames) ? coverageOf(capture, proof.data, rules) : undefined,
@@ -173,7 +197,7 @@ export function createApp(ledger: Ledger, options: AppOptions) {
   app.post("/api/runs/:run/rules/:rule", async (c) => {
     const run = c.req.param("run");
     if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
-    const body = Decision.safeParse(await c.req.json().catch(() => null));
+    const body = RuleDecision.safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json({ error: z.prettifyError(body.error) }, 400);
     const rule = options.rules.decide(run, c.req.param("rule"), body.data.status, body.data.note);
     return rule ? c.json(rule) : c.json({ error: "no such rule" }, 404);
@@ -219,6 +243,106 @@ export function createApp(ledger: Ledger, options: AppOptions) {
         sentBytes: totals.reduce((n, t) => n + t.sentBytes, 0),
       },
     });
+  });
+
+  // Decisions on differences: stored in the run's proof, applied to its last replay at once.
+  const runFiles = async (run: string) => {
+    const dir = resolve(options.runsDir, run);
+    const proofFile = Bun.file(join(dir, "proof.json"));
+    const resultFile = Bun.file(join(dir, "result.json"));
+    if (!(await proofFile.exists()) || !(await resultFile.exists())) return null;
+    const proof = ProofSchema.safeParse(await proofFile.json().catch(() => null));
+    const saved = (await resultFile.json().catch(() => null)) as SavedResult | null;
+    if (!proof.success || !saved || !Array.isArray(saved.result?.checkpoints)) return null;
+    return { dir, proof: proof.data, saved };
+  };
+  const saveDecisions = async (
+    files: NonNullable<Awaited<ReturnType<typeof runFiles>>>,
+    decisions: Decision[],
+  ) => {
+    const proof = { ...files.proof, decisions };
+    const checkpoints = files.saved.result.checkpoints.map((c) => ({
+      ...c,
+      diff: reapplyDecisions(c.diff, c.screen, decisions),
+    }));
+    const saved = {
+      ...files.saved,
+      result: { ...files.saved.result, checkpoints, equal: isEqual(checkpoints) },
+    };
+    await Bun.write(join(files.dir, "proof.json"), `${JSON.stringify(proof, null, 2)}\n`);
+    await Bun.write(join(files.dir, "result.json"), JSON.stringify(saved, null, 2));
+    return saved.result;
+  };
+  const busy = (run: string) => options.repairs?.status(run)?.state === "running";
+  const sameDecision = (
+    d: Pick<Decision, "screen" | "field" | "group">,
+    e: Pick<Decision, "screen" | "field" | "group">,
+  ) => d.screen === e.screen && d.field === e.field && (d.group ?? null) === (e.group ?? null);
+
+  app.post("/api/runs/:run/decisions", async (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
+    if (busy(run)) return c.json({ error: "a repair of this run is running" }, 409);
+    const body = AcceptBody.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json({ error: z.prettifyError(body.error) }, 400);
+    const files = await runFiles(run);
+    if (!files) return c.json({ error: "no proof or replay for this run" }, 404);
+    const b = body.data;
+    const checkpoint = files.saved.result.checkpoints.find(
+      (x) => x.scenario === b.scenario && x.step === b.step,
+    );
+    const f = checkpoint?.diff.fields.find(
+      (x) =>
+        x.verdict === "different" &&
+        x.legacy.label === b.field &&
+        (x.legacy.group ?? null) === (b.group ?? null),
+    );
+    if (!checkpoint || !f) return c.json({ error: "no such difference in the last replay" }, 404);
+    const decision: Decision = {
+      screen: checkpoint.screen,
+      field: b.field,
+      group: b.group,
+      legacy: f.legacyValue,
+      rebuilt: f.rebuiltValue,
+      kind: b.kind,
+      by: b.by,
+      why: b.why,
+      at: new Date().toISOString(),
+    };
+    const others = files.proof.decisions.filter((d) => !sameDecision(d, decision));
+    const result = await saveDecisions(files, [...others, decision]);
+    return c.json({ decision, equal: result.equal });
+  });
+
+  app.post("/api/runs/:run/decisions/revoke", async (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
+    if (busy(run)) return c.json({ error: "a repair of this run is running" }, 409);
+    const body = RevokeBody.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json({ error: z.prettifyError(body.error) }, 400);
+    const files = await runFiles(run);
+    if (!files) return c.json({ error: "no proof or replay for this run" }, 404);
+    const kept = files.proof.decisions.filter((d) => !sameDecision(d, body.data));
+    if (kept.length === files.proof.decisions.length) return c.json({ error: "no such decision" }, 404);
+    const result = await saveDecisions(files, kept);
+    return c.json({ equal: result.equal });
+  });
+
+  // One Muse Code repair from the diff screen, then a new replay; the page polls for progress.
+  app.post("/api/runs/:run/repair", async (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
+    if (!options.repairs) return c.json({ error: "repairs are not enabled on this server" }, 404);
+    const files = await runFiles(run);
+    if (!files) return c.json({ error: "no proof or replay for this run" }, 404);
+    if (files.saved.result.equal) return c.json({ error: "nothing to repair: this run has parity" }, 409);
+    const job = options.repairs.start(run, files.saved.replay);
+    return typeof job === "string" ? c.json({ error: job }, 409) : c.json(job, 202);
+  });
+  app.get("/api/runs/:run/repair", (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.json({ error: "bad run" }, 400);
+    return c.json(options.repairs?.status(run) ?? { run, state: "idle", log: [] });
   });
 
   // The send log: everything that left the machine, and what it cost.

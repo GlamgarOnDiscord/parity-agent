@@ -93,3 +93,14 @@ The spec draws 1 to 4 lines per invoice from the six items of the demo data, qua
 What it found was data, not arithmetic: line totals, the included tax and thousands formatting held on every case, and the item master was missing. A first run also caught two faults in Parity itself, now fixed and tested: `1200.00` was read as a plain number and compared as text against `1,200.00`, and shrinking drifted from one difference to another one already reported.
 
 Not covered yet: item codes that do not exist. The rebuild still falls back to a default item where FrontAccounting refuses the line; adding an unknown code to the spec is the next case to find.
+
+## Differences people decide, from the diff screen (2026-10-28)
+
+| action | result | spend |
+|---|---|---|
+| Accept the cent on Virtual Salesman 3 (69.21 before, 69.22 after) as "the legacy app was wrong", with a name and a reason | stored in the proof, verdict "Parity, 1 accepted", listed in the report and the pull-request summary; it holds for these two values only | none |
+| Send to Muse Code, FrontAccounting rebuild with item 301 removed (7 differences) | item 301 back; Parity's replay right after caught a new difference: included tax 11.91 before, 11.90 after on item 102 | $0.41 |
+| Send to Muse Code again | still 11.90: Muse Code tried a tax per line | $0.40 |
+
+The regression came from the spec: the rule read from the recording says included tax = sub-total × 5 / 105, and Muse Code rewrote the working formula to follow it. FrontAccounting rounds the base before it computes the tax. The repair prompt now says the legacy values win over a formula from the spec. One failing example is not enough to infer a rounding rule; the next step is to fuzz around a numeric difference and hand Muse Code a table of inputs and legacy values.
+

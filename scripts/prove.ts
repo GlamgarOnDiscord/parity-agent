@@ -38,7 +38,7 @@ try {
     for (const c of result.checkpoints) {
       console.log(`${c.scenario} › ${c.screen} (step ${c.step})`);
       for (const f of c.diff.fields) {
-        const mark = f.verdict === "equal" ? "  =" : f.verdict === "masked" ? "  ~" : "  ✗";
+        const mark = { equal: "  =", masked: "  ~", accepted: "  a", different: "  ✗" }[f.verdict];
         const left = `${f.legacy.label}: ${f.legacy.value}`.padEnd(30);
         console.log(`${mark} ${left} ${f.rebuilt.label}: ${f.rebuilt.value}`);
       }
