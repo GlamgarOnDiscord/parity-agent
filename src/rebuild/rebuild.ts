@@ -30,6 +30,9 @@ export interface Iteration {
   equal: boolean;
   different: number;
   missing: number;
+  /** Fields with the same value in both apps, out of every field compared. */
+  fieldsEqual?: number;
+  fieldsCompared?: number;
   /** Times Muse Code proved its own change through the Parity MCP server. */
   selfChecks?: number;
   error?: string;
@@ -125,10 +128,16 @@ export async function startApp(appDir: string): Promise<{ url: string; stop: () 
   throw new Error(`the generated app did not start: ${out.slice(-300)}`);
 }
 
-const counts = (r: ProveResult) => ({
-  different: r.checkpoints.reduce((s, c) => s + c.diff.counts.different, 0),
-  missing: r.checkpoints.reduce((s, c) => s + c.diff.counts.missing, 0),
-});
+const counts = (r: ProveResult) => {
+  const sum = (k: keyof ProveResult["checkpoints"][number]["diff"]["counts"]) =>
+    r.checkpoints.reduce((s, c) => s + (c.diff.counts[k] ?? 0), 0);
+  return {
+    different: sum("different"),
+    missing: sum("missing"),
+    fieldsEqual: sum("equal"),
+    fieldsCompared: sum("equal") + sum("different") + sum("masked") + sum("accepted") + sum("missing"),
+  };
+};
 
 async function proveApp(config: Config, appDir: string, proof: Proof): Promise<ProveResult> {
   const app = await startApp(appDir);

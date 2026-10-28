@@ -82,7 +82,7 @@ function shots(
 function fieldRow(f: FieldDiff) {
   return `<tr class="${f.verdict}"><td>${esc(f.legacy.label)}</td><td class="v">${esc(f.legacy.value)}</td>
 <td>${esc(f.rebuilt.label)}</td><td class="v">${esc(f.rebuilt.value)}</td><td class="mark">${
-    f.verdict === "equal" ? "equal" : f.verdict === "masked" ? "noise" : "different"
+    f.verdict === "masked" ? "noise" : f.verdict
   }</td></tr>`;
 }
 
@@ -98,12 +98,15 @@ export function renderReport(r: ReportInput): string {
       different: t.different + c.diff.counts.different,
       masked: t.masked + c.diff.counts.masked,
       missing: t.missing + c.diff.counts.missing,
+      accepted: t.accepted + (c.diff.counts.accepted ?? 0),
     }),
-    { equal: 0, different: 0, masked: 0, missing: 0 },
+    { equal: 0, different: 0, masked: 0, missing: 0, accepted: 0 },
   );
-  const compared = totals.equal + totals.different + totals.masked;
+  const compared = totals.equal + totals.different + totals.masked + totals.accepted;
   const verdict = r.result.equal
-    ? "Parity"
+    ? totals.accepted
+      ? `Parity, with ${plural(totals.accepted, "accepted difference")}`
+      : "Parity"
     : `No parity: ${totals.different} ${totals.different === 1 ? "difference" : "differences"}${
         totals.missing ? `, ${totals.missing} missing` : ""
       }`;
@@ -131,6 +134,22 @@ export function renderReport(r: ReportInput): string {
   <p class="values"><span class="before">${esc(f.value)}</span> before, no such field after.</p></article>`,
     ),
   ]);
+
+  const kinds = { "legacy-bug": "the legacy app was wrong", change: "a change on purpose" };
+  const acceptedDiffs = r.result.checkpoints.flatMap((c) =>
+    c.diff.fields
+      .filter((f) => f.verdict === "accepted" && f.decision)
+      .map((f) => {
+        const d = f.decision as NonNullable<FieldDiff["decision"]>;
+        return `<article class="diff accepted">
+  <h3>${esc(f.legacy.label)} <span>${esc(scenarioName(c.scenario))}, step ${c.step}</span></h3>
+  <p class="values"><span class="before">${esc(f.legacy.value)}</span> before, <span class="after">${esc(
+    f.rebuilt.value,
+  )}</span> after: ${esc(kinds[d.kind])}.</p>
+  <p class="why">&ldquo;${esc(d.why)}&rdquo; ${esc(d.by)}, ${esc(d.at.slice(0, 10))}</p>
+</article>`;
+      }),
+  );
 
   const checkpoints = r.result.checkpoints
     .map(
@@ -198,6 +217,8 @@ export function renderReport(r: ReportInput): string {
   th { text-align: left; font-weight: 500; color: var(--soft); font-size: 11px; border-bottom: 1px solid var(--ink); padding: 4px 6px; }
   td { padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
   tr.different td { color: var(--diff); font-weight: 600; } tr.masked td { color: var(--noise); }
+  tr.accepted td { color: var(--blue); } .diff.accepted { border-left-color: var(--blue); }
+  .diff.accepted .after { color: var(--blue); } p.why { margin: 4px 0 0; color: var(--soft); }
   td.mark { font-size: 11px; color: var(--soft); text-align: right; } tr.different td.mark { color: var(--diff); }
   .cp { break-inside: avoid; } code { display: block; margin-top: 3px; font-size: 12px; color: var(--soft); }
   .id { color: var(--soft); white-space: nowrap; }
@@ -226,9 +247,16 @@ export function renderReport(r: ReportInput): string {
   <div><dt>Different</dt><dd>${totals.different}</dd></div>
   <div><dt>Noise, masked</dt><dd>${totals.masked}</dd></div>
   <div><dt>Missing</dt><dd>${totals.missing}</dd></div>
+  ${totals.accepted ? `<div><dt>Accepted</dt><dd>${totals.accepted}</dd></div>` : ""}
 </dl>
 
 ${differences.length ? `<h2>Differences</h2>${differences.join("")}` : `<h2>Differences</h2><p class="note">None. Every compared field has the same value in both apps.</p>`}
+
+${
+  acceptedDiffs.length
+    ? `<h2>Accepted differences</h2><p class="note">Differences a person decided the rebuild may keep, with who and why. Each holds for these two values only.</p>${acceptedDiffs.join("")}`
+    : ""
+}
 
 <h2>Checkpoints</h2>
 ${checkpoints}

@@ -1,3 +1,4 @@
+import { applyDecisions } from "../diff/decisions";
 import { diffScreens, type ScreenDiff } from "../diff/diff";
 import { detectVolatile } from "../diff/volatile";
 import type { AppDriver } from "../drivers/types";
@@ -55,10 +56,13 @@ export async function prove(
       scenario: reference.scenario,
       step: reference.step,
       screen: reference.screen.id,
-      diff: diffScreens(match, volatile),
+      diff: applyDecisions(diffScreens(match, volatile), reference.screen.id, proof.decisions),
     };
   });
 
-  const equal = checkpoints.every((c) => c.diff.counts.different === 0 && c.diff.counts.missing === 0);
-  return { volatile, checkpoints, equal };
+  return { volatile, checkpoints, equal: isEqual(checkpoints) };
 }
+
+/** Parity: nothing different and nothing missing. Noise and accepted differences do not count against it. */
+export const isEqual = (checkpoints: CheckpointResult[]) =>
+  checkpoints.every((c) => c.diff.counts.different === 0 && c.diff.counts.missing === 0);

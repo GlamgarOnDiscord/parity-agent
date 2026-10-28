@@ -1,7 +1,9 @@
 import type { Coverage } from "../coverage/coverage";
 import type { FieldDiff } from "../diff/diff";
 import type { Proof } from "../proof/schema";
+import type { HistoryEntry } from "../rebuild/history";
 import type { ProveResult } from "../replay/prove";
+import type { RepairStatus } from "./repair";
 import { esc, icon, shell, ticks } from "./ui";
 
 /** What `bun run report` leaves in runs/<run>/result.json for this screen. */
@@ -13,6 +15,8 @@ export interface SavedResult {
   evidence: Record<string, string>;
   /** Reference app screenshots under runs/<run>/evidence, when the reference was replayed rather than recorded. */
   reference?: Record<string, string>;
+  /** How the report was run, so a repair from this screen can replay the same way. */
+  replay?: { app?: string; url?: string; referenceUrl?: string };
 }
 
 export interface DiffInput {
@@ -23,6 +27,10 @@ export interface DiffInput {
   calls: { calls: number; costUsd: number; sentBytes: number };
   /** PARITY_BUDGET_USD, the cap every model call is checked against. */
   budgetUsd: number;
+  /** Every proof of the app during rebuilds and repairs of this run, oldest first. */
+  history?: HistoryEntry[];
+  /** Whether this server can start a repair, and the one running or last finished for this run. */
+  repair?: { available: boolean; status?: RepairStatus };
   exploration?: {
     steps: number;
     costUsd: number;
@@ -97,6 +105,33 @@ th { text-align: left; font: 500 11px var(--mono); color: var(--t3); letter-spac
 td { padding: 8px 12px; border-bottom: 1px solid var(--line); } tr:last-child td { border-bottom: 0; }
 td.v { font-family: var(--mono); white-space: nowrap; } tr.different td { background: rgba(239, 68, 68, .06); } tr.different td.v { color: #fca5a5; }
 tr.masked td.v { color: var(--t3); }
+tr.accepted td.v { color: var(--blue-hi); }
+.moved .act { grid-column: 1 / -1; }
+.moved details summary { list-style: none; cursor: pointer; color: var(--t2); font-size: 12px; display: inline-flex; gap: 6px; align-items: center; }
+.moved details summary::-webkit-details-marker { display: none; }
+.moved details summary:hover { color: var(--t1); }
+.decide { display: grid; gap: 10px; margin-top: 10px; padding: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; }
+.decide fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 6px; }
+.decide legend { color: var(--t3); font-size: 12px; margin-bottom: 4px; }
+.decide label { display: flex; gap: 8px; align-items: baseline; font-size: 13px; }
+.decide input[type="text"], .decide textarea { font: inherit; color: var(--t1); background: var(--card); border: 1px solid var(--line-2); border-radius: 8px; padding: 7px 10px; width: 100%; box-sizing: border-box; }
+.decide textarea { min-height: 64px; resize: vertical; }
+.decide .err { color: #fca5a5; font-size: 12px; margin: 0; min-height: 1em; }
+.accepted-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.accepted-list li { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.accepted-list li:last-child { border-bottom: 0; }
+.accepted-list .vals { font: 14px var(--mono); white-space: nowrap; } .accepted-list .vals .after { color: var(--blue-hi); }
+.accepted-list .why { color: var(--t2); font-size: 13px; } .accepted-list .by { color: var(--t3); font-size: 12px; }
+.linkbtn { font: inherit; font-size: 12px; color: var(--t3); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; justify-self: end; }
+.linkbtn:hover { color: var(--t1); }
+.repair { display: grid; gap: 10px; }
+.repair pre { margin: 0; max-height: 220px; overflow: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: 12px/1.5 var(--mono); color: var(--t2); white-space: pre-wrap; }
+.repair .state { display: flex; gap: 10px; align-items: center; color: var(--t2); }
+.history { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.history li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; }
+.history .h { font: 12px var(--mono); color: var(--t3); } .history .h b { color: var(--t1); font: 500 13px Geist, system-ui, sans-serif; }
+.history .n { font: 13px var(--mono); text-align: right; }
+.history .ticks { grid-column: 1 / -1; }
 @media (max-width: 1100px) { .meters, .split { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .page { padding: 18px 16px 40px; } .top { flex-wrap: wrap; padding: 14px 16px; } .top .right { display: none; }
   .strips figure { grid-template-columns: 1fr; gap: 4px; } .panel header .meta { margin-left: 0; width: 100%; } }
@@ -205,6 +240,7 @@ export function diffPage(d: DiffInput): string {
   const equal = all.filter((v) => v === "equal").length;
   const different = all.filter((v) => v === "different").length;
   const masked = all.filter((v) => v === "masked").length;
+  const accepted = all.filter((v) => v === "accepted").length;
   const missing = result.checkpoints.reduce((n, c) => n + c.diff.counts.missing, 0);
   const compared = all.length;
   const cov = d.coverage;
@@ -217,12 +253,13 @@ export function diffPage(d: DiffInput): string {
   ${ticks(
     [
       { n: equal, cls: "on" },
+      { n: accepted, cls: "part" },
       { n: masked, cls: "warn" },
       { n: different + missing, cls: "bad" },
     ],
     compared + missing,
   )}
-  <p><b>${different}</b> different · <b>${masked}</b> noise · <b>${missing}</b> missing · ${result.checkpoints.length} checkpoints, replayed twice</p>
+  <p><b>${different}</b> different · <b>${accepted}</b> accepted · <b>${masked}</b> noise · <b>${missing}</b> missing · ${result.checkpoints.length} checkpoints, replayed twice</p>
 </section>
 <section class="card meter" aria-label="Coverage of the recording">
   <header>Recorded fields checked ${icon("eye")}</header>
@@ -252,11 +289,12 @@ export function diffPage(d: DiffInput): string {
   const checkpoints = result.checkpoints
     .map((c) => {
       const n = c.diff.counts;
-      const total = n.equal + n.different + n.masked + n.missing;
+      const total = n.equal + n.different + n.masked + n.missing + (n.accepted ?? 0);
       return `<div class="row"><div class="h"><b>${esc(scenarioName(c.scenario))}, step ${c.step}</b><span>${n.equal}/${total}</span></div>
 ${ticks(
   [
     { n: n.equal, cls: "on" },
+    { n: n.accepted ?? 0, cls: "part" },
     { n: n.masked, cls: "warn" },
     { n: n.different + n.missing, cls: "bad" },
   ],
@@ -265,6 +303,21 @@ ${ticks(
     })
     .join("");
 
+  const acceptForm = (c: (typeof result.checkpoints)[number], f: FieldDiff) =>
+    `<div class="act"><details><summary>${icon("check")}Accept this difference</summary>
+<form class="decide" data-scenario="${esc(c.scenario)}" data-step="${c.step}" data-field="${esc(f.legacy.label)}"${
+      f.legacy.group ? ` data-group="${esc(f.legacy.group)}"` : ""
+    }>
+  <fieldset><legend>The rebuild may show ${esc(f.rebuilt.value)} here because</legend>
+    <label><input type="radio" name="kind" value="legacy-bug" checked> the legacy app was wrong and the rebuild is right</label>
+    <label><input type="radio" name="kind" value="change"> it is a change made on purpose</label>
+  </fieldset>
+  <input type="text" name="by" placeholder="Your name" maxlength="80" required autocomplete="name">
+  <textarea name="why" placeholder="Why, in a sentence the next reader will understand" maxlength="1000" required></textarea>
+  <p class="err" role="status"></p>
+  <div><button class="btn white" type="submit">Accept with this reason</button></div>
+</form></details></div>`;
+
   const moved = result.checkpoints.flatMap((c) => [
     ...c.diff.fields
       .filter((f) => f.verdict === "different")
@@ -272,7 +325,7 @@ ${ticks(
         (f) =>
           `<li><span>${esc(f.legacy.label.replace(/:$/, ""))}</span><span class="vals">${esc(f.legacy.value)} → <span class="after">${esc(
             f.rebuilt.value,
-          )}</span></span><span class="where">${esc(scenarioName(c.scenario))}, step ${c.step}</span></li>`,
+          )}</span></span><span class="where">${esc(scenarioName(c.scenario))}, step ${c.step}</span>${acceptForm(c, f)}</li>`,
       ),
     ...c.diff.missingInRebuilt.map(
       (f) =>
@@ -289,6 +342,76 @@ ${ticks(
             `<li><span>${esc(r.label)}</span><span class="f">frames ${r.frames.join(", ") || "none"}</span><span class="tag ${STATE[r.state][0]}">${STATE[r.state][1]}</span></li>`,
         )
         .join("")
+    : "";
+
+  const kinds = { "legacy-bug": "legacy app was wrong", change: "change on purpose" };
+  const acceptedItems = result.checkpoints.flatMap((c) =>
+    c.diff.fields
+      .filter((f) => f.verdict === "accepted" && f.decision)
+      .map((f) => {
+        const dec = f.decision as NonNullable<FieldDiff["decision"]>;
+        return `<li><span>${esc(f.legacy.label.replace(/:$/, ""))} <span class="tag blue">${kinds[dec.kind]}</span></span>
+<span class="vals">${esc(f.legacy.value)} → <span class="after">${esc(f.rebuilt.value)}</span></span>
+<span class="why">${esc(dec.why)}</span>
+<button class="linkbtn" type="button" data-revoke data-screen="${esc(c.screen)}" data-field="${esc(dec.field)}"${
+          dec.group ? ` data-group="${esc(dec.group)}"` : ""
+        }>Revoke</button>
+<span class="by">${esc(dec.by)}, ${esc(new Date(dec.at).toLocaleString("en-GB"))} · ${esc(scenarioName(c.scenario))}, step ${c.step}</span></li>`;
+      }),
+  );
+  const acceptedPanel = acceptedItems.length
+    ? `<section class="card panel"><header>${icon("check")}<h2>Accepted differences</h2><span class="meta">${acceptedItems.length} · stored in the proof</span></header>
+<div class="body"><ul class="accepted-list">${acceptedItems.join("")}</ul></div></section>`
+    : "";
+
+  const job = d.repair?.status;
+  const canRepair = d.repair?.available && (different > 0 || missing > 0) && job?.state !== "running";
+  const repairPanel =
+    d.repair?.available && (job || different + missing > 0)
+      ? `<section class="card panel" id="repair"><header>${icon("send")}<h2>Repair with Muse Code</h2><span class="meta">one iteration, about $0.50 · capped at $${d.budgetUsd.toFixed(0)}</span></header>
+<div class="body repair">
+<p class="none">Muse Code gets every difference still open, with the inputs that produced it; accepted differences are left alone. Parity then replays the proof and this page shows the result.</p>
+${
+  job
+    ? `<div class="state"><span class="dot ${job.state === "failed" ? "bad" : job.state === "done" ? "ok" : "warn"}"></span>${
+        job.state === "running"
+          ? `Running since ${esc(new Date(job.startedAt).toLocaleTimeString("en-GB"))}`
+          : `${job.state === "done" ? "Finished" : "Failed"} at ${esc(new Date(job.endedAt ?? job.startedAt).toLocaleTimeString("en-GB"))}`
+      }</div><pre aria-live="polite">${esc(job.log.slice(-40).join("\n"))}</pre>`
+    : ""
+}
+${canRepair ? `<div><button class="btn blue" type="button" id="send-repair">${icon("send")}Send to Muse Code</button></div>` : ""}
+</div></section>`
+      : "";
+
+  const history = d.history ?? [];
+  const historyPanel = history.length
+    ? `<section class="card panel"><header>${icon("diff")}<h2>Repair history</h2><span class="meta">${history.length} proofs · $${history
+        .reduce((n, h) => n + h.costUsd, 0)
+        .toFixed(2)} spent</span></header>
+<div class="body"><ol class="history">${history
+        .slice(-12)
+        .map((h) => {
+          const total = h.fieldsCompared ?? 0;
+          const eq = h.fieldsEqual ?? 0;
+          const state = h.error ? "error" : h.equal ? "parity" : `${h.different} different`;
+          return `<li><span class="h"><b>${h.n === 0 ? "Proof before" : h.kind === "build" ? "Build" : "Repair"}</b> · ${esc(h.source)} · ${esc(
+            new Date(h.at).toLocaleString("en-GB"),
+          )} · $${h.costUsd.toFixed(2)}</span><span class="n">${total ? `${eq} / ${total}` : ""} <span class="tag ${
+            h.error ? "bad" : h.equal ? "ok" : "warn"
+          }">${state}</span></span>${
+            total
+              ? ticks(
+                  [
+                    { n: eq, cls: "on" },
+                    { n: total - eq, cls: h.equal ? "part" : "bad" },
+                  ],
+                  total,
+                )
+              : ""
+          }</li>`;
+        })
+        .join("")}</ol></div></section>`
     : "";
 
   const explored = d.exploration
@@ -360,7 +483,7 @@ ${c.diff.fields
   .map(
     (f) =>
       `<tr class="${f.verdict}"><td>${esc(f.legacy.label)}</td><td class="v">${esc(f.legacy.value)}</td><td>${esc(f.rebuilt.label)}</td><td class="v">${esc(f.rebuilt.value)}</td><td><span class="tag ${
-        f.verdict === "equal" ? "ok" : f.verdict === "different" ? "bad" : "warn"
+        { equal: "ok", different: "bad", masked: "warn", accepted: "blue" }[f.verdict]
       }">${f.verdict === "masked" ? "noise" : f.verdict}</span></td></tr>`,
   )
   .join("")}
@@ -381,7 +504,11 @@ ${c.diff.missingInRebuilt.map((f) => `<tr class="different"><td>${esc(f.label)}<
 <div class="right"><span class="mono" style="color:var(--t3)">${esc(candidate)}</span><a class="btn" href="/review/${run}">${icon("rules")}Rules</a></div></div>
 <div class="page">
 <div><h1>${esc(d.proof.reference.app)} against the rebuild <span class="verdict ${ok ? "ok" : "bad"}">${
-      ok ? "Parity" : `No parity · ${count} ${count === 1 ? "difference" : "differences"}`
+      ok
+        ? accepted
+          ? `Parity · ${accepted} accepted`
+          : "Parity"
+        : `No parity · ${count} ${count === 1 ? "difference" : "differences"}`
     }</span></h1>
 <p class="lede">Replayed ${new Date(at).toLocaleString("en-GB")}. Matching and comparison are plain code; no model judged equality.</p></div>
 ${meters}
@@ -390,7 +517,10 @@ ${meters}
   <section class="card panel"><header>${icon("diff")}<h2>Fields by checkpoint</h2><span class="meta">${compared} compared</span></header>
     <div class="body">${checkpoints}<div class="legend"><span><i style="background:var(--blue)"></i>equal ${equal}</span><span><i style="background:var(--amber)"></i>noise ${masked}</span><span><i style="background:var(--red)"></i>different ${count}</span></div></div></section>
   <section class="card panel"><header>${icon("alert")}<h2>What moved</h2><span class="meta">${count} ${count === 1 ? "field" : "fields"}</span></header>
-    <div class="body">${moved.length ? `<ul class="moved">${moved.join("")}</ul>` : `<p class="none">Nothing. Every compared field has the same value in both apps.</p>`}</div></section>
+    <div class="body">${moved.length ? `<ul class="moved">${moved.join("")}</ul>` : `<p class="none">Nothing${accepted ? " open" : ""}. Every compared field has the same value in both apps${accepted ? ", or a person accepted the difference" : ""}.</p>`}</div></section>
+  ${repairPanel}
+  ${acceptedPanel}
+  ${historyPanel}
   ${cov ? "" : explored}
   </div>
   ${
@@ -415,6 +545,57 @@ const show = (b) => {
 for (const b of document.querySelectorAll(".seg button")) b.addEventListener("click", () => show(b));
 // On a phone the whole screen is too small to read; the field strips lead there.
 const field = document.querySelector('.seg button[data-view="field"]');
-if (field && matchMedia("(max-width: 640px)").matches) show(field);`,
+if (field && matchMedia("(max-width: 640px)").matches) show(field);
+const post = async (path, body) => {
+  const r = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+};
+const api = "/api/runs/${run}";
+const remembered = (() => { try { return localStorage.getItem("parity.by") || ""; } catch { return ""; } })();
+for (const form of document.querySelectorAll("form.decide")) {
+  form.by.value = remembered;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const err = form.querySelector(".err");
+    err.textContent = "";
+    const body = { scenario: form.dataset.scenario, step: Number(form.dataset.step), field: form.dataset.field,
+      kind: form.kind.value, by: form.by.value.trim(), why: form.why.value.trim() };
+    if (form.dataset.group) body.group = form.dataset.group;
+    try { localStorage.setItem("parity.by", body.by); } catch {}
+    try { await post(api + "/decisions", body); location.reload(); } catch (x) { err.textContent = x.message; }
+  });
+}
+for (const b of document.querySelectorAll("[data-revoke]")) {
+  b.addEventListener("click", async () => {
+    const body = { screen: b.dataset.screen, field: b.dataset.field };
+    if (b.dataset.group) body.group = b.dataset.group;
+    b.disabled = true;
+    try { await post(api + "/decisions/revoke", body); location.reload(); } catch (x) { b.disabled = false; b.textContent = x.message; }
+  });
+}
+// Two steps, no dialog: the first click names the cost, the second starts the run.
+const send = document.getElementById("send-repair");
+if (send) {
+  let armed = false;
+  send.addEventListener("click", async () => {
+    if (!armed) { armed = true; send.lastChild.textContent = "Confirm: start one Muse Code repair, about $0.50"; return; }
+    send.disabled = true;
+    try { await post(api + "/repair", {}); location.hash = "repair"; location.reload(); }
+    catch (x) { send.disabled = false; armed = false; send.lastChild.textContent = x.message; }
+  });
+}
+${
+  job?.state === "running"
+    ? `setTimeout(function poll() {
+  fetch(api + "/repair").then((r) => r.json()).then((j) => {
+    const pre = document.querySelector("#repair pre");
+    if (pre) { pre.textContent = j.log.slice(-40).join("\\n"); pre.scrollTop = pre.scrollHeight; }
+    if (j.state === "running") setTimeout(poll, 1500); else location.reload();
+  }).catch(() => setTimeout(poll, 3000));
+}, 1500);`
+    : ""
+}`,
   });
 }

@@ -37,6 +37,23 @@ export function summaryOf(reference: string, candidate: string, result: ProveRes
     ),
   ]);
   if (rows.length) lines.push("", "| Field | Where | Before | After |", "| --- | --- | --- | --- |", ...rows);
+  const accepted = result.checkpoints.flatMap((c) =>
+    c.diff.fields
+      .filter((f) => f.verdict === "accepted" && f.decision)
+      .map(
+        (f) =>
+          `| ${cell(f.legacy.label)} | ${cell(f.legacy.value)} | ${cell(f.rebuilt.value)} | ${cell(f.decision?.by ?? "")}: ${cell(f.decision?.why ?? "")} |`,
+      ),
+  );
+  if (accepted.length)
+    lines.push(
+      "",
+      "Accepted on purpose:",
+      "",
+      "| Field | Before | After | Decided by |",
+      "| --- | --- | --- | --- |",
+      ...accepted,
+    );
   if (result.volatile.length) lines.push("", `Noise masked: ${result.volatile.map(cell).join(", ")}.`);
   return `${lines.join("\n")}\n`;
 }
