@@ -156,3 +156,36 @@ export async function shrink(
   }
   return { case: best, tries };
 }
+
+/**
+ * Cases next to a failing one: each value moved a little (the next integer, twice, ten times, another item), one
+ * at a time. A rounding rule shows in the pattern of values around a difference, not in one of them.
+ */
+export function around(spec: FuzzSpec, c: Case, max = 8): Case[] {
+  const variants: Case[][] = [];
+  for (const [li, line] of c.entries()) {
+    for (const [ii, input] of spec.line.entries()) {
+      const current = line[ii];
+      if (current === null || current === undefined) continue;
+      let values: string[];
+      if ("oneOf" in input) values = input.oneOf.filter((v) => v !== current).slice(0, 3);
+      else {
+        const n = Number(current);
+        const [lo, hi] = input.int;
+        values = [n + 1, n * 2, n * 10, n + 7, lo].filter((v) => v >= lo && v <= hi && v !== n).map(String);
+      }
+      variants.push(values.map((v) => c.map((l, j) => (j === li ? l.map((x, k) => (k === ii ? v : x)) : l))));
+    }
+  }
+  const out: Case[] = [];
+  const seen = new Set([JSON.stringify(c)]);
+  for (let round = 0; out.length < max && variants.some((v) => v.length > round); round++) {
+    for (const v of variants) {
+      const next = v[round];
+      if (!next || out.length >= max || seen.has(JSON.stringify(next))) continue;
+      seen.add(JSON.stringify(next));
+      out.push(next);
+    }
+  }
+  return out;
+}
