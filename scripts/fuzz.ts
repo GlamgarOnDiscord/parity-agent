@@ -10,7 +10,7 @@ import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
 import type { AppDriver } from "../src/drivers/types";
 import { describeCase, FuzzSpecSchema } from "../src/fuzz/case";
-import { addFailures, type FuzzReport, fuzz } from "../src/fuzz/fuzz";
+import { addFailures, examplesAround, type FuzzReport, fuzz } from "../src/fuzz/fuzz";
 import { Ledger } from "../src/models/ledger";
 import { ProofSchema } from "../src/proof/schema";
 import { appendHistory } from "../src/rebuild/history";
@@ -54,13 +54,14 @@ const adapter = spec.reference?.adapter ?? proof.reference.adapter;
 const seed = Number(values.seed);
 const count = Number(values.count);
 
-async function fuzzOnce(): Promise<FuzzReport> {
+async function fuzzOnce(): Promise<{ report: FuzzReport; examples: string }> {
   const served = values.app ? await startApp(resolve(values.app)) : null;
   const reference = await openBrowser(config, { url: values["reference-url"] as string });
   let candidate: AppDriver | undefined;
   try {
     candidate = await openBrowser(config, { url: values.url ?? (served?.url as string) });
-    return await fuzz({ reference, candidate, adapter, volatile: proof.volatile }, spec, {
+    const sides = { reference, candidate, adapter, volatile: proof.volatile };
+    const report = await fuzz(sides, spec, {
       seed,
       count,
       maxFailures: Number(values.failures),
@@ -72,6 +73,10 @@ async function fuzzOnce(): Promise<FuzzReport> {
           process.stdout.write(`\n  case ${i}: ${describeCase(spec, c)}\n    ${r.signature.join(", ")}\n`);
       },
     });
+    // Only when a repair follows: the table costs a few more replays, no model call.
+    const tables = [];
+    if (values.repair) for (const f of report.failures) tables.push(await examplesAround(sides, spec, f));
+    return { report, examples: tables.filter(Boolean).join("\n\n") };
   } finally {
     await candidate?.close();
     await reference.close();
@@ -107,8 +112,10 @@ const ledger = values.repair ? new Ledger(openDb(config.PARITY_DB)) : null;
 let report: FuzzReport | undefined;
 for (let round = 1; round <= rounds; round++) {
   if (rounds > 1) console.log(`\nRound ${round}: ${count} cases, seed ${seed}`);
-  report = await fuzzOnce();
+  const once = await fuzzOnce();
+  report = once.report;
   print(report);
+  if (once.examples) console.log(`\n${once.examples}`);
   if (values.json) await Bun.write(values.json, `${JSON.stringify(report, null, 2)}\n`);
   if (report.failures.length === 0) break;
 
@@ -129,6 +136,7 @@ for (let round = 1; round <= rounds; round++) {
     runId: `fuzz-${spec.id}`,
     maxIterations: 1,
     maxSteps: Number(values.steps),
+    examples: once.examples || undefined,
   });
   await appendHistory(join(dirname(values.proof), "history.json"), result.iterations, "fuzz");
   for (const it of result.iterations) {
