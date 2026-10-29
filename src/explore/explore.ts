@@ -143,6 +143,8 @@ export async function explore(
     if (step.safetyReceipt) receipts.push(step.safetyReceipt);
     if (step.safetyChecks.length > 0 && step.safetyChecks.every((c) => acknowledge.has(c.code))) {
       acknowledged.push({ step: n, codes: step.safetyChecks.map((c) => c.code), actions: step.actions });
+      // The operator's standing permission covers this sandbox run, not a test that replays it anywhere later.
+      trace = null;
     } else if (step.safetyChecks.length > 0) {
       const checks = step.safetyChecks.map((c) => `${c.code}: ${c.message}`).join("; ");
       return result("safety-check", `${checks} Pending actions: ${JSON.stringify(step.actions)}`, n);
