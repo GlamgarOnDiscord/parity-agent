@@ -3,6 +3,7 @@ import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
 import type { AppDriver } from "../src/drivers/types";
 import {
+  around,
   type Case,
   caseScenario,
   type FuzzSpec,
@@ -11,7 +12,7 @@ import {
   seeded,
   shrink,
 } from "../src/fuzz/case";
-import { addFailures, fuzz } from "../src/fuzz/fuzz";
+import { addFailures, examplesAround, fuzz } from "../src/fuzz/fuzz";
 import { type Proof, ProofSchema } from "../src/proof/schema";
 
 // Chrome starts cold on CI runners; hooks that launch it need more than the default 5 s.
@@ -55,6 +56,21 @@ describe("generated cases", () => {
       { do: "click", target: "Add Item" },
       { do: "check", screen: "case-1", note: "Item Code B, Quantity 3" },
     ]);
+  });
+});
+
+describe("cases around a difference", () => {
+  test("moves one value at a time, inside the spec's bounds, never the case itself", () => {
+    const next = around(spec, [["B", "1", null]], 6);
+    expect(next).toHaveLength(5);
+    expect(next).toContainEqual([["A", "1", null]]);
+    expect(next).toContainEqual([["B", "2", null]]);
+    expect(next).toContainEqual([["B", "10", null]]);
+    for (const c of next) {
+      expect(c).not.toEqual([["B", "1", null]]);
+      expect(Number(c[0]?.[1])).toBeLessThanOrEqual(99);
+    }
+    expect(around(spec, [["B", "99", null]], 20).some((c) => Number(c[0]?.[1]) > 99)).toBe(false);
   });
 });
 
@@ -162,5 +178,12 @@ describe("differential fuzzing on two live apps", () => {
     expect(once.proof.checkpoints[0]?.screen.id).toBe(once.added[0] as string);
     expect(once.proof.checkpoints[0]?.screen.fields.find((x) => x.label === "Sub-total")?.value).toBe("0.00");
     expect(addFailures(once.proof, small, report).added).toEqual([]);
+
+    // A number that differs gets the cases around it, with what each app showed.
+    const table = await examplesAround({ reference, candidate }, small, f as NonNullable<typeof f>, 4);
+    expect(table).toContain("| Inputs | Sub-total, legacy | Sub-total, rebuilt |");
+    expect(table).toContain("| Item Code B, Quantity 1 | 0.00 | 5.00 |");
+    expect(table).toContain("| Item Code A, Quantity 1 | 10.00 | same |");
+    expect(table).toContain("| Item Code B, Quantity 2 | 0.00 | 10.00 |");
   });
 });

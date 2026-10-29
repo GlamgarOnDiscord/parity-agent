@@ -220,6 +220,8 @@ export async function rebuild(
      * project root it is read from.
      */
     selfCheck?: { root: string; proofPath: string };
+    /** Evidence added to every repair prompt, such as the table of cases around a numeric difference. */
+    examples?: string;
   },
 ): Promise<RebuildResult> {
   const apiKey = requireKey(config.MODEL_API_KEY, "MODEL_API_KEY");
@@ -274,7 +276,7 @@ export async function rebuild(
         apiKey,
         model: config.PARITY_MODEL_STRUCTURED,
         workspace: appDir,
-        prompt: prompt + selfCheckNote,
+        prompt: prompt + (options.examples ? `\n\n${options.examples}` : "") + selfCheckNote,
         maxSteps: options.maxSteps ?? 20,
         runId: options.runId,
         eventsFile: join(appDir, "..", `muse-run-${n}.jsonl`),
