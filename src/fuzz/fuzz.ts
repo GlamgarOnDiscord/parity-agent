@@ -3,7 +3,16 @@ import type { AppDriver } from "../drivers/types";
 import { matchScreens } from "../fields/match";
 import type { Adapter, Checkpoint, Proof } from "../proof/schema";
 import { replay } from "../replay/replay";
-import { type Case, caseScenario, describeCase, type FuzzSpec, generateCase, seeded, shrink } from "./case";
+import {
+  around,
+  type Case,
+  caseScenario,
+  describeCase,
+  type FuzzSpec,
+  generateCase,
+  seeded,
+  shrink,
+} from "./case";
 
 export interface CaseResult {
   /** What the reference showed: kept as the checkpoints of the case if it becomes part of the proof. */
@@ -156,4 +165,50 @@ export function addFailures(
     added.push(id);
   }
   return { proof: next, added };
+}
+
+const cell = (v: string) => v.replaceAll("|", "\\|").trim();
+const NUMBER = /^-?[\d\s.,]*\d$/;
+
+/**
+ * For a difference in numbers, play the cases around it on both apps and give the repair a table of inputs and
+ * what each app showed. One example cannot tell a rounding rule apart from a typo; a few around it can. Plain
+ * replays, no model call. Empty when no differing value is a number.
+ */
+export async function examplesAround(
+  sides: Sides,
+  spec: FuzzSpec,
+  failure: Failure,
+  max = 8,
+): Promise<string> {
+  const labels = [
+    ...new Set(
+      failure.result.diffs.flatMap((d) =>
+        d.fields
+          .filter((f) => f.verdict === "different" && NUMBER.test(f.legacy.value.trim()))
+          .map((f) => f.legacy.label),
+      ),
+    ),
+  ];
+  if (labels.length === 0) return "";
+  const rows: string[] = [];
+  for (const c of [failure.case, ...around(spec, failure.case, max)]) {
+    const r = c === failure.case ? failure.result : await playCase(sides, spec, c).catch(() => null);
+    if (!r || r.error) continue;
+    const cells = labels.map((label) => {
+      const f = r.diffs.flatMap((d) => d.fields).find((x) => x.legacy.label === label);
+      if (!f) return " | ";
+      return `${cell(f.legacy.value)} | ${f.verdict === "different" ? cell(f.rebuilt.value) : "same"}`;
+    });
+    rows.push(`| ${cell(describeCase(spec, c))} | ${cells.join(" | ")} |`);
+  }
+  const head = `| Inputs | ${labels.map((l) => `${l}, legacy | ${l}, rebuilt`).join(" | ")} |`;
+  const rule = `|${" --- |".repeat(1 + labels.length * 2)}`;
+  return [
+    `Cases around the difference on \`${labels.join("`, `")}\`, played on both apps ("same" where they agree):`,
+    "",
+    head,
+    rule,
+    ...rows,
+  ].join("\n");
 }
