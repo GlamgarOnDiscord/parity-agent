@@ -14,6 +14,13 @@ export interface AppDriver {
   perform(step: Exclude<Step, { do: "check" }>): Promise<void>;
   /** A raw computer-use action, for exploration. */
   act(action: ComputerAction): Promise<void>;
+  /**
+   * The scenario steps a raw action stands for, read from the element under it before it runs, so an exploration
+   * can be replayed on another app: a click on a button becomes a click on its name, typing becomes a fill of the
+   * focused field's label. `[]` when the action changes nothing a scenario keeps (a move, a scroll, focusing a
+   * field), `null` when it cannot be said with labels (a drag, a click on a name another element comes first for).
+   */
+  describe?(action: ComputerAction): Promise<Exclude<Step, { do: "check" }>[] | null>;
   screenshot(): Promise<DataUrl>;
   /** Where the app is now: the page URL, or the window title on a desktop. */
   location(): Promise<string>;
