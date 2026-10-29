@@ -242,6 +242,8 @@ describe("exploration", () => {
     expect(run.acknowledged).toHaveLength(1);
     expect(seen[1]?.acknowledged?.[0]?.id).toBe("s1");
     expect(run.found.map((f) => f.location)).toEqual([`${origin}/prices`]);
+    // An acknowledged action is never saved as a test that replays it without asking.
+    expect(run.found[0]?.steps).toBeUndefined();
   });
 
   test("a browser Parity did not launch is refused for exploration", async () => {
