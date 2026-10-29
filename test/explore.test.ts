@@ -1,9 +1,13 @@
 import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from "bun:test";
 import { loadConfig } from "../src/config";
+import { diffScreens } from "../src/diff/diff";
 import { openBrowser } from "../src/drivers";
 import type { AppDriver } from "../src/drivers/types";
-import { explore } from "../src/explore/explore";
+import { addExplored, explore } from "../src/explore/explore";
+import { matchScreens } from "../src/fields/match";
 import type { ComputerAction, ComputerClient, ComputerRequest, ComputerStep } from "../src/models/types";
+import { ProofSchema } from "../src/proof/schema";
+import { replay } from "../src/replay/replay";
 
 // Chrome starts cold on CI runners; hooks that launch it need more than the default 5 s.
 setDefaultTimeout(60_000);
@@ -56,6 +60,13 @@ const PAGES: Record<string, string> = {
       pc.createOffer().then((o) => pc.setLocalDescription(o));
     } catch {}
   </script>`,
+  // An order form: the model clicks the quantity, types, and presses a button that shows the total.
+  "/order": `<label style="position:absolute;left:20px;top:100px">Quantity <input id="q" style="width:120px"></label>
+    <button id="go" style="position:absolute;left:20px;top:200px;width:150px;height:30px">Compute</button>
+    <button style="position:absolute;left:20px;top:300px;width:150px;height:30px">Compute again</button>
+    <script>document.getElementById("go").onclick = () => document.body.insertAdjacentHTML("beforeend",
+      '<label>Net amount <output data-field="Net amount">' + (Number(document.getElementById("q").value) * 12.5).toFixed(2) + '</output></label>' +
+      '<label>Delivery <output data-field="Delivery">tomorrow</output></label>');</script>`,
   "/prices": `<label>Item <input value="101"></label><label>Unit price <input value="300.00"></label><label>Tax rate <input value="5%"></label>`,
 };
 
@@ -286,5 +297,69 @@ describe("exploration", () => {
       origin,
     });
     expect(run.stoppedBecause).toBe("safety-check");
+  });
+});
+
+describe("exploration that writes tests", () => {
+  const proof = ProofSchema.parse({
+    format: "parity-proof",
+    version: 1,
+    createdAt: "2026-10-30T00:00:00Z",
+    reference: { app: "ref", source: "replay" },
+    scenarios: [],
+    checkpoints: [],
+  });
+
+  test("what the model did becomes steps by labels, and the screen it found a scenario that replays", async () => {
+    const model = scripted([
+      [
+        { type: "click", x: 120, y: 110, button: "left" },
+        { type: "type", text: "4" },
+        { type: "type", text: "0" },
+        { type: "click", x: 60, y: 215, button: "left" },
+      ],
+    ]);
+    const setup = [{ do: "open" as const, path: "/order" }];
+    const run = await explore(driver, model, { setup, known, goal: "x", maxSteps: 3, maxCostUsd: 1, origin });
+    expect(run.found).toHaveLength(1);
+    expect(run.found[0]?.steps).toEqual([
+      { do: "fill", field: "Quantity", value: "40" },
+      { do: "click", target: "Compute" },
+    ]);
+
+    const { proof: next, added } = addExplored(proof, setup, run, "Order");
+    expect(added).toHaveLength(1);
+    const scenario = next.scenarios[0];
+    expect(scenario?.steps.at(-1)).toMatchObject({ do: "check", screen: added[0] });
+    expect(next.checkpoints[0]?.screen.fields.find((f) => f.label === "Net amount")?.value).toBe("500.00");
+    expect(addExplored(next, setup, run, "Order").added).toEqual([]);
+
+    // Replayed by Parity alone, no model: the same screen with the same values.
+    const [again] = await replay(driver, scenario as NonNullable<typeof scenario>);
+    const diff = diffScreens(matchScreens(next.checkpoints[0]?.screen as never, again?.screen as never));
+    expect(diff.counts.different).toBe(0);
+    expect(diff.missingInRebuilt).toEqual([]);
+  });
+
+  test("a drag cannot be said with labels: the screen is kept, without a scenario", async () => {
+    const model = scripted([
+      [
+        { type: "click", x: 120, y: 110, button: "left" },
+        { type: "type", text: "2" },
+        { type: "click", x: 60, y: 215, button: "left" },
+        { type: "drag", path: [{ x: 1, y: 1 }] },
+      ],
+    ]);
+    const run = await explore(driver, model, {
+      setup: [{ do: "open", path: "/order" }],
+      known,
+      goal: "x",
+      maxSteps: 3,
+      maxCostUsd: 1,
+      origin,
+    });
+    expect(run.found).toHaveLength(1);
+    expect(run.found[0]?.steps).toBeUndefined();
+    expect(addExplored(proof, [], run, "Order")).toMatchObject({ added: [], skipped: 1 });
   });
 });
