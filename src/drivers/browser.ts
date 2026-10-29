@@ -26,6 +26,47 @@ const CHROME_PATHS = [
 ].filter((p): p is string => Boolean(p));
 
 /** Runs in the page: the button or link whose text contains `text`. */
+/** What a click at a point would press: a button or a link and its name, a form control, or nothing. */
+function underPoint(x: number, y: number): { kind: "click"; name: string } | { kind: "control" } | null {
+  const el = document.elementFromPoint(x, y);
+  if (!el) return null;
+  const clickable = el.closest("button, [role=button], a, input[type=submit], input[type=button]");
+  if (clickable) {
+    const name = (
+      clickable.textContent ||
+      (clickable as HTMLInputElement).value ||
+      clickable.getAttribute("aria-label") ||
+      ""
+    ).trim();
+    return { kind: "click", name };
+  }
+  return el.closest("input, select, textarea, label") ? { kind: "control" } : null;
+}
+
+/** The names a replay could find the focused field by, with its value once `typed` is added at the caret. */
+function focusedField(typed: string): { names: string[]; value: string } | null {
+  const el = document.activeElement;
+  if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) return null;
+  const at = el.selectionStart ?? el.value.length;
+  const end = el.selectionEnd ?? at;
+  const value = el.value.slice(0, at) + typed + el.value.slice(end);
+  const names = [
+    el.getAttribute("data-field"),
+    el.getAttribute("aria-label"),
+    el.labels?.[0]?.textContent,
+    el.getAttribute("placeholder"),
+    el.getAttribute("name"),
+  ]
+    .map((n) =>
+      (n ?? "")
+        .replace(/\s+/g, " ")
+        .replace(/[\s:*]+$/, "")
+        .trim(),
+    )
+    .filter(Boolean);
+  return { names, value };
+}
+
 function clickableByText(text: string): Element | null {
   const needle = text.toLowerCase();
   for (const el of document.querySelectorAll(
@@ -146,6 +187,49 @@ class BrowserDriver implements AppDriver {
       case "screenshot":
       case "wait":
         return;
+    }
+  }
+
+  async describe(action: ComputerAction): Promise<Exclude<Step, { do: "check" }>[] | null> {
+    switch (action.type) {
+      case "click":
+      case "double_click": {
+        const under = await this.page.evaluate(underPoint, action.x, action.y);
+        if (!under || under.kind === "control") return [];
+        if (!under.name) return null;
+        // A replay presses the first element with that name: it has to be this one.
+        const first = await this.page.evaluateHandle(clickableByText, under.name);
+        const here = await this.page.evaluateHandle(
+          (x: number, y: number) =>
+            document
+              .elementFromPoint(x, y)
+              ?.closest("button, [role=button], a, input[type=submit], input[type=button]") ?? null,
+          action.x,
+          action.y,
+        );
+        const same = await this.page.evaluate((a, b) => a !== null && a === b, first, here);
+        return same ? [{ do: "click", target: under.name }] : null;
+      }
+      case "type": {
+        const field = await this.page.evaluate(focusedField, action.text);
+        if (!field) return null;
+        // The first name a replay finds this same field by.
+        const focused = await this.page.evaluateHandle(() => document.activeElement);
+        for (const name of field.names) {
+          const found = await this.page.evaluateHandle(scanPage, name);
+          if (await this.page.evaluate((a, b) => a === b, found, focused)) {
+            return [{ do: "fill", field: name, value: field.value }];
+          }
+        }
+        return null;
+      }
+      case "keypress":
+        // Moving between fields changes nothing a scenario keeps; Enter may submit, which labels cannot say.
+        return action.keys.every((k) => /^(tab|shift)$/i.test(k)) ? [] : null;
+      case "drag":
+        return null;
+      default:
+        return [];
     }
   }
 

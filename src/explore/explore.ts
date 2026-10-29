@@ -1,7 +1,7 @@
 import type { AppDriver } from "../drivers/types";
 import type { Screen } from "../fields/types";
 import type { ComputerClient, ComputerStep, DataUrl } from "../models/types";
-import type { Scenario } from "../proof/schema";
+import { type Proof, type Scenario, ScenarioSchema, type Step } from "../proof/schema";
 
 export interface FoundScreen {
   step: number;
@@ -9,6 +9,13 @@ export interface FoundScreen {
   title: string;
   labels: string[];
   screenshot: DataUrl;
+  /** The fields as read when the screen was found: the reference values of its scenario. */
+  screen: Screen;
+  /**
+   * How to reach it again, by labels, from the end of the setup: what the model did, as scenario steps. Absent
+   * when one of its actions could not be said with labels (a drag, an ambiguous name).
+   */
+  steps?: Exclude<Step, { do: "check" }>[];
 }
 
 export interface Exploration {
@@ -99,6 +106,8 @@ export async function explore(
   let actions = 0;
   let previous: ComputerStep | undefined;
   const acknowledged: Exploration["acknowledged"] = [];
+  // Null once an action could not be said with labels, and for a driver that cannot say any.
+  let trace: Exclude<Step, { do: "check" }>[] | null = driver.describe ? [] : null;
 
   const result = (stoppedBecause: Exploration["stoppedBecause"], note?: string, steps = 0): Exploration => ({
     steps,
@@ -141,6 +150,9 @@ export async function explore(
     if (!step.callId) return result("done", step.text, n);
 
     for (const action of step.actions) {
+      const said = trace && driver.describe ? await driver.describe(action).catch(() => null) : null;
+      if (said === null) trace = null;
+      else if (trace) for (const s of said) record(trace, s);
       await driver.act(action);
       actions++;
     }
@@ -159,10 +171,58 @@ export async function explore(
         title: screen.title ?? "",
         labels: [...labels],
         screenshot: await driver.screenshot(),
+        screen,
+        steps: trace ? [...trace] : undefined,
       });
       seen.push(labels);
     }
     previous = step;
   }
   return result("max-steps", undefined, options.maxSteps);
+}
+
+/** Typing twice in the same field is one fill with the final value. */
+function record(trace: Exclude<Step, { do: "check" }>[], step: Exclude<Step, { do: "check" }>) {
+  const last = trace.at(-1);
+  if (step.do === "fill" && last?.do === "fill" && last.field === step.field) last.value = step.value;
+  else trace.push(step);
+}
+
+/**
+ * Every screen exploration found with its path becomes a scenario of the proof: the setup, what the model did,
+ * then a check of the fields it showed. A test no person wrote, replayed on the rebuild like any other. A screen
+ * already reached by the same steps is not added twice.
+ */
+export function addExplored(
+  proof: Proof,
+  setup: Scenario["steps"],
+  run: Pick<Exploration, "found">,
+  name: string,
+): { proof: Proof; added: string[]; skipped: number } {
+  const next: Proof = { ...proof, scenarios: [...proof.scenarios], checkpoints: [...proof.checkpoints] };
+  const added: string[] = [];
+  let skipped = 0;
+  for (const f of run.found) {
+    if (!f.steps || f.steps.length === 0) {
+      skipped++;
+      continue;
+    }
+    const before = [...setup.filter((s) => s.do !== "check"), ...f.steps];
+    const id = `explored-${Bun.hash(JSON.stringify(before)).toString(16).slice(0, 10)}`;
+    const key = JSON.stringify(before);
+    if (next.scenarios.some((s) => s.id === id || JSON.stringify(s.steps.slice(0, -1)) === key)) continue;
+    const title = f.title || f.location;
+    const scenario = ScenarioSchema.parse({
+      id,
+      name: `${name}: ${title} (explored, step ${f.step})`,
+      steps: [
+        ...before,
+        { do: "check", screen: id, note: `found by exploration: ${f.labels.slice(0, 6).join(", ")}` },
+      ],
+    });
+    next.scenarios.push(scenario);
+    next.checkpoints.push({ scenario: id, step: before.length, screen: { ...f.screen, id } });
+    added.push(id);
+  }
+  return { proof: next, added, skipped };
 }
