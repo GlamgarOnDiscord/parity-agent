@@ -2,12 +2,13 @@
 // bun run explore <proof.json> --url <app url> [--goal "..."] [--steps 12] [--max-usd 0.5] [--out runs/<name>]
 // The proof's steps up to its first check are played first, without the model (logging in, for example).
 // [--ack <code>] acknowledges that Meta safety check code on the operator's behalf, for an app on this machine only.
+// [--save] adds every screen found, with the steps that reach it, to the proof as a scenario.
 import { mkdirSync } from "node:fs";
 import { basename, join } from "node:path";
 import { parseArgs } from "node:util";
 import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
-import { explore } from "../src/explore/explore";
+import { addExplored, explore } from "../src/explore/explore";
 import { createModels } from "../src/models";
 import { Ledger } from "../src/models/ledger";
 import { ProofSchema } from "../src/proof/schema";
@@ -23,12 +24,13 @@ const { values, positionals } = parseArgs({
     out: { type: "string" },
     // Safety check codes acknowledged in advance for a local sandbox, e.g. computer_action_requires_confirmation.
     ack: { type: "string", multiple: true, default: [] },
+    save: { type: "boolean", default: false },
   },
 });
 const file = positionals[0];
 if (!file || !values.url) {
   console.log(
-    "usage: bun run explore <proof.json> --url <app url> [--goal ...] [--steps 12] [--max-usd 0.5]",
+    "usage: bun run explore <proof.json> --url <app url> [--goal ...] [--steps 12] [--max-usd 0.5] [--save]",
   );
   process.exit(1);
 }
@@ -65,6 +67,14 @@ try {
     join(out, "exploration.json"),
     `${JSON.stringify({ ...run, found: run.found.map(({ screenshot: _, ...f }) => f) }, null, 2)}\n`,
   );
+  if (values.save) {
+    const next = addExplored(proof, login, run, proof.reference.app);
+    await Bun.write(file, `${JSON.stringify(ProofSchema.parse(next.proof), null, 2)}\n`);
+    console.log(
+      `Added to ${file}: ${next.added.join(", ") || "nothing new"}` +
+        (next.skipped ? ` (${next.skipped} found screens could not be said with labels)` : ""),
+    );
+  }
   console.log(
     `${run.steps} model steps, ${run.actions} actions, $${run.costUsd.toFixed(3)}, stopped: ${run.stoppedBecause}`,
   );
@@ -73,7 +83,10 @@ try {
   if (run.note) console.log(`  ${run.note.slice(0, 400)}`);
   for (const f of run.found)
     console.log(
-      `  new screen at step ${f.step}: ${f.title} (${f.location}) ${f.labels.slice(0, 8).join(", ")}`,
+      `  new screen at step ${f.step}: ${f.title} (${f.location}) ${f.labels.slice(0, 8).join(", ")}` +
+        (f.steps
+          ? `\n    reached by: ${f.steps.map((s) => (s.do === "fill" ? `${s.field}=${s.value}` : s.do === "click" ? s.target : s.path)).join(" > ")}`
+          : ""),
     );
   console.log(`Wrote ${join(out, "exploration.json")}`);
 } finally {
