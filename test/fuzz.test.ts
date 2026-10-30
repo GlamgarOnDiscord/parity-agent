@@ -62,7 +62,7 @@ describe("generated cases", () => {
 describe("cases around a difference", () => {
   test("moves one value at a time, inside the spec's bounds, never the case itself", () => {
     const next = around(spec, [["B", "1", null]], 6);
-    expect(next).toHaveLength(5);
+    expect(next).toHaveLength(6);
     expect(next).toContainEqual([["A", "1", null]]);
     expect(next).toContainEqual([["B", "2", null]]);
     expect(next).toContainEqual([["B", "10", null]]);

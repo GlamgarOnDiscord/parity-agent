@@ -1,6 +1,6 @@
 // Differential fuzzing of a rebuilt app against the live reference:
 // parity fuzz <spec.json> --proof <proof.json> --reference-url <url> (--app <dir> | --url <url>)
-//   [--seed 1] [--count 30] [--save] [--repair --rounds 3 --steps 12]
+//   [--seed 1] [--count 30] [--save] [--examples] [--repair --rounds 3 --steps 12]
 // Fuzzing and shrinking make no model call. --save adds each difference to the proof as a scenario; --repair
 // then sends the proof to Muse Code and fuzzes again with the same seed, until the cases pass or the rounds end.
 import { readFileSync } from "node:fs";
@@ -29,6 +29,7 @@ const { values, positionals } = parseArgs({
     failures: { type: "string", default: "3" },
     save: { type: "boolean", default: false },
     repair: { type: "boolean", default: false },
+    examples: { type: "boolean", default: false },
     rounds: { type: "string", default: "3" },
     steps: { type: "string", default: "12" },
     json: { type: "string" },
@@ -75,7 +76,8 @@ async function fuzzOnce(): Promise<{ report: FuzzReport; examples: string }> {
     });
     // Only when a repair follows: the table costs a few more replays, no model call.
     const tables = [];
-    if (values.repair) for (const f of report.failures) tables.push(await examplesAround(sides, spec, f));
+    if (values.repair || values.examples)
+      for (const f of report.failures) tables.push(await examplesAround(sides, spec, f));
     return { report, examples: tables.filter(Boolean).join("\n\n") };
   } finally {
     await candidate?.close();

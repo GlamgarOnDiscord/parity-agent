@@ -1,4 +1,4 @@
-import type { Coverage } from "../coverage/coverage";
+import { type Coverage, type Explored, isExplored } from "../coverage/coverage";
 import type { FieldDiff } from "../diff/diff";
 import type { Proof } from "../proof/schema";
 import type { HistoryEntry } from "../rebuild/history";
@@ -24,6 +24,8 @@ export interface DiffInput {
   proof: Proof;
   saved?: SavedResult;
   coverage?: Coverage;
+  /** What exploration added to the proof: scenarios, screens, fields no recording showed. */
+  explored?: Explored;
   calls: { calls: number; costUsd: number; sentBytes: number };
   /** PARITY_BUDGET_USD, the cap every model call is checked against. */
   budgetUsd: number;
@@ -264,6 +266,15 @@ export function diffPage(d: DiffInput): string {
   const compared = all.length;
   const cov = d.coverage;
   const recorded = cov ? cov.rows.length : 0;
+  const ex = d.explored;
+  const exploredLine =
+    ex && ex.scenarios > 0
+      ? ` · exploration wrote <b>${ex.scenarios}</b> ${ex.scenarios === 1 ? "scenario" : "scenarios"}, <b>${ex.fields.length}</b> fields no person recorded${
+          ex.fields.length
+            ? `: ${esc(ex.fields.slice(0, 8).join(", "))}${ex.fields.length > 8 ? "…" : ""}`
+            : ""
+        }`
+      : "";
 
   const meters = `<div class="meters">
 <section class="card meter" aria-label="Fields compared">
@@ -293,8 +304,11 @@ export function diffPage(d: DiffInput): string {
     ],
     recorded,
   )}
-  <p><b>${cov.counts.ruled}</b> explained by a rule only · <b>${cov.counts.seen}</b> seen and never tested</p>`
-      : `<div class="big">n/a</div><p>No recording for this run: the reference was replayed.</p>`
+  <p><b>${cov.counts.ruled}</b> explained by a rule only · <b>${cov.counts.seen}</b> seen and never tested${exploredLine}</p>`
+      : ex && ex.screens > 0
+        ? `<div class="big">${ex.screens}<small>screens explored</small></div>
+  <p>No recording for this run: the reference was replayed${exploredLine}</p>`
+        : `<div class="big">n/a</div><p>No recording for this run: the reference was replayed.</p>`
   }
 </section>
 <section class="card meter" aria-label="What left this machine">
@@ -309,7 +323,8 @@ export function diffPage(d: DiffInput): string {
     .map((c) => {
       const n = c.diff.counts;
       const total = n.equal + n.different + n.masked + n.missing + (n.accepted ?? 0);
-      return `<div class="row"><div class="h"><b>${esc(scenarioName(c.scenario))}, step ${c.step}</b><span>${n.equal}/${total}</span></div>
+      const by = isExplored(c.scenario) ? ` <small class="by">${icon("compass")} explored</small>` : "";
+      return `<div class="row"><div class="h"><b>${esc(scenarioName(c.scenario))}, step ${Number(c.step)}</b>${by}<span>${n.equal}/${total}</span></div>
 ${ticks(
   [
     { n: n.equal, cls: "on" },
@@ -434,11 +449,11 @@ ${canRepair ? `<div><button class="btn blue" type="button" id="send-repair">${ic
     : "";
 
   const explored = d.exploration
-    ? `<section class="card panel"><header>${icon("compass")}<h2>Screens found by exploration</h2><span class="meta">${d.exploration.steps} steps · $${d.exploration.costUsd.toFixed(3)}</span></header>
+    ? `<section class="card panel"><header>${icon("compass")}<h2>Screens found by exploration</h2><span class="meta">${Number(d.exploration.steps)} steps · $${Number(d.exploration.costUsd).toFixed(3)}</span></header>
 <div class="body"><ol class="found">${d.exploration.found
         .map(
           (f) =>
-            `<li><span class="n">#${f.step}</span><span>${esc(f.title)}</span><span class="l">${esc(f.labels.slice(0, 6).join(", "))}</span></li>`,
+            `<li><span class="n">#${Number(f.step)}</span><span>${esc(f.title)}</span><span class="l">${esc(f.labels.slice(0, 6).join(", "))}</span></li>`,
         )
         .join("")}</ol></div></section>`
     : "";

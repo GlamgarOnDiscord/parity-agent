@@ -81,3 +81,39 @@ export function coverageOf(capture: Capture, proof: Proof, rules: Rule[]): Cover
   );
   return { rows: sorted, counts };
 }
+
+/** Scenarios written by `explore --save`, not by a person or a recording. */
+export const isExplored = (scenario: string) => scenario.startsWith("explored-");
+
+export interface Explored {
+  /** Scenarios of the proof that exploration wrote. */
+  scenarios: number;
+  /** Checkpoints of those scenarios: screens a replay now compares because exploration found them. */
+  screens: number;
+  /** Labels only those checkpoints compare, and that the recording, if any, never showed. */
+  fields: string[];
+}
+
+/** What exploration added to the proof. Deterministic, read from the proof alone (and the recording, if any). */
+export function exploredOf(proof: Proof, capture?: Capture): Explored {
+  const recorded = new Set(capture?.frames.flatMap((f) => f.screen.fields.map((x) => key(x.label))) ?? []);
+  const elsewhere = new Set(
+    proof.checkpoints
+      .filter((c) => !isExplored(c.scenario))
+      .flatMap((c) => c.screen.fields.map((f) => key(f.label))),
+  );
+  const ours = proof.checkpoints.filter((c) => isExplored(c.scenario));
+  const fields = new Map<string, string>();
+  for (const c of ours) {
+    for (const f of c.screen.fields) {
+      const k = key(f.label);
+      if (k && !recorded.has(k) && !elsewhere.has(k) && !fields.has(k))
+        fields.set(k, f.label.replace(/[\s:]+$/g, "").trim());
+    }
+  }
+  return {
+    scenarios: proof.scenarios.filter((s) => isExplored(s.id)).length,
+    screens: ours.length,
+    fields: [...fields.values()].sort((a, b) => a.localeCompare(b)),
+  };
+}

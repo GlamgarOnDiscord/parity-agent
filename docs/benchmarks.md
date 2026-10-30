@@ -104,3 +104,18 @@ Not covered yet: item codes that do not exist. The rebuild still falls back to a
 
 The regression came from the spec: the rule read from the recording says included tax = sub-total × 5 / 105, and Muse Code rewrote the working formula to follow it. FrontAccounting rounds the base before it computes the tax. The repair prompt now says the legacy values win over a formula from the spec. One failing example is not enough to infer a rounding rule; the next step is to fuzz around a numeric difference and hand Muse Code a table of inputs and legacy values.
 
+## Exploration that writes tests, and a rounding rule found from examples (2026-10-30)
+
+A numeric difference the repair could not settle in D5: the rebuild shows Included Tax 11.90 where FrontAccounting shows 11.91 on a 250.00 line. `parity fuzz --repair` now plays the cases around the shrunk one on both apps and gives Muse Code a table of inputs and the values each app showed, the cases that differ first.
+
+| Repair | Table | Spend | Result |
+| --- | --- | --- | --- |
+| 1 | 9 neighbours, 1 differing (the case itself) | $0.48 | still 11.90: Muse Code went back to `sub * 5 / 105` |
+| 2 | 24 neighbours searched, the 2 differing listed first | $0.36 | PARITY: `round2(round3(sub * 5 / 105))`, a double rounding |
+
+After repair 2: seeds 7, 8 and 9 (60 cases the repair never saw) at parity, and the whole proof at parity. One example cannot tell a rounding rule from a typo; two that differ, next to cases that agree, did.
+
+Exploration then wrote a test. `bun run explore ... --ack computer_action_requires_confirmation --save` (8 model steps, $0.071, ended by a 500 from the API) found Sales Types, a screen no person recorded, with Tax included and Calculation factor. Meta asked to confirm 7 of the 8 steps, so the scenario was held back until its one step (`click "Sales Types"` after the login) was read and approved with `--from ... --save-acknowledged`, at no model cost. Replayed on FrontAccounting: 10 of 10 fields equal. Replayed on the rebuild: it fails at the login, because the rebuild only has the invoice screen. That gap is what migration mode (D7) is for.
+
+D6 spend so far: $0.91.
+

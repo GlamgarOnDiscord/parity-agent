@@ -179,7 +179,7 @@ export async function examplesAround(
   sides: Sides,
   spec: FuzzSpec,
   failure: Failure,
-  max = 8,
+  max = 24,
 ): Promise<string> {
   const labels = [
     ...new Set(
@@ -191,21 +191,29 @@ export async function examplesAround(
     ),
   ];
   if (labels.length === 0) return "";
-  const rows: string[] = [];
+  // A rule shows in the cases it gets wrong: every one that differs is listed, then a few that agree.
+  const differ: string[] = [];
+  const agree: string[] = [];
   for (const c of [failure.case, ...around(spec, failure.case, max)]) {
+    if (differ.length >= 8) break;
     const r = c === failure.case ? failure.result : await playCase(sides, spec, c).catch(() => null);
     if (!r || r.error) continue;
-    const cells = labels.map((label) => {
-      const f = r.diffs.flatMap((d) => d.fields).find((x) => x.legacy.label === label);
-      if (!f) return " | ";
-      return `${cell(f.legacy.value)} | ${f.verdict === "different" ? cell(f.rebuilt.value) : "same"}`;
-    });
-    rows.push(`| ${cell(describeCase(spec, c))} | ${cells.join(" | ")} |`);
+    const found = labels.map((label) =>
+      r.diffs.flatMap((d) => d.fields).find((x) => x.legacy.label === label),
+    );
+    if (found.every((f) => !f)) continue;
+    const cells = found.map((f) =>
+      f ? `${cell(f.legacy.value)} | ${f.verdict === "different" ? cell(f.rebuilt.value) : "same"}` : " | ",
+    );
+    const row = `| ${cell(describeCase(spec, c))} | ${cells.join(" | ")} |`;
+    (found.some((f) => f?.verdict === "different") ? differ : agree).push(row);
   }
+  const rows = [...differ, ...agree.slice(0, 4)];
   const head = `| Inputs | ${labels.map((l) => `${l}, legacy | ${l}, rebuilt`).join(" | ")} |`;
   const rule = `|${" --- |".repeat(1 + labels.length * 2)}`;
   return [
-    `Cases around the difference on \`${labels.join("`, `")}\`, played on both apps ("same" where they agree):`,
+    `Cases around the difference on \`${labels.join("`, `")}\`, played on both apps ("same" where they agree).`,
+    "One formula, with its rounding steps, has to give every legacy value below: find it before you change code.",
     "",
     head,
     rule,
