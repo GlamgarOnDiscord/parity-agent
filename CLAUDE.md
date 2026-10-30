@@ -25,6 +25,9 @@ Rebuilds old business software as a web app and proves the new app behaves the s
 - `src/models/`: `ModelClient` roles (structured, hard, open, computer, segment, transcribe), pricing, ledger
 - `src/drivers/`: `AppDriver` interface and registry (browser, desktop)
 - `src/fields/`: field model, value normalization, screen matching
-- `src/server/`: Hono app
-- `docs/`: pitch, decisions, sprints (`docs/sprints.md`, milestones S1 to S9 on GitHub)
+- `src/replay/`, `src/diff/`: replay, proof, field diff, accepted differences
+- `src/rebuild/`, `src/fuzz/`, `src/explore/`: Muse Code rebuild and repair, differential fuzzing, exploration
+- `src/migrate/` + `templates/migrated-app/`: opt-in migration (inventory, records, per-screen builds)
+- `src/server/`: Hono app (rules, diff, migration board)
+- `docs/`: pitch, decisions, sprints (`docs/sprints.md`, milestones D2 to D10 on GitHub)
 - `founder/`: product research (board, panel, competitors, plan)
