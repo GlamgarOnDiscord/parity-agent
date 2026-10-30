@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, setDefaultTimeout, test } from "bun:test";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadConfig } from "../src/config";
@@ -183,6 +183,45 @@ describe("records through the legacy screens", () => {
       }),
     );
     expect((await proveApp(loadConfig(), app, proof)).equal).toBe(false);
+  });
+});
+
+describe("a workspace Muse Code has edited", () => {
+  const m = MigrationSchema.parse({
+    name: "safe",
+    title: "Safe",
+    url: "http://127.0.0.1:8080/",
+    start: ["/"],
+    entities: [],
+    screens: [{ id: "a", title: "A", path: "/a", proof: "x.json" }],
+  });
+
+  test("a link put in place of a fixed file is replaced, never written through", () => {
+    const app = join(dir, "linked");
+    scaffold(app, m, []);
+    const outside = join(dir, "outside.txt");
+    writeFileSync(outside, "keep me");
+    rmSync(join(app, "public", "app.js"));
+    try {
+      symlinkSync(outside, join(app, "public", "app.js"), "file");
+    } catch {
+      return; // creating file links needs a privilege this machine may not grant
+    }
+    scaffold(app, m, []);
+    expect(readFileSync(outside, "utf8")).toBe("keep me");
+    expect(lstatSync(join(app, "public", "app.js")).isSymbolicLink()).toBe(false);
+  });
+
+  test("a folder of the app replaced by a link to elsewhere is refused", () => {
+    const app = join(dir, "junction");
+    scaffold(app, m, []);
+    const elsewhere = join(dir, "elsewhere");
+    mkdirSync(elsewhere);
+    rmSync(join(app, "data"), { recursive: true, force: true });
+    symlinkSync(elsewhere, join(app, "data"), "junction");
+    expect(() =>
+      scaffold(app, m, [{ id: "items", path: "/i", selector: "Item:", fields: [], records: [] }]),
+    ).toThrow("not a real directory");
   });
 });
 
