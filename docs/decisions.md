@@ -34,3 +34,8 @@ Playwright's launch talks to Chrome over pipes, and its bundled `ws` client neve
 ## D3. The legacy reference comes from the recording (2026-10-26)
 
 Replaying an old Windows app automatically needs a desktop driver, a vision loop and a sandbox per run; reading the key frames of the narrated recording gives the same checkpoints for a few cents, once. Proofs therefore take their reference checkpoints from the capture (`reference.source = "capture"`), and automatic replays target only the rebuilt app. A new behavior of the old app is captured by recording it again, not by driving it.
+
+## D4. Migration reads the records through the legacy app's own forms (2026-10-30)
+
+A whole-app migration needs the legacy data, and the D4 fuzzing repair showed what happens without it: Muse Code wrote the catalogue into the rebuild. `parity migrate` reads every record the way a person would, picking each choice of the list on its form (or opening it by address when the list has no visible label) and reading the screen in plain code, into `data/*.json` that the migrated app loads into SQLite. The same reads become the proof: one scenario per record. A database dump would be faster but needs credentials and knowledge of the schema; reading the screens needs neither and checks what users actually see. Migration stays opt-in and capped because each screen costs a Muse Code build; forms that only show a record could be generated without a model, which the D7 run confirmed.
+
