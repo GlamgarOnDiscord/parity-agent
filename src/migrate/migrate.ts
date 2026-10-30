@@ -1,5 +1,5 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { existsSync, lstatSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { z } from "zod";
 import { type Config, requireKey } from "../config";
 import type { Ledger } from "../models/ledger";
@@ -102,12 +102,30 @@ const TEMPLATE = resolve("templates/migrated-app");
 /** Files of the template a build may not change: restored after every Muse Code run. */
 const FIXED = ["public/app.js", "public/index.html", "public/style.css", "CONTRACT.md"];
 
+/**
+ * Write a file of the app without following anything Muse Code may have put in its place: every directory on the
+ * way must be a real directory, and whatever sits at the path (a symbolic link, a hard link, a folder) is removed
+ * first, so the write can only create a new file inside the app.
+ */
+function put(appDir: string, rel: string, content: string): void {
+  const root = resolve(appDir);
+  const dest = resolve(root, rel);
+  if (!dest.startsWith(root + sep)) throw new Error(`refusing to write outside the app: ${rel}`);
+  let dir = root;
+  for (const part of relative(root, dirname(dest)).split(sep).filter(Boolean)) {
+    dir = join(dir, part);
+    if (!existsSync(dir)) mkdirSync(dir);
+    else if (!lstatSync(dir).isDirectory()) throw new Error(`${relative(root, dir)} is not a real directory`);
+  }
+  rmSync(dest, { force: true, recursive: true });
+  writeFileSync(dest, content, { flag: "wx" });
+}
+
 /** Lay the app out from the template: the shell, the kit, the list of screens, and the migrated records. */
 export function scaffold(appDir: string, m: Migration, entities: Entity[]): void {
-  mkdirSync(join(appDir, "public", "screens"), { recursive: true });
-  mkdirSync(join(appDir, "data"), { recursive: true });
-  for (const f of FIXED) cpSync(join(TEMPLATE, f), join(appDir, f));
-  cpSync(join(TEMPLATE, "server.ts"), join(appDir, "server.ts"));
+  mkdirSync(appDir, { recursive: true });
+  restoreFixed(appDir, m.title);
+  put(appDir, "server.ts", readFileSync(join(TEMPLATE, "server.ts"), "utf8"));
   const byId = new Map(entities.map((e) => [e.id, e]));
   const screens = m.screens.map((s) => ({
     id: s.id,
@@ -115,38 +133,35 @@ export function scaffold(appDir: string, m: Migration, entities: Entity[]): void
     menu: s.menu,
     path: s.path ?? byId.get(s.entity ?? "")?.path ?? `/${s.id}`,
   }));
-  writeFileSync(join(appDir, "public", "screens.json"), `${JSON.stringify(screens, null, 2)}\n`);
-  for (const e of entities)
-    writeFileSync(join(appDir, "data", `${e.id}.json`), `${JSON.stringify(dataFile(e), null, 2)}\n`);
+  put(appDir, "public/screens.json", `${JSON.stringify(screens, null, 2)}\n`);
+  for (const e of entities) put(appDir, `data/${e.id}.json`, `${JSON.stringify(dataFile(e), null, 2)}\n`);
   for (const s of m.screens) {
-    const file = join(appDir, "public", "screens", `${s.id}.js`);
-    if (!existsSync(file))
-      writeFileSync(
-        file,
+    if (!existsSync(join(appDir, "public", "screens", `${s.id}.js`)))
+      put(
+        appDir,
+        `public/screens/${s.id}.js`,
         `// Muse Code fills this screen.\nexport async function render(root, kit) {\n  root.append(kit.ui.empty("Not migrated yet."));\n}\n`,
       );
   }
-  writeFileSync(
-    join(appDir, "migration.json"),
-    `${JSON.stringify({ name: m.name, title: m.title, screens }, null, 2)}\n`,
-  );
-  nameApp(appDir, m.title);
+  put(appDir, "migration.json", `${JSON.stringify({ name: m.name, title: m.title, screens }, null, 2)}\n`);
 }
 
 const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
-/** The app's name in the shell, from the migration: the template ships a placeholder. */
-function nameApp(appDir: string, title: string) {
-  const file = join(appDir, "public", "index.html");
-  const html = readFileSync(file, "utf8")
-    .replace("<title>Rebuilt app</title>", `<title>${escapeHtml(title)}</title>`)
-    .replace('<span id="app-name">Rebuilt app</span>', `<span id="app-name">${escapeHtml(title)}</span>`);
-  writeFileSync(file, html);
-}
-
+/**
+ * Put the template's fixed files back, read from the template only, with the app's name in the shell: whatever a
+ * build did to them, links included, is replaced.
+ */
 function restoreFixed(appDir: string, title: string) {
-  for (const f of FIXED) cpSync(join(TEMPLATE, f), join(appDir, f));
-  nameApp(appDir, title);
+  for (const f of FIXED) {
+    let content = readFileSync(join(TEMPLATE, f), "utf8");
+    if (f === "public/index.html") {
+      content = content
+        .replace("<title>Rebuilt app</title>", `<title>${escapeHtml(title)}</title>`)
+        .replace('<span id="app-name">Rebuilt app</span>', `<span id="app-name">${escapeHtml(title)}</span>`);
+    }
+    put(appDir, f, content);
+  }
 }
 
 /** The labels a screen shows, in order, with values from a few records: what the build has to reproduce. */
@@ -279,8 +294,7 @@ export async function buildScreen(
     scenarios: proof.scenarios.length,
   };
   if (screen.port && existsSync(screen.port)) {
-    mkdirSync(join(appDir, "reference"), { recursive: true });
-    cpSync(screen.port, join(appDir, "reference", `${screen.id}.js`));
+    put(appDir, `reference/${screen.id}.js`, readFileSync(screen.port, "utf8"));
   }
   const repairOnly = options.from && !options.from.equal;
   let prompt = repairOnly
