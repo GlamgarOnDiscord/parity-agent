@@ -1,0 +1,70 @@
+{
+  "name": "fa-migrate",
+  "title": "FrontAccounting",
+  "url": "http://127.0.0.1:8080/",
+  "setup": [
+    {
+      "do": "open",
+      "path": "/"
+    },
+    {
+      "do": "fill",
+      "field": "User name",
+      "value": "admin"
+    },
+    {
+      "do": "fill",
+      "field": "Password",
+      "value": "password"
+    },
+    {
+      "do": "click",
+      "target": "Login"
+    }
+  ],
+  "start": ["/index.php?application=orders", "/index.php?application=stock"],
+  "entities": [
+    {
+      "id": "customers",
+      "path": "/sales/manage/customers.php",
+      "selector": "Select a customer:"
+    },
+    {
+      "id": "items",
+      "path": "/inventory/manage/items.php",
+      "selector": "stock_id",
+      "param": "stock_id"
+    },
+    {
+      "id": "prices",
+      "path": "/inventory/prices.php",
+      "selector": "stock_id",
+      "param": "stock_id"
+    }
+  ],
+  "screens": [
+    {
+      "id": "customers",
+      "title": "Customers",
+      "menu": "Sales",
+      "entity": "customers"
+    },
+    {
+      "id": "items",
+      "title": "Items",
+      "menu": "Items and Inventory",
+      "entity": "items"
+    },
+    {
+      "id": "invoice",
+      "title": "Direct Sales Invoice",
+      "menu": "Sales",
+      "path": "/sales/sales_order_entry.php?NewInvoice=0",
+      "proof": "fixtures/proofs/fa-invoice.json",
+      "uses": ["items", "prices", "customers"],
+      "port": "generated/fa/app/public/app.js"
+    }
+  ],
+  "maxRepairs": 2,
+  "maxSteps": 16
+}

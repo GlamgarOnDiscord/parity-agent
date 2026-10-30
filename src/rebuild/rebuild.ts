@@ -47,6 +47,8 @@ export interface RebuildResult {
 }
 
 const TEMPLATE = resolve("templates/generated-app");
+/** Apps made by `parity migrate` carry migration.json and their migrated records in data/. */
+const MIGRATED = resolve("templates/migrated-app");
 
 const SERVED = /\.(html|css|js|json|png|svg|ico|woff2?)$/i;
 
@@ -99,8 +101,15 @@ function publicDirOf(appDir: string): string {
  */
 export async function startApp(appDir: string): Promise<{ url: string; stop: () => void }> {
   const stage = mkdtempSync(join(tmpdir(), "parity-app-"));
-  cpSync(join(TEMPLATE, "server.ts"), join(stage, "server.ts"));
+  const migrated = existsSync(join(appDir, "migration.json"));
+  cpSync(join(migrated ? MIGRATED : TEMPLATE, "server.ts"), join(stage, "server.ts"));
   copyRegular(publicDirOf(appDir), join(stage, "public"));
+  if (migrated && existsSync(join(appDir, "data"))) {
+    const data = join(appDir, "data");
+    if (lstatSync(data).isDirectory() && realpathSync(data) === join(realpathSync(appDir), "data")) {
+      copyRegular(data, join(stage, "data"));
+    }
+  }
   const proc = Bun.spawn([process.execPath, join(stage, "server.ts")], {
     env: { PATH: process.env.PATH ?? "", PORT: "0" },
     stdout: "pipe",
@@ -141,7 +150,7 @@ const counts = (r: ProveResult) => {
   };
 };
 
-async function proveApp(config: Config, appDir: string, proof: Proof): Promise<ProveResult> {
+export async function proveApp(config: Config, appDir: string, proof: Proof): Promise<ProveResult> {
   const app = await startApp(appDir);
   try {
     const driver = await openBrowser(config, { url: app.url });
