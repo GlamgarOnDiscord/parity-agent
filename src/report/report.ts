@@ -1,4 +1,4 @@
-import type { Coverage } from "../coverage/coverage";
+import type { Coverage, Explored } from "../coverage/coverage";
 import type { FieldDiff } from "../diff/diff";
 import type { DataUrl } from "../models/types";
 import type { Proof } from "../proof/schema";
@@ -12,6 +12,7 @@ export interface ReportInput {
   candidate: string;
   rules: StoredRule[];
   coverage?: Coverage;
+  explored?: Explored;
   calls: { calls: number; costUsd: number; sentBytes: number };
   /** Reference evidence per checkpoint screen id, for example the key frame of the recording. */
   legacyImages: Record<string, DataUrl>;
@@ -280,6 +281,17 @@ ${
     ? `<h2>Coverage</h2><p class="note">${r.coverage.counts.tested} fields checked by this proof, ${r.coverage.counts.ruled} explained by a rule only, ${
         r.coverage.counts.seen
       } seen in the recording and never tested${gaps.length ? `: ${gaps.join(", ")}` : ""}.</p>`
+    : ""
+}
+
+${
+  r.explored && r.explored.scenarios > 0
+    ? `${r.coverage ? "" : "<h2>Coverage</h2>"}<p class="note">Exploration wrote ${plural(r.explored.scenarios, "scenario")} (${plural(
+        r.explored.screens,
+        "screen",
+      )}) no person recorded${
+        r.explored.fields.length ? `; only they check ${r.explored.fields.map(esc).join(", ")}` : ""
+      }.</p>`
     : ""
 }
 

@@ -242,8 +242,21 @@ describe("exploration", () => {
     expect(run.acknowledged).toHaveLength(1);
     expect(seen[1]?.acknowledged?.[0]?.id).toBe("s1");
     expect(run.found.map((f) => f.location)).toEqual([`${origin}/prices`]);
-    // An acknowledged action is never saved as a test that replays it without asking.
-    expect(run.found[0]?.steps).toBeUndefined();
+    // An acknowledged action is never saved as a test that replays it unless the operator approves it apart.
+    expect(run.found[0]).toMatchObject({
+      steps: [{ do: "click", target: "Price list" }],
+      acknowledged: true,
+    });
+    const empty = ProofSchema.parse({
+      format: "parity-proof",
+      version: 1,
+      createdAt: "2026-10-30T00:00:00Z",
+      reference: { app: "ref", source: "replay" },
+      scenarios: [],
+      checkpoints: [],
+    });
+    expect(addExplored(empty, [], run, "x")).toMatchObject({ added: [], held: 1 });
+    expect(addExplored(empty, [], run, "x", { acknowledged: true }).added).toHaveLength(1);
   });
 
   test("a browser Parity did not launch is refused for exploration", async () => {

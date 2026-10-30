@@ -243,7 +243,13 @@ class BrowserDriver implements AppDriver {
   }
 
   async readScreen(screenId: string): Promise<Screen> {
-    const raw = (await this.page.evaluate(scanPage)) as RawField[];
+    // A raw click from exploration may still be navigating: read again once the new page has settled.
+    const raw = (await this.page.evaluate(scanPage).catch(async (error: unknown) => {
+      if (!/context was destroyed|navigat/i.test(String(error))) throw error;
+      await this.page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 10_000 }).catch(() => {});
+      await this.settle();
+      return this.page.evaluate(scanPage);
+    })) as RawField[];
     const counts = new Map<string, number>();
     const fields: Field[] = raw.map((f) => {
       const n = (counts.get(f.label) ?? 0) + 1;
@@ -416,7 +422,10 @@ async function launchChrome(
     proc.kill();
     await proc.exited;
     guard.server.close();
-    rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+    // Windows may hold a profile file a moment after Chrome exits; a leftover temp folder is not an error.
+    try {
+      rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+    } catch {}
   };
   const reader = proc.stderr.getReader();
   const decoder = new TextDecoder();
