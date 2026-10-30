@@ -16,6 +16,11 @@ export interface FoundScreen {
    * when one of its actions could not be said with labels (a drag, an ambiguous name).
    */
   steps?: Exclude<Step, { do: "check" }>[];
+  /**
+   * The steps include an action Meta asked to confirm, acknowledged under the operator's `--ack` for this run.
+   * Such a scenario is saved only when the operator approves it separately, after reading its steps.
+   */
+  acknowledged?: boolean;
 }
 
 export interface Exploration {
@@ -108,6 +113,7 @@ export async function explore(
   const acknowledged: Exploration["acknowledged"] = [];
   // Null once an action could not be said with labels, and for a driver that cannot say any.
   let trace: Exclude<Step, { do: "check" }>[] | null = driver.describe ? [] : null;
+  let throughAck = false;
 
   const result = (stoppedBecause: Exploration["stoppedBecause"], note?: string, steps = 0): Exploration => ({
     steps,
@@ -143,8 +149,8 @@ export async function explore(
     if (step.safetyReceipt) receipts.push(step.safetyReceipt);
     if (step.safetyChecks.length > 0 && step.safetyChecks.every((c) => acknowledge.has(c.code))) {
       acknowledged.push({ step: n, codes: step.safetyChecks.map((c) => c.code), actions: step.actions });
-      // The operator's standing permission covers this sandbox run, not a test that replays it anywhere later.
-      trace = null;
+      // The operator's standing permission covers this sandbox run, not a test that replays it later.
+      throughAck = true;
     } else if (step.safetyChecks.length > 0) {
       const checks = step.safetyChecks.map((c) => `${c.code}: ${c.message}`).join("; ");
       return result("safety-check", `${checks} Pending actions: ${JSON.stringify(step.actions)}`, n);
@@ -175,6 +181,7 @@ export async function explore(
         screenshot: await driver.screenshot(),
         screen,
         steps: trace ? [...trace] : undefined,
+        acknowledged: throughAck || undefined,
       });
       seen.push(labels);
     }
@@ -193,20 +200,27 @@ function record(trace: Exclude<Step, { do: "check" }>[], step: Exclude<Step, { d
 /**
  * Every screen exploration found with its path becomes a scenario of the proof: the setup, what the model did,
  * then a check of the fields it showed. A test no person wrote, replayed on the rebuild like any other. A screen
- * already reached by the same steps is not added twice.
+ * already reached by the same steps is not added twice; one reached through an acknowledged action is held back
+ * unless `acknowledged` says the operator approved it.
  */
 export function addExplored(
   proof: Proof,
   setup: Scenario["steps"],
   run: Pick<Exploration, "found">,
   name: string,
-): { proof: Proof; added: string[]; skipped: number } {
+  options: { acknowledged?: boolean } = {},
+): { proof: Proof; added: string[]; skipped: number; held: number } {
   const next: Proof = { ...proof, scenarios: [...proof.scenarios], checkpoints: [...proof.checkpoints] };
   const added: string[] = [];
   let skipped = 0;
+  let held = 0;
   for (const f of run.found) {
     if (!f.steps || f.steps.length === 0) {
       skipped++;
+      continue;
+    }
+    if (f.acknowledged && !options.acknowledged) {
+      held++;
       continue;
     }
     const before = [...setup.filter((s) => s.do !== "check"), ...f.steps];
@@ -226,5 +240,5 @@ export function addExplored(
     next.checkpoints.push({ scenario: id, step: before.length, screen: { ...f.screen, id } });
     added.push(id);
   }
-  return { proof: next, added, skipped };
+  return { proof: next, added, skipped, held };
 }
