@@ -172,7 +172,9 @@ export function around(spec: FuzzSpec, c: Case, max = 8): Case[] {
       else {
         const n = Number(current);
         const [lo, hi] = input.int;
-        values = [n + 1, n * 2, n * 10, n + 7, lo].filter((v) => v >= lo && v <= hi && v !== n).map(String);
+        values = [n + 1, n * 2, n * 10, n + 7, lo, n + 2, n * 3, n + 13, n + 3, n + 29, n * 7, n + 51]
+          .filter((v) => v >= lo && v <= hi && v !== n)
+          .map(String);
       }
       variants.push(values.map((v) => c.map((l, j) => (j === li ? l.map((x, k) => (k === ii ? v : x)) : l))));
     }

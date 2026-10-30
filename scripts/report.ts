@@ -8,7 +8,7 @@ import { basename, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import type { Capture } from "../src/capture/capture";
 import { loadConfig } from "../src/config";
-import { coverageOf } from "../src/coverage/coverage";
+import { coverageOf, exploredOf } from "../src/coverage/coverage";
 import { openBrowser } from "../src/drivers";
 import { Ledger } from "../src/models/ledger";
 import type { DataUrl } from "../src/models/types";
@@ -124,6 +124,10 @@ const coverage =
         rules.filter((r) => r.status !== "rejected"),
       )
     : undefined;
+const explored = exploredOf(
+  proof,
+  captureFile && existsSync(captureFile) ? ((await Bun.file(captureFile).json()) as Capture) : undefined,
+);
 const ids = runId ? [runId, `rebuild-${runId}`] : [];
 const totals = ids.map((id) => ledger.total(id));
 const calls = {
@@ -139,6 +143,7 @@ const html = renderReport({
   candidate,
   rules,
   coverage,
+  explored,
   calls,
   legacyImages,
   rebuiltImages,

@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { z } from "zod";
 import type { Capture } from "../capture/capture";
-import { coverageOf } from "../coverage/coverage";
+import { coverageOf, exploredOf } from "../coverage/coverage";
 import { type Decision, reapplyDecisions } from "../diff/decisions";
 import { matchScreens } from "../fields/match";
 import type { Ledger } from "../models/ledger";
@@ -140,6 +140,7 @@ export function createApp(ledger: Ledger, options: AppOptions) {
       proof: proof.data,
       saved: await json<SavedResult>("result.json"),
       coverage: Array.isArray(capture?.frames) ? coverageOf(capture, proof.data, rules) : undefined,
+      explored: exploredOf(proof.data, Array.isArray(capture?.frames) ? capture : undefined),
       calls: {
         calls: totals.reduce((n, t) => n + t.calls, 0),
         costUsd: totals.reduce((n, t) => n + t.costUsd, 0),

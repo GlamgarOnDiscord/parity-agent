@@ -45,7 +45,7 @@ Exit: fuzzing finds at least one difference the recording did not show, shrinks 
 - Repair history per run: iterations, cost, fields equal over time (the parity card of the mockups)
 - Muse Spark Open on Baseten for rule extraction, if a key is available (open-weights bonus)
 
-Exit: from the diff screen, one difference is accepted with a reason and another is repaired by Muse Code in one click. Spend: about $1. (done: the VS3 cent accepted with a name and a reason; one click brought FrontAccounting item 301 back for $0.41, and the replay after it caught a tax regression the repair introduced, still open; $0.81 in all)
+Exit: from the diff screen, one difference is accepted with a reason and another is repaired by Muse Code in one click. Spend: about $1. (done: the VS3 cent accepted with a name and a reason; one click brought FrontAccounting item 301 back for $0.41, and the replay after it caught a tax regression the repair introduced, closed in D6; $0.81 in all)
 
 ### D6 Exploration that writes tests (Oct 31)
 
@@ -53,7 +53,7 @@ Exit: from the diff screen, one difference is accepted with a reason and another
 - Coverage map counts explored screens and scenarios; the diff shows what exploration added
 - Desktop replay of Virtual Salesman 3 under Wine with Muse Spark computer use, so the Windows app can be re-captured on a new scenario without a person
 
-Exit: one scenario that no person wrote is replayed on both FrontAccounting and its rebuild; VS3 is driven by the agent through one invoice. Spend: about $1.
+Exit: one scenario that no person wrote is replayed on both FrontAccounting and its rebuild; VS3 is driven by the agent through one invoice. Spend: about $1. (done except VS3: exploration found Sales Types and wrote its scenario, at parity on FrontAccounting and failing on the rebuild, which lacks that screen; the tax cent closed by a $0.36 repair from a table of cases around it; $0.91 in all. VS3 under Wine moves to D9)
 
 ### D7 Migration mode, opt-in (Nov 1)
 

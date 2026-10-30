@@ -3,13 +3,14 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Capture } from "../src/capture/capture";
-import { coverageOf } from "../src/coverage/coverage";
+import { coverageOf, exploredOf } from "../src/coverage/coverage";
 import { playwrightSpec } from "../src/export/playwright";
 import { Ledger } from "../src/models/ledger";
 import { type Proof, ProofSchema } from "../src/proof/schema";
 import type { Rule } from "../src/rules/extract";
 import { RuleStore } from "../src/rules/store";
 import { createApp } from "../src/server/app";
+import { diffPage } from "../src/server/diff";
 import { openDb } from "../src/store/db";
 
 const screen = (fields: [string, string][]) => ({
@@ -105,6 +106,81 @@ describe("coverage map", () => {
 
   test("gaps come first", () => {
     expect(cov.rows[0]?.state).toBe("seen");
+  });
+});
+
+describe("what exploration added", () => {
+  const withExplored: Proof = ProofSchema.parse({
+    ...proof,
+    scenarios: [
+      ...proof.scenarios,
+      {
+        id: "explored-1a2b3c",
+        name: "legacy: Price list (explored, step 2)",
+        steps: [
+          { do: "open", path: "/" },
+          { do: "click", target: "Price list" },
+          { do: "check", screen: "explored-1a2b3c" },
+        ],
+      },
+    ],
+    checkpoints: [
+      ...proof.checkpoints,
+      {
+        scenario: "explored-1a2b3c",
+        step: 2,
+        screen: screen([
+          ["Unit price:", "300.00"],
+          ["Tax rate", "5%"],
+          ["Total", "1.00"],
+          ["Discount", "0"],
+        ]),
+      },
+    ],
+  });
+
+  test("counts the scenarios and screens it wrote, and the fields no recording or person showed", () => {
+    expect(exploredOf(withExplored, capture)).toEqual({
+      scenarios: 1,
+      screens: 1,
+      fields: ["Tax rate", "Unit price"],
+    });
+    expect(exploredOf(withExplored).fields).toEqual(["Discount", "Tax rate", "Unit price"]);
+    expect(exploredOf(proof)).toEqual({ scenarios: 0, screens: 0, fields: [] });
+  });
+
+  test("the diff screen says it, also for a run with no recording, and marks explored checkpoints", () => {
+    const diff = (c: Proof["checkpoints"][number]) => ({
+      fields: c.screen.fields.map((f) => ({ legacy: f, rebuilt: f, verdict: "equal" as const })),
+      missingInRebuilt: [],
+      extraInRebuilt: [],
+      counts: { equal: c.screen.fields.length, different: 0, masked: 0, missing: 0, accepted: 0 },
+    });
+    const html = diffPage({
+      run: "fa",
+      proof: withExplored,
+      saved: {
+        result: {
+          volatile: [],
+          equal: true,
+          checkpoints: withExplored.checkpoints.map((c) => ({
+            scenario: c.scenario,
+            step: c.step,
+            screen: c.screen.id,
+            diff: diff(c),
+          })),
+        },
+        candidate: "generated/fa/app",
+        at: "2026-10-30T00:00:00Z",
+        evidence: {},
+      } as never,
+      explored: exploredOf(withExplored),
+      calls: { calls: 0, costUsd: 0, sentBytes: 0 },
+      budgetUsd: 20,
+    });
+    expect(html).toContain("1<small>screens explored</small>");
+    expect(html).toContain("exploration wrote <b>1</b> scenario, <b>3</b> fields no person recorded");
+    expect(html).toContain("explored</small>");
   });
 });
 
