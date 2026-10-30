@@ -8,7 +8,9 @@ Never cut: field matching, deterministic replay, volatile-field masking, the one
 
 ## Plan v2 (2026-10-27)
 
-The first plan held one sprint per day and S1 to S8 landed on the first day (PRs #31 to #55). Plan v2 at least doubles the work per day. Each day names its exit check and its model spend; the credit line is the $150 of Meta credits, about $3.6 spent so far. The video moves to the end, once the product it shows is final.
+The first plan held one sprint per day and S1 to S8 landed on the first day (PRs #31 to #55). Plan v2 at least doubles the work per day. Each day names its exit check and its model spend; the credit line is the $150 of Meta credits. The video moves to the end, once the product it shows is final.
+
+Status on 2026-10-30: D2 to D7 done, two days ahead (PRs #85 to #111). Spend logged: $18.07; the local cap `PARITY_BUDGET_USD` was raised from $20 to $35 for migration mode. Left: D8 video, D9 proof for strangers and polish (VS3 under Wine moved there from D6), D10 submit.
 
 ### D2 Keep proving (Oct 27)
 

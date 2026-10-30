@@ -72,8 +72,10 @@ Model calls need a Meta Model API key: `cp .env.example .env` and set `MODEL_API
 | `bun run prove --proof <proof.json> --url <app>`       | replays a proof on any web app                                                                      | none           |
 | `bun run report runs/<run>`                            | the one-page proof report, with both screens zoomed on each difference                              | none           |
 | `bun run record:reference <scenario.json> --url <app>` | records a web app as the reference over several runs and measures its noise                         | none           |
-| `bun run explore <proof.json> --url <app>`             | Muse Spark computer use explores the app and reports screens the proof never checked                | yes, capped    |
-| `bun run parity fuzz <spec.json> --proof <proof.json> --reference-url <legacy> --app <dir>` | generates cases from a seed, plays each on both apps, shrinks every difference and adds it to the proof; `--repair` hands them to Muse Code | none; `--repair` uses Muse Code |
+| `bun run explore <proof.json> --url <app> [--save]`    | Muse Spark computer use explores the app; `--save` turns each new screen into a scenario of the proof (held back if it went through an acknowledged action, until `--from <exploration.json> --save-acknowledged`) | yes, capped    |
+| `bun run parity fuzz <spec.json> --proof <proof.json> --reference-url <legacy> --app <dir>` | generates cases from a seed, plays each on both apps, shrinks every difference and adds it to the proof; `--repair` hands them to Muse Code with a table of the cases around each numeric difference (`--examples` prints it alone) | none; `--repair` uses Muse Code |
+| `bun run parity migrate inventory\|plan\|prepare\|prove <migration.json>` | opt-in migration: crawl the legacy app, cost per screen, records read through its forms into `data/`, proof per screen | none |
+| `bun run parity migrate run <migration.json> --budget 6 --yes` | one Muse Code build per screen on the modern template, proved, repaired, stopped at the budget; board at `/migrate/<run>` | yes, Muse Code, capped |
 | `bun run export:playwright runs/<run>`                 | a standalone Playwright test from a proof                                                           | none           |
 | `bun run record:replay runs/<run>`                     | films the rebuilt app and puts it next to the legacy recording                                      | none           |
 
