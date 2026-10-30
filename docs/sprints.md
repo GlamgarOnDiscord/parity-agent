@@ -65,7 +65,7 @@ A whole app rather than one screen, for those who pay for it: off by default, `p
 - One Muse Code build per screen on the shared data layer; each screen proved with its scenarios and fuzzed
 - Migration board: screens found, rebuilt, proved, differences accepted, spend per screen
 
-Exit: three FrontAccounting screens (customers, items, sales invoice) rebuilt in the modern template on data migrated from FrontAccounting, each at parity or with named accepted differences. Spend: about $10, above the default local cap of $20.
+Exit: three FrontAccounting screens (customers, items, sales invoice) rebuilt in the modern template on data migrated from FrontAccounting, each at parity or with named accepted differences. Spend: about $10, above the default local cap of $20. (done Oct 30: customers 28/28, items 113/113, invoice 258/258, all on records read through FrontAccounting's own forms; $2.83, the cap raised to $35 with the owner's agreement)
 
 ### D8 Video (Nov 2)
 

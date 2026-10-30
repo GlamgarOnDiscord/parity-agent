@@ -117,6 +117,8 @@ class BrowserDriver implements AppDriver {
         const target = new URL(step.path, base);
         if (target.origin !== base.origin) throw new Error(`refusing to leave ${base.origin}: ${step.path}`);
         await this.page.goto(target.toString(), { waitUntil: "domcontentloaded" });
+        // A screen drawn by script after load (a migrated app) is only there once its requests are done.
+        await this.settle();
         return;
       }
       case "fill": {
@@ -231,6 +233,36 @@ class BrowserDriver implements AppDriver {
       default:
         return [];
     }
+  }
+
+  async links() {
+    const origin = new URL(this.options.url).origin;
+    const raw = await this.page.evaluate(() =>
+      [...document.querySelectorAll("a[href]")].map((a) => ({
+        text: (a.textContent ?? "").replace(/\s+/g, " ").trim(),
+        href: (a as HTMLAnchorElement).href,
+      })),
+    );
+    const out: { text: string; path: string }[] = [];
+    for (const { text, href } of raw) {
+      const url = new URL(href);
+      if (url.origin !== origin || !/^https?:$/.test(url.protocol)) continue;
+      const path = url.pathname + url.search;
+      if (!out.some((l) => l.path === path)) out.push({ text, path });
+    }
+    return out;
+  }
+
+  async choices(field: string) {
+    const control = await this.find(scanPage, field, "field");
+    return control.evaluate((el) =>
+      // An option with no value is a placeholder ("New customer", "Select..."), not a choice of data.
+      el instanceof HTMLSelectElement
+        ? [...el.options]
+            .filter((o) => o.value !== "")
+            .map((o) => ({ text: (o.textContent ?? "").trim(), value: o.value }))
+        : [],
+    );
   }
 
   async location() {

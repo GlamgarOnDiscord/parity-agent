@@ -13,6 +13,7 @@ import { readHistory } from "../rebuild/history";
 import { isEqual } from "../replay/prove";
 import { workedExample } from "../rules/extract";
 import type { RuleStore } from "../rules/store";
+import { BoardSchema, boardPage } from "./board";
 import { type DiffInput, diffPage, type SavedResult } from "./diff";
 import type { RepairJobs } from "./repair";
 import { reviewPage } from "./review";
@@ -113,6 +114,17 @@ export function createApp(ledger: Ledger, options: AppOptions) {
     if (getCookie(c, SESSION_COOKIE) !== session)
       return c.text("Open the link printed by the server first.", 401);
     return c.html(reviewPage(run));
+  });
+
+  app.get("/migrate/:run", async (c) => {
+    const run = c.req.param("run");
+    if (!RUN.test(run)) return c.text("bad run", 400);
+    if (getCookie(c, SESSION_COOKIE) !== session)
+      return c.text("Open the link printed by the server first.", 401);
+    const f = Bun.file(join(resolve(options.runsDir, run), "board.json"));
+    const board = BoardSchema.safeParse((await f.exists()) ? await f.json().catch(() => null) : null);
+    if (!board.success) return c.text("No migration board for this run.", 404);
+    return c.html(boardPage(board.data));
   });
 
   app.get("/diff/:run", async (c) => {

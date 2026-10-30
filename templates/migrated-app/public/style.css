@@ -1,0 +1,236 @@
+/* Parity migration template. Light business UI; one accent, quiet surfaces, numbers in tabular figures. */
+:root {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --side: #0f1115;
+  --side-t: #c9ccd3;
+  --side-hi: #ffffff;
+  --line: #e3e5ea;
+  --line-2: #d3d6dd;
+  --t1: #12141a;
+  --t2: #4b5162;
+  --t3: #7a8091;
+  --accent: #2a4bff;
+  --accent-soft: #eef1ff;
+  --bad: #b42318;
+  --ok: #1f7a3f;
+  --r: 8px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--t1);
+  font: 14px / 1.45 var(--font);
+}
+.shell {
+  display: grid;
+  grid-template-columns: 232px 1fr;
+  min-height: 100vh;
+}
+.side {
+  background: var(--side);
+  color: var(--side-t);
+  padding: 16px 12px;
+  min-height: 100vh;
+}
+.brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--side-hi);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 4px 8px 16px;
+}
+.mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: var(--accent);
+}
+.side h2 {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b8f99;
+  margin: 16px 8px 6px;
+  font-weight: 600;
+}
+.side a.item {
+  display: block;
+  color: var(--side-t);
+  text-decoration: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+.side a.item:hover {
+  background: #1b1e25;
+  color: var(--side-hi);
+}
+.side a.item[aria-current="page"] {
+  background: #1f2430;
+  color: var(--side-hi);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+main {
+  padding: 28px 32px 48px;
+  min-width: 0;
+}
+.top h1 {
+  font-size: 20px;
+  margin: 0;
+  font-weight: 600;
+}
+.top .sub {
+  margin: 4px 0 20px;
+  color: var(--t3);
+}
+.screen {
+  display: grid;
+  gap: 16px;
+  max-width: 1100px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+.card > h2 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.card > .body {
+  padding: 16px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px 16px;
+}
+.field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.field label,
+.field .label {
+  font-size: 12px;
+  color: var(--t2);
+}
+input,
+select,
+textarea {
+  font: inherit;
+  color: var(--t1);
+  background: #fff;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  padding: 7px 9px;
+  width: 100%;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+input[type="checkbox"] {
+  width: auto;
+}
+output {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  padding: 7px 0;
+}
+.picker {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+}
+.picker .field {
+  flex: 1;
+  max-width: 420px;
+}
+button {
+  font: inherit;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 6px;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+button.ghost {
+  background: #fff;
+  color: var(--accent);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t2);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  background: #fafbfc;
+}
+td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+td.num,
+th.num {
+  text-align: right;
+}
+tr:last-child td {
+  border-bottom: 0;
+}
+.totals {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 4px 24px;
+  justify-content: end;
+  padding: 12px 16px;
+}
+.totals .label {
+  color: var(--t2);
+  text-align: right;
+}
+.totals output {
+  padding: 0;
+  text-align: right;
+  font-weight: 600;
+}
+.empty {
+  color: var(--t3);
+  padding: 24px 16px;
+  text-align: center;
+}
+.error {
+  color: var(--bad);
+  padding: 12px 16px;
+}
+@media (max-width: 760px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .side {
+    min-height: 0;
+  }
+  main {
+    padding: 20px 16px;
+  }
+}

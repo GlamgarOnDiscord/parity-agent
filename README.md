@@ -102,6 +102,12 @@ bun run prove --proof fixtures/scenarios/frontaccounting-invoice.proof.json --ur
 
 Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behaviour: [docs/meta-api.md](docs/meta-api.md).
 
+## Migrating a whole app, screen by screen
+
+Off by default, because it spends. `parity migrate inventory` crawls the legacy app by its links and lists every screen, its fields and the lists that pick a record, with no model call. `plan` prints the cost per screen and which Meta model does what. `prepare` reads every record through the legacy app's own forms into `data/*.json`, which the rebuilt app loads into SQLite, and turns each record into a scenario of the proof. `run --budget 6 --yes` has Muse Code build each screen from a modern template, proves it, and stops before crossing the budget. `prove` checks the screens again for free; the board at `/migrate/<run>` shows each screen, its proof and its spend.
+
+On FrontAccounting: customers (28 of 28 fields, first build, $0.30), items (113 of 113, after a fix on Parity's side and one repair, $2.03) and the sales invoice (258 of 258, ported to the template with prices and descriptions read from the migrated records instead of written in code, $0.50). [Details](docs/benchmarks.md).
+
 ## Principles
 
 - **AI never decides what "the same" means.** Matching and comparison are plain code. AI captures, proposes and explains.
@@ -124,7 +130,8 @@ Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behav
 | `parity` CLI, GitHub Action on pull requests, MCP server, offline proof | done                                               |
 | Differential fuzzing with shrinking, against live FrontAccounting | done                                                     |
 | Differences people decide: accept with who and why, repair in one click, repair history | done                       |
-| Migration mode, opt-in: whole app, data model, modern template | planned (D7)                                             |
+| Exploration that writes tests, coverage of what it added     | done                                                          |
+| Migration mode, opt-in: inventory, migrated records, modern template, one build per screen, board | done: 3 FrontAccounting screens proved, $2.83 |
 | Muse Spark Open on Baseten for on-premise rule extraction    | client ready, not verified (no key yet)                       |
 | Replaying the Windows app itself instead of its recording    | cut: the recording is the reference ([D3](docs/decisions.md)) |
 
