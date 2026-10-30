@@ -35,6 +35,11 @@ const COMMANDS: Record<string, { script: string; about: string; models: boolean 
     about: "record a web app as the reference and measure its noise",
     models: false,
   },
+  migrate: {
+    script: "migrate.ts",
+    about: "opt-in: inventory, plan and migrate a whole app screen by screen, capped",
+    models: true,
+  },
   fuzz: {
     script: "fuzz.ts",
     about: "generate cases, play them on both apps, shrink every difference",

@@ -119,3 +119,17 @@ Exploration then wrote a test. `bun run explore ... --ack computer_action_requir
 
 D6 spend so far: $0.91.
 
+## Migration mode on FrontAccounting (2026-10-30)
+
+`parity migrate` with [fixtures/migrations/frontaccounting.json](../fixtures/migrations/frontaccounting.json). Inventory, records and every comparison are plain code; only builds and repairs call Muse Code (muse-spark-1.3). Estimate printed before the run: about $4.35, at most $5.70; budget given: $6.
+
+| Step | What | Model calls | Spend |
+| --- | --- | --- | --- |
+| inventory | 25 screens crawled in 5 s, 38 links not followed because their words say they change data | none | $0 |
+| records | 2 customers (14 fields), 6 items (21), 7 price lists (6), read through FrontAccounting's own forms | none | $0 |
+| customers | built in the modern template, 2 scenarios, 28 of 28 fields equal at the first proof | 1 build | $0.30 |
+| items | first build and 2 repairs failed: Parity picked records by the list's form name (`stock_id`), which a modern screen does not show. Fixed in Parity: such a list is now refused unless records open by address (`?stock_id=102`). Then one targeted repair (FrontAccounting shows the item code in "Select an item:"): 113 of 113 | 1 build, 3 repairs | $2.03 |
+| invoice | the D3 rebuild ported to the template, catalogue replaced by the migrated items and prices: 7 scenarios, 258 of 258 at the first proof | 1 build | $0.50 |
+
+Total $2.83. Two lessons. A form that shows one record can be rebuilt from its data without any model: a ten-line generic screen proved the customers too; Muse Code earns its cost on layout and on screens with logic. And a fault on Parity's side (how a record is picked) cost three paid runs before the replay error was read; repairs now stop at the budget, and the board shows the spend per screen.
+

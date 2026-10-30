@@ -22,6 +22,10 @@ export interface AppDriver {
    */
   describe?(action: ComputerAction): Promise<Exclude<Step, { do: "check" }>[] | null>;
   screenshot(): Promise<DataUrl>;
+  /** Links on the current screen to other screens of the same app, as paths, for an inventory. */
+  links?(): Promise<{ text: string; path: string }[]>;
+  /** The choices of a list field, by its label: the text a replay picks with `fill`, and the value behind it. */
+  choices?(field: string): Promise<{ text: string; value: string }[]>;
   /** Where the app is now: the page URL, or the window title on a desktop. */
   location(): Promise<string>;
   /** The fields visible on the current screen, read without AI when the platform allows it. */
