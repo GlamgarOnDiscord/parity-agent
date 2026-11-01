@@ -4,6 +4,10 @@
 set -euo pipefail
 BUN="$1"
 RUN_AS="$2"
+if ! command -v ip > /dev/null; then
+  echo "This check needs ip (package iproute2) to bring loopback up in the new network namespace." >&2
+  exit 1
+fi
 ip link set lo up
 if curl -s -m 3 -o /dev/null https://github.com; then
   echo "The network is still reachable; this check would prove nothing." >&2
@@ -13,7 +17,9 @@ echo "Network cut: loopback only."
 sudo -u "$RUN_AS" env PATH="$PATH" HOME="$HOME" bash -s "$BUN" <<'INNER'
 set -euo pipefail
 BUN="$1"
-"$BUN" scripts/serve-static.ts examples/invoice --port 4173 &
+"$BUN" scripts/serve-static.ts examples/invoice --port 4173 > /dev/null &
+# The app server would otherwise outlive the check and hold its output open.
+trap 'kill $! 2> /dev/null || true' EXIT
 for i in $(seq 1 30); do curl -fsS -o /dev/null http://127.0.0.1:4173/ && break; sleep 1; done
 "$BUN" bin/parity.ts report --proof examples/invoice/parity.proof.json --url http://127.0.0.1:4173/ \
   --out offline-report.html --summary offline-summary.md

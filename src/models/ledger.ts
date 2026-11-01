@@ -48,13 +48,26 @@ export interface SentCall {
   error: string | null;
 }
 
+/** PARITY_BUDGET_USD as a number of dollars; unset means $20, anything that is not a plain number is refused. */
+export function budgetFrom(value: string | undefined): number {
+  if (value === undefined || value === "") return 20;
+  if (!/^\s*\d+(\.\d+)?\s*$/.test(value)) {
+    throw new Error(`PARITY_BUDGET_USD must be a number of dollars, such as 20 or 35.5; got "${value}"`);
+  }
+  return Number(value);
+}
+
 /** The send log: every call that leaves the machine, with what it cost. */
 export class Ledger {
   constructor(
     private readonly db: Database,
     /** Spending cap in USD across every run; calls are refused once it is reached. */
-    readonly budgetUsd = Number(process.env.PARITY_BUDGET_USD ?? 20),
-  ) {}
+    readonly budgetUsd = budgetFrom(process.env.PARITY_BUDGET_USD),
+  ) {
+    // A cap that is not a number would compare false with every total and never stop a call.
+    if (!Number.isFinite(budgetUsd) || budgetUsd < 0)
+      throw new Error(`budget must be a number of USD, got ${budgetUsd}`);
+  }
 
   /** Throw before a paid call if the budget is spent. */
   assertBudget(): void {

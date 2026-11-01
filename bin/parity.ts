@@ -45,6 +45,11 @@ const COMMANDS: Record<string, { script: string; about: string; models: boolean 
     about: "generate cases, play them on both apps, shrink every difference",
     models: false,
   },
+  bench: {
+    script: "bench-drivers.ts",
+    about: "replay time and flakiness of the configured browser driver",
+    models: false,
+  },
   export: { script: "export-playwright.ts", about: "write a Playwright test from a proof", models: false },
   tour: {
     script: "film-tour.ts",
