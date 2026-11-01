@@ -35,7 +35,7 @@ Needs [Bun](https://bun.sh) 1.3 or later and Chrome or Chromium (`PARITY_CHROME_
 git clone https://github.com/GlamgarOnDiscord/parity-agent.git
 cd parity-agent
 bun install
-bun test                                                           # 85 tests, some in headless Chrome
+bun test                                                           # 139 tests, some in headless Chrome
 bun run prove                                                      # the one-cent difference, field by field
 bun run prove --fixed                                              # the corrected rebuild: parity
 bun run report --proof fixtures/proofs/vs3-invoice.json --fixture  # writes runs/report.html
@@ -76,6 +76,7 @@ Model calls need a Meta Model API key: `cp .env.example .env` and set `MODEL_API
 | `bun run parity fuzz <spec.json> --proof <proof.json> --reference-url <legacy> --app <dir>` | generates cases from a seed, plays each on both apps, shrinks every difference and adds it to the proof; `--repair` hands them to Muse Code with a table of the cases around each numeric difference (`--examples` prints it alone) | none; `--repair` uses Muse Code |
 | `bun run parity migrate inventory\|plan\|prepare\|prove <migration.json>` | opt-in migration: crawl the legacy app, cost per screen, records read through its forms into `data/`, proof per screen | none |
 | `bun run parity migrate run <migration.json> --budget 6 --yes` | one Muse Code build per screen on the modern template, proved, repaired, stopped at the budget; board at `/migrate/<run>` | yes, Muse Code, capped |
+| `bun run bench --runs 20`                              | replay time and flaky runs of the configured browser driver (`PARITY_BROWSER`)                      | none           |
 | `bun run export:playwright runs/<run>`                 | a standalone Playwright test from a proof                                                           | none           |
 | `bun run record:replay runs/<run>`                     | films the rebuilt app and puts it next to the legacy recording                                      | none           |
 
@@ -100,6 +101,7 @@ bun run prove --proof fixtures/scenarios/frontaccounting-invoice.proof.json --ur
 | FrontAccounting invoice, 5 replays                                               | 63 fields, 4 noisy, 3.3 s per run                           |
 | Exploration of FrontAccounting by Muse Spark computer use                        | 12 steps, 4 screens the recording never showed, $0.153      |
 | Report on a rebuild that adds rounded taxes                                      | 1 difference: 69.21 before, 69.22 after                     |
+| Proof of the example invoice, 40 proofs per driver, Linux container              | 3.56 s median launched by Parity, 3.19 s attached; 0 flaky  |
 | Fuzzing the FrontAccounting rebuild against the live app, 12 invoices            | 3 items the recording never showed, each shrunk to one or two lines; fixed by one $0.46 repair, then 52 fresh invoices at parity |
 
 Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behaviour: [docs/meta-api.md](docs/meta-api.md).
@@ -134,7 +136,10 @@ On FrontAccounting: customers (28 of 28 fields, first build, $0.30), items (113 
 | Differences people decide: accept with who and why, repair in one click, repair history | done                       |
 | Exploration that writes tests, coverage of what it added     | done                                                          |
 | Migration mode, opt-in: inventory, migrated records, modern template, one build per screen, board | done: 3 FrontAccounting screens proved, $2.83 |
+| Benchmarks per driver and per role, threat model, landing page | done (Lightpanda not measured yet): [benchmarks](docs/benchmarks.md), [threat model](docs/threat-model.md), `site/` on GitHub Pages |
+| Video, X thread, submission                                  | script, shots and captions in [docs/video.md](docs/video.md); recording and posting by the founder |
 | Muse Spark Open on Baseten for on-premise rule extraction    | client ready, not verified (no key yet)                       |
+| Virtual Salesman 3 driven under Wine by computer use         | not done: needs the VS3 binary, which is not redistributed    |
 | Replaying the Windows app itself instead of its recording    | cut: the recording is the reference ([D3](docs/decisions.md)) |
 
 Plan and exit checks: [docs/sprints.md](docs/sprints.md).

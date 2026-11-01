@@ -1,0 +1,94 @@
+1
+00:00:00,000 --> 00:00:06,000
+Every line of this invoice is right.
+
+2
+00:00:06,000 --> 00:00:12,000
+The total is one cent off. Every test passes.
+
+3
+00:00:12,000 --> 00:00:20,000
+This is how old business software dies: someone rewrites it,
+nobody can say what the old one really did,
+
+4
+00:00:20,000 --> 00:00:30,000
+and the bugs that slip through are business bugs. Parity rebuilds the app
+and proves the new one does the same thing, field by field.
+
+5
+00:00:30,000 --> 00:00:38,000
+You record someone using the old app and talking.
+Muse Voice Transcribe reads the narration,
+
+6
+00:00:38,000 --> 00:00:46,000
+Muse Spark and SAM read every field on every key frame,
+and the business rules come out in plain language, each with its evidence.
+
+7
+00:00:46,000 --> 00:00:55,000
+The formulas are checked against the recorded values by code.
+An expert accepts them in a click.
+
+8
+00:00:55,000 --> 00:01:05,000
+Muse Code builds the web app from the accepted rules.
+Parity replays the same invoice on it:
+
+9
+00:01:05,000 --> 00:01:15,000
+eight of eight fields equal, first try, forty-six cents.
+
+10
+00:01:15,000 --> 00:01:25,000
+And when a rebuild adds the rounded taxes instead of rounding once,
+Parity names the field: 69.21 before, 69.22 after.
+
+11
+00:01:25,000 --> 00:01:35,000
+AI never decides what the same means. The comparison is plain code.
+
+12
+00:01:35,000 --> 00:01:45,000
+On an app nobody here wrote, FrontAccounting,
+Parity fuzzes the rebuild against the live app.
+
+13
+00:01:45,000 --> 00:01:55,000
+It found three items the recording never showed, shrank each
+to a one- or two-line invoice, and one repair closed them.
+
+14
+00:01:55,000 --> 00:02:05,000
+The proof stays. Every pull request is replayed by a GitHub Action, with no model call;
+a change that breaks the cent fails its check.
+
+15
+00:02:05,000 --> 00:02:15,000
+And a coding agent can call Parity itself, through MCP,
+before it opens its pull request.
+
+16
+00:02:15,000 --> 00:02:25,000
+Muse Spark computer use explores the app alone, confined to it,
+and turns the screens nobody recorded into tests.
+
+17
+00:02:25,000 --> 00:02:35,000
+Migration mode goes screen by screen: customers, items and invoices,
+on records read through the old app's own forms, each one proved.
+
+18
+00:02:35,000 --> 00:02:43,000
+Nothing leaves your machine unless you send it.
+Cut the network: the proof still runs.
+
+19
+00:02:43,000 --> 00:02:50,000
+Every model call is in the send log, with its cost.
+The whole hackathon cost eighteen dollars.
+
+20
+00:02:50,000 --> 00:02:59,000
+Parity. Record it once, prove it forever. Open source.

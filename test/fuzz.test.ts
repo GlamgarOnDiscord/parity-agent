@@ -181,9 +181,9 @@ describe("differential fuzzing on two live apps", () => {
 
     // A number that differs gets the cases around it, with what each app showed.
     const table = await examplesAround({ reference, candidate }, small, f as NonNullable<typeof f>, 4);
-    expect(table).toContain("| Inputs | Sub-total, legacy | Sub-total, rebuilt |");
-    expect(table).toContain("| Item Code B, Quantity 1 | 0.00 | 5.00 |");
-    expect(table).toContain("| Item Code A, Quantity 1 | 10.00 | same |");
-    expect(table).toContain("| Item Code B, Quantity 2 | 0.00 | 10.00 |");
+    expect(table).toContain("| Inputs | `Sub-total`, legacy | `Sub-total`, rebuilt |");
+    expect(table).toContain("| `Item Code B, Quantity 1` | `0.00` | `5.00` |");
+    expect(table).toContain("| `Item Code A, Quantity 1` | `10.00` | same |");
+    expect(table).toContain("| `Item Code B, Quantity 2` | `0.00` | `10.00` |");
   });
 });

@@ -1,4 +1,5 @@
 import type { Capture } from "../capture/capture";
+import { code, line } from "../models/prompt-text";
 import type { Proof } from "../proof/schema";
 import type { Rule } from "../rules/extract";
 
@@ -53,40 +54,40 @@ export function writeSpec(c: Capture, proof: Proof, rules: Rule[]): string {
   const lines: string[] = [
     "# SPEC",
     "",
-    `One screen: **${title}**. Build it in \`public/\` following CONTRACT.md.`,
+    `One screen: ${code(title)}. Build it in \`public/\` following CONTRACT.md.`,
     "",
     "## Inputs (in this order)",
     "",
-    ...inputs.map((l) => `- \`${l}\``),
+    ...inputs.map((l) => `- ${code(l)}`),
     "",
     "## Buttons",
     "",
-    ...buttons.map((b) => `- \`${b}\`: computes every displayed value below`),
+    ...buttons.map((b) => `- ${code(b)}: computes every displayed value below`),
     "",
     "## Displayed values",
     "",
-    ...outputs.map((f) => `- \`${f.label}\`, shown like \`${f.value}\``),
+    ...outputs.map((f) => `- ${code(f.label)}, shown like ${code(f.value)}`),
     "",
     "## Business rules (accepted by the domain expert)",
     "",
   ];
   for (const r of rules) {
-    lines.push(`- **${r.id} ${r.title}.** ${r.statement}`);
+    lines.push(`- **${r.id} ${line(r.title)}.** ${line(r.statement)}`);
     if (r.target && r.expression)
-      lines.push(`  - \`${r.target} = ${r.expression}\` (round(x, n) is half up)`);
+      lines.push(`  - ${code(`${r.target} = ${r.expression}`)} (round(x, n) is half up)`);
   }
   if (lookups.size) {
     lines.push("", "## Reference data seen on screen", "");
-    for (const [k, vals] of lookups) lines.push(`- ${k} ${[...vals].map((v) => `\`${v}\``).join(", ")}`);
+    for (const [k, vals] of lookups) lines.push(`- ${code(k)}: ${[...vals].map(code).join(", ")}`);
   }
   lines.push("", "## Example that must match exactly", "");
   for (const s of steps) {
-    if (s.do === "fill") lines.push(`- type \`${s.value}\` in \`${s.field}\``);
-    if (s.do === "click") lines.push(`- press \`${s.target}\``);
+    if (s.do === "fill") lines.push(`- type ${code(s.value)} in ${code(s.field)}`);
+    if (s.do === "click") lines.push(`- press ${code(s.target)}`);
   }
   if (checkpoint) {
     lines.push("- then the screen shows:");
-    for (const f of checkpoint.screen.fields) lines.push(`  - \`${f.label}\` = \`${f.value}\``);
+    for (const f of checkpoint.screen.fields) lines.push(`  - ${code(f.label)} = ${code(f.value)}`);
   }
   return `${lines.join("\n")}\n`;
 }

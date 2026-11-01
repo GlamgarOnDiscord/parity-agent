@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readdirSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative, resolve, sep } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -36,9 +36,14 @@ const refuse = (t: string) => ({ content: [{ type: "text" as const, text: t }], 
  */
 export function createParityMcp(o: ParityMcpOptions) {
   const root = resolve(o.root);
+  // Checked on the real path: a link inside the project that points out of it does not count as inside.
+  const realRoot = existsSync(root) ? realpathSync(root) : root;
   const inside = (p: string) => {
     const full = resolve(root, p);
-    return full === root || full.startsWith(root + sep) ? full : null;
+    const real = existsSync(full) ? realpathSync(full) : full;
+    const within = (x: string, r: string) => x === r || x.startsWith(r + sep);
+    // The real path is what gets opened, so a link swapped after this check cannot redirect it.
+    return within(full, root) && within(real, realRoot) ? real : null;
   };
   const server = new McpServer({ name: "parity", version: "0.2.0" });
 

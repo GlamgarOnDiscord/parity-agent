@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- No script, no font or image from another site, no tracking: the page loads only its own files. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Parity: one cent, proven</title>
+  <meta name="description" content="Parity rebuilds old business software as a web app and proves the new app does what the old one did, field by field. Get the one-cent difference in two minutes, no API key.">
+  <style>
+    :root {
+      --ground: #0e0e10; --card: #19191c; --card-raised: #202024; --line: #26262b; --line-strong: #313137;
+      --text: #f4f4f5; --text-2: #a1a1aa; --muted: #8b8b94; --blue: #4c6fff; --link: #7690ff;
+      --green: #86efac; --red: #fca5a5;
+      --sans: Geist, "Segoe UI Variable", system-ui, -apple-system, sans-serif;
+      --mono: "Geist Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--ground); color: var(--text); font: 400 17px/1.55 var(--sans); }
+    main { max-width: 860px; margin: 0 auto; padding: 56px 16px 72px; }
+    a { color: var(--link); }
+    h1 { font-size: clamp(30px, 6vw, 44px); line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 18px; font-weight: 600; }
+    h2 { font-size: 22px; letter-spacing: -0.01em; margin: 56px 0 14px; font-weight: 600; }
+    p { margin: 0 0 14px; color: var(--text-2); }
+    p strong { color: var(--text); font-weight: 600; }
+    .lede { font-size: 19px; color: var(--text); }
+    .tag { font: 500 11px/1 var(--mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--link); margin: 0 0 18px; }
+    figure { margin: 28px 0; }
+    figure img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    figcaption { font-size: 13px; color: var(--muted); margin-top: 10px; }
+    .cent { display: flex; gap: 14px; flex-wrap: wrap; margin: 24px 0; }
+    .cent div { flex: 1 1 200px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+    .cent span { display: block; font: 500 11px/1 var(--mono); letter-spacing: 0.04em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+    .cent b { font: 500 32px/1 var(--mono); font-feature-settings: "tnum"; letter-spacing: -0.02em; }
+    .old b { color: var(--green); } .new b { color: var(--red); }
+    pre { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; overflow-x: auto;
+      font: 400 13px/1.6 var(--mono); color: var(--text); margin: 0 0 14px; }
+    pre .c { color: var(--muted); } pre .ok { color: var(--green); } pre .bad { color: var(--red); }
+    code { font-family: var(--mono); font-size: 0.9em; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; font-feature-settings: "tnum"; }
+    th { text-align: left; padding: 0 8px 8px; font: 500 11px/1 var(--mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+    td { padding: 10px 8px; border-top: 1px solid var(--line); vertical-align: top; color: var(--text-2); }
+    td:last-child { color: var(--text); font-family: var(--mono); font-size: 13px; }
+    ul { padding-left: 20px; color: var(--text-2); } li { margin-bottom: 6px; }
+    footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+<main>
+  <p class="tag">Open source · Apache-2.0 · runs on your machine</p>
+  <h1>Every line of the invoice is right. The total is one cent off.</h1>
+  <p class="lede">Parity rebuilds old business software as a modern web app and proves the new app does exactly what the old one did, field by field. The proof stays: replay it after any later change, made by a person or by an AI coding agent.</p>
+
+  <div class="cent">
+    <div class="old"><span>Virtual Salesman 3, 2006</span><b>69.21</b></div>
+    <div class="new"><span>A naive rebuild</span><b>69.22</b></div>
+  </div>
+  <p>The old Windows app adds the unrounded taxes and rounds once. A rebuild that adds the rounded amounts shows 69.22. Every unit test can pass and the business is still wrong. <strong>Parity catches it, names the field, and puts both screens side by side in a report you can sign.</strong></p>
+
+  <figure>
+    <img src="media/vs3-side-by-side.gif" width="1280" height="437" alt="Virtual Salesman 3 under Wine on the left, the web app Muse Code rebuilt from its recording on the right, the same invoice played on both">
+    <figcaption>Left: Virtual Salesman 3 recorded under Wine. Right: the web app Muse Code built from that recording. 8 of 8 fields equal, first try, $0.46.</figcaption>
+  </figure>
+
+  <h2>Get the cent in two minutes, no API key</h2>
+  <p>You need <a href="https://bun.sh">Bun</a> 1.3 or later and Chrome or Chromium. Nothing leaves your machine: the replay and the diff are plain code, and the browser can only reach the app under test.</p>
+<pre><span class="c"># clone and install</span>
+git clone https://github.com/GlamgarOnDiscord/parity-agent.git
+cd parity-agent
+bun install
+
+<span class="c"># the naive rebuild: the cent, field by field (exit code 1)</span>
+bun run prove
+<span class="bad">  ✗ Total: 69.21                   Total: $69.22</span>
+<span class="bad">NO PARITY: differences above.</span>
+
+<span class="c"># the corrected rebuild</span>
+bun run prove --fixed
+<span class="ok">PARITY: every field matches.</span>
+
+<span class="c"># the one-page report, written to runs/report.html</span>
+bun run report --proof fixtures/proofs/vs3-invoice.json --fixture</pre>
+  <p><code>prove</code> and <code>report</code> exit with code 1 on a difference, like a failing test, so the same command gates a pull request. The repository ships a GitHub Action that does exactly that.</p>
+
+  <figure>
+    <img src="media/report-one-cent.png" width="900" height="640" alt="The proof report: no parity, 1 difference, Total 69.21 before and 69.22 after, with both screens zoomed on the field">
+    <figcaption>The proof report: the verdict, each difference with both screens zoomed on the field, and a place to sign.</figcaption>
+  </figure>
+
+  <h2>How it works</h2>
+  <ul>
+    <li><strong>Record.</strong> Someone narrates their use of the old app. Muse Voice Transcribe reads the narration, Muse Spark and SAM 3.1 read the fields on every key frame.</li>
+    <li><strong>Explore.</strong> Muse Spark computer use drives the app alone, confined to it, and turns screens nobody recorded into replayable scenarios.</li>
+    <li><strong>Rules.</strong> Business rules in plain language with their evidence; formulas are checked against the recorded values by code; an expert accepts or rejects each in a click.</li>
+    <li><strong>Rebuild.</strong> Muse Code builds the web app from the accepted rules and repairs it difference by difference.</li>
+    <li><strong>Prove.</strong> Every scenario is replayed and compared field by field. <strong>AI never decides what "the same" means</strong>: matching and comparison are plain code.</li>
+  </ul>
+
+  <h2>Measured, not claimed</h2>
+  <table>
+    <thead><tr><th scope="col">What was run</th><th scope="col">Result</th></tr></thead>
+    <tbody>
+    <tr><td>Virtual Salesman 3 rebuilt by Muse Code from its recording</td><td>8 of 8 fields, first try, $0.46</td></tr>
+    <tr><td>FrontAccounting, an app nobody here wrote, invoice rebuilt and proved against the live app</td><td>65 of 65 fields</td></tr>
+    <tr><td>Fuzzing that rebuild against live FrontAccounting</td><td>3 differences the recording never showed, shrunk, closed by a $0.46 repair</td></tr>
+    <tr><td>Migration mode: customers, items and sales invoice on migrated records</td><td>28/28, 113/113, 258/258, $2.83</td></tr>
+    <tr><td>Proof of the example invoice, 40 proofs per driver</td><td>3.56 s median launched by Parity, 3.19 s attached; 0 flaky</td></tr>
+    </tbody>
+  </table>
+  <p>Method and every figure: <a href="https://github.com/GlamgarOnDiscord/parity-agent/blob/main/docs/benchmarks.md">benchmarks</a>. Threat model: <a href="https://github.com/GlamgarOnDiscord/parity-agent/blob/main/docs/threat-model.md">what Parity protects and what it does not</a>.</p>
+
+  <h2>Built with Meta models</h2>
+  <p>Muse Spark reads screens and writes rules, Muse Spark computer use explores, Muse Wonder settles contradictions, Muse Code builds and repairs, SAM 3.1 finds fields on desktop frames, Muse Voice Transcribe reads the narration. Every call goes through a send log with its cost and the bytes sent, and stops at the budget you set.</p>
+
+  <footer>
+    <a href="https://github.com/GlamgarOnDiscord/parity-agent">Source on GitHub</a> · Apache-2.0 · Built for the Meta Global AI Developer Hackathon 2026. This page loads no script and sets no cookie.
+  </footer>
+</main>
+</body>
+</html>
