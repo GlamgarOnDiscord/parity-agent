@@ -17,6 +17,7 @@ Rebuilds old business software as a web app and proves the new app behaves the s
 
 - `bun install`, `bun run dev` (http://127.0.0.1:8787)
 - Before committing: `bun test`, `bun run typecheck`, `bun run check` (`bun run format` to fix)
+- `bun run bench --runs 20`: replay time and flaky runs of the configured browser driver, no model call
 - `bun run models:check`: one real call per Meta model (needs `.env`, costs cents)
 
 ## Layout
@@ -29,5 +30,6 @@ Rebuilds old business software as a web app and proves the new app behaves the s
 - `src/rebuild/`, `src/fuzz/`, `src/explore/`: Muse Code rebuild and repair, differential fuzzing, exploration
 - `src/migrate/` + `templates/migrated-app/`: opt-in migration (inventory, records, per-screen builds)
 - `src/server/`: Hono app (rules, diff, migration board)
-- `docs/`: pitch, decisions, sprints (`docs/sprints.md`, milestones D2 to D10 on GitHub)
+- `docs/`: pitch, decisions, sprints (`docs/sprints.md`, milestones D2 to D10 on GitHub), benchmarks, threat model, video, X thread, submission
+- `site/`: the landing page, published by `.github/workflows/pages.yml` with the README media; no script, no tracking
 - `founder/`: product research (board, panel, competitors, plan)
