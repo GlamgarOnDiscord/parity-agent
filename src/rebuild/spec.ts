@@ -54,7 +54,7 @@ export function writeSpec(c: Capture, proof: Proof, rules: Rule[]): string {
   const lines: string[] = [
     "# SPEC",
     "",
-    `One screen: **${line(title)}**. Build it in \`public/\` following CONTRACT.md.`,
+    `One screen: ${code(title)}. Build it in \`public/\` following CONTRACT.md.`,
     "",
     "## Inputs (in this order)",
     "",
@@ -78,7 +78,7 @@ export function writeSpec(c: Capture, proof: Proof, rules: Rule[]): string {
   }
   if (lookups.size) {
     lines.push("", "## Reference data seen on screen", "");
-    for (const [k, vals] of lookups) lines.push(`- ${k} ${[...vals].map(code).join(", ")}`);
+    for (const [k, vals] of lookups) lines.push(`- ${code(k)}: ${[...vals].map(code).join(", ")}`);
   }
   lines.push("", "## Example that must match exactly", "");
   for (const s of steps) {

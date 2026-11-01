@@ -50,7 +50,7 @@ export interface SentCall {
 
 /** PARITY_BUDGET_USD as a number of dollars; unset means $20, anything that is not a plain number is refused. */
 export function budgetFrom(value: string | undefined): number {
-  if (value === undefined || value.trim() === "") return 20;
+  if (value === undefined || value === "") return 20;
   if (!/^\s*\d+(\.\d+)?\s*$/.test(value)) {
     throw new Error(`PARITY_BUDGET_USD must be a number of dollars, such as 20 or 35.5; got "${value}"`);
   }

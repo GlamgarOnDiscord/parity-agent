@@ -57,7 +57,7 @@ Parity fuzzes the rebuild against the live app.
 13
 00:01:45,000 --> 00:01:55,000
 It found three items the recording never showed, shrank each
-to a one-line invoice, and one repair closed them.
+to a one- or two-line invoice, and one repair closed them.
 
 14
 00:01:55,000 --> 00:02:05,000

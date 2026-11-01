@@ -15,11 +15,11 @@ Voice-over in plain sentences, about 150 words a minute. The numbers on screen a
 | 0:30-0:55 | Shot 3: `parity capture` on the narrated recording, then the review screen: a rule with its evidence frame, accepted in a click | "You record someone using the old app and talking. Muse Voice Transcribe reads the narration, Muse Spark and SAM read every field on every key frame, and the business rules come out in plain language, each with its evidence. The formulas are checked against the recorded values by code. An expert accepts them in a click." |
 | 0:55-1:15 | Shot 4: `parity rebuild`, Muse Code at work, then the GIF: legacy left, rebuilt right | "Muse Code builds the web app from the accepted rules. Parity replays the same invoice on it: eight of eight fields equal, first try, forty-six cents." |
 | 1:15-1:35 | Shot 5: `bun run prove` on the naive rebuild, the red Total line, then the one-page report | "And when a rebuild adds the rounded taxes instead of rounding once, Parity names the field: 69.21 before, 69.22 after. AI never decides what the same means. The comparison is plain code." |
-| 1:35-1:55 | Shot 6: FrontAccounting in Docker, `parity fuzz`, a difference shrunk to one line, then parity on 52 fresh cases | "On an app nobody here wrote, FrontAccounting, Parity fuzzes the rebuild against the live app. It found three items the recording never showed, shrank each to a one-line invoice, and one repair closed them." |
+| 1:35-1:55 | Shot 6: FrontAccounting in Docker, `parity fuzz`, a difference shrunk to one or two lines, then parity on 52 fresh cases | "On an app nobody here wrote, FrontAccounting, Parity fuzzes the rebuild against the live app. It found three items the recording never showed, shrank each to a one- or two-line invoice, and one repair closed them." |
 | 1:55-2:15 | Shot 7: a pull request that breaks the cent, its red check and the verdict comment; then Muse Code calling `prove` over MCP | "The proof stays. Every pull request is replayed by a GitHub Action, with no model call; a change that breaks the cent fails its check. And a coding agent can call Parity itself, through MCP, before it opens its pull request." |
 | 2:15-2:35 | Shot 8: Muse Spark computer use exploring FrontAccounting, Sales Types found; then the migration board, three screens proved | "Muse Spark computer use explores the app alone, confined to it, and turns the screens nobody recorded into tests. Migration mode goes screen by screen: customers, items and invoices, on records read through the old app's own forms, each one proved." |
 | 2:35-2:50 | Shot 9: the network cut, `prove` still passing; the send log with every call and its cost | "Nothing leaves your machine unless you send it. Cut the network: the proof still runs. Every model call is in the send log, with its cost. The whole hackathon cost eighteen dollars." |
-| 2:50-3:00 | Shot 10: the landing page, the repository, the logo | "Parity. Record it once, prove it forever. Open source." |
+| 2:50-2:59 | Shot 10: the landing page, the repository, the logo | "Parity. Record it once, prove it forever. Open source." |
 
 ## Shots and the command behind each
 
@@ -29,12 +29,12 @@ Record at 1920×1080, 30 fps, the terminal at 18 pt on the dark theme of [DESIGN
 |---|---|---|
 | 1 | `bun run report --proof fixtures/proofs/vs3-invoice.json --fixture`, open `runs/report.html`, zoom on the Total difference | none |
 | 2 | The original VS3 recording (kept outside the repository, [D3](decisions.md)) | none |
-| 3 | `bun run capture recordings/vs3.mp4`, then `bun run dev` and the review link printed at launch | about $0.30, or replay an existing run from `runs/` |
+| 3 | `bun run capture recordings/vs3.mp4 --sam "text field"` (SAM is off unless `--sam` names what to find), then `bun run dev` and the review link printed at launch | about $0.30, or replay an existing run from `runs/` |
 | 4 | `bun run rebuild runs/<vs3 run>`; the side-by-side from `bun run record:replay runs/<vs3 run>` | about $0.50, or reuse the D1 run |
 | 5 | `bun run prove`, then the report from shot 1 | none |
-| 6 | `docker compose -f sandboxes/frontaccounting/compose.yaml up -d --build`, then `bun run parity fuzz fixtures/fuzz/fa-invoice.json --proof <proof> --reference-url http://127.0.0.1:8080/ --app <app> --seed 1 --count 12` | none without `--repair` |
+| 6 | `docker compose -f sandboxes/frontaccounting/compose.yaml up -d --build`, then `bun run parity fuzz fixtures/fuzz/fa-invoice.json --proof <proof> --reference-url http://127.0.0.1:8080/ --app <app> --seed 1 --count 12` for the differences, the same with `--repair` for the fix, then seed 1 again and `--seed 2`, `--seed 3` for the fresh cases (52 in all) | $0.46 for the repair, the rest none |
 | 7 | A branch that changes `examples/invoice/index.html` to add rounded taxes, its pull request and the Parity check; `bun run parity mcp` attached to Muse Code calling `prove` | none for the check; a repair run if filmed live |
-| 8 | `bun run explore <proof> --url http://127.0.0.1:8080/ --steps 8 --max-usd 0.2`, then `/migrate/<run>` from `bun run dev` | about $0.10 |
+| 8 | `bun run explore <proof> --url http://127.0.0.1:8080/ --steps 8 --max-usd 0.2 --ack computer_action_requires_confirmation --save`, then `--from <exploration.json> --save-acknowledged` once its steps are read; then `/migrate/<run>` from `bun run dev` | about $0.10 |
 | 9 | `sudo unshare --net -- bash scripts/ci-offline.sh "$(command -v bun)" "$(id -un)"` on Linux (needs `ip`), then the send log of a run in the diff screen | none |
 | 10 | The GitHub Pages landing page (`site/index.html`) and the repository page | none |
 
@@ -53,6 +53,6 @@ The network-cut clip (shot 9) doubles as the short clip of D9: export it alone, 
 ffmpeg -i parity-edit.mov -c:v libx264 -preset slow -crf 20 -pix_fmt yuv420p -c:a aac -b:a 160k -movflags +faststart -t 179 parity-demo.mp4
 ```
 
-`-t 179` cuts at 2:59 whatever the edit says; check the length with `ffprobe -v error -show_entries format=duration -of csv=p=0 parity-demo.mp4`.
+`-t 179` cuts at 2:59 whatever the edit says, which is why the last shot is timed to end there; check the length with `ffprobe -v error -show_entries format=duration -of csv=p=0 parity-demo.mp4`.
 
-The X cut: the first 0:12 and shot 5, 30 seconds, square 1080×1080, captions burnt in.
+The X cut: the first 0:12 and shot 5 trimmed to 18 s, 30 seconds, square 1080×1080, captions burnt in.

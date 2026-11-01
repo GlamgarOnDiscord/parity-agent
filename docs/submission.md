@@ -54,6 +54,8 @@ All of it, from Oct 26 after the kickoff; see the commit history and [sprints.md
 git clone https://github.com/GlamgarOnDiscord/parity-agent.git && cd parity-agent && bun install && bun run prove
 ```
 
+`bun run prove` exits with code 1 on purpose: it shows the one-cent difference of the naive rebuild, the way a failing test would. `bun run prove --fixed` shows the corrected rebuild at parity and exits 0.
+
 Needs Bun 1.3 or later and Chrome or Chromium; no API key.
 
 **Bonus categories**

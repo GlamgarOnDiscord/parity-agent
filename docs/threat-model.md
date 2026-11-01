@@ -38,23 +38,23 @@ Out of scope: a local user or process with the operator's own rights (it can rea
 ### The local server answers only its own pages
 
 - A Host allowlist (DNS rebinding) and an Origin check on every request; `/api/*` needs the bearer token or the session cookie; POSTs must be JSON, which a cross-site form cannot send (`src/server/app.ts`, tests `local API`).
-- The launch key works once and becomes an HttpOnly, SameSite=Strict cookie, now limited to 12 hours. Run and evidence names are checked by pattern and by containment.
-- Every page escapes what it prints with one shared escaper (`src/server/ui.ts`); the report accepts PNG data URLs only (`src/report/report.ts`).
+- The launch key works once and becomes an HttpOnly, SameSite=Strict cookie, now limited to 12 hours, checked by the server as well as by the browser. Run and evidence names are checked by pattern and by containment.
+- Every server page escapes what it prints with one shared escaper (`src/server/ui.ts`); the standalone report has its own escaper and accepts PNG data URLs only (`src/report/report.ts`).
 
 ### Text from the app stays data
 
-- **In prompts.** Labels and values go into Muse Code prompts through `code()` and `line()` (`src/models/prompt-text.ts`): one line, inside a code span whose fence is longer than any backtick in the value, so a value cannot close its span and write instructions after it. Applied to the spec, the repair prompt, the fuzz table and the migration prompt (test `prompt text`). New in this pass.
+- **In prompts.** Every label, value, title, selector, row group and recorded action read from the app goes into Muse Code prompts through `code()` (`src/models/prompt-text.ts`): one line, inside a code span whose fence is longer than any backtick in the value, so a value cannot close its span and write instructions after it. Applied to the spec, the repair prompt, the fuzz table and the migration prompt (test `prompt text`). New in this pass. The rules' own titles and statements stay prose on one line (`line()`): they are written by Muse Spark and accepted by the expert before any build. A code span marks text as data; it does not make a model ignore it, which is why the agent also never gets Parity's secrets (below).
 - **In pull-request comments.** `cell()` keeps a value on one line and out of table, HTML and link syntax, and now also out of mentions, issue references and bare links (`src/report/summary.ts`, test `pull-request summary`). New in this pass.
 - **In exported tests.** Playwright code is built with `JSON.stringify` and every JavaScript line terminator is stripped (`src/export/playwright.ts`).
 - **In speech.** The narration text reaches the speech synthesizer through an environment variable, never a command line (`src/capture/speak.ts`).
 
 ### The coding agent works with less than Parity has
 
-- Muse Code reads its prompt from a file and its key from stdin, never from argv. It now gets a minimal environment: paths, home, temp, locale, proxy and certificates, and the browser settings its Parity MCP server needs. API keys, the server token and CI tokens are not in it (`museEnv`, test `Muse Code environment`). New in this pass; not yet exercised on a paid run.
+- Muse Code reads its prompt from a file and its key from stdin, never from argv. It now gets a minimal environment: paths, home, temp, locale, proxy and certificates, and the browser settings its Parity MCP server needs. API keys, the server token, CI tokens and any CDP address are not in it, so the Parity MCP server it starts always launches its own confined Chrome (`museEnv`, test `Muse Code environment`). New in this pass; not yet exercised on a paid run.
 - The model is always passed explicitly and the run's usage report is checked: a Contributor model fails the run.
 - The workspace is staged back file by file: only regular, non-linked web files through checked descriptors; migration never writes through a link Muse Code left and restores the files it owns after each run (`src/rebuild/rebuild.ts`, `src/migrate/migrate.ts`).
 - The staged app server runs with `PATH` and `PORT` only.
-- The MCP tools are read-only. Paths must stay inside the project, now checked on the real path so a link cannot lead out (test `MCP paths`); apps must be http(s) on loopback; a repair pins the server to one proof and one app.
+- The MCP tools never write project files. `prove` replays the proof's clicks and fills on the app it is given, so that app should be a disposable candidate (the rebuild or a sandbox), never production. Paths must stay inside the project, now checked and opened on the real path so a link cannot lead out (test `MCP paths`); apps must be http(s) on loopback; a repair pins the server to one proof and one app.
 
 ### The GitHub Action
 
@@ -67,7 +67,7 @@ Out of scope: a local user or process with the operator's own rights (it can rea
 |---|---|---|
 | A Muse Code run can spend past the budget | its cost is known only when it ends | max steps and a 15-minute timeout per run; migration estimates before each screen and stops before crossing the budget |
 | Chrome's debugging port is open on 127.0.0.1 during a replay | Bun's WebSocket is the transport that works on Windows ([D2](decisions.md)); a pipe transport is the fix | a random port, a throwaway profile, the browser closed after each run; only local processes can reach it |
-| The session cookie is sent to other services on 127.0.0.1 | cookies ignore ports | a new session per launch, 12 hours at most, HttpOnly; the Origin check stops cross-port requests from pages |
+| The session cookie is sent to other services on 127.0.0.1 | cookies ignore ports | a new session per launch, refused by the server after 12 hours, HttpOnly; the Origin check stops cross-port requests from pages |
 | The unpinned MCP server can prove any local port | agents prove apps on whatever port they started | loopback only, read-only replay through the confined browser; repairs use the pinned mode |
 | A same-repository pull request runs its own code in the `proof` job with `pull-requests: write` | that is what proving a change means | only collaborators get a write token; forks get a read-only one |
 | Muse Code itself may read files outside its workspace | it is the vendor's agent, with its own sandbox | it never sees Parity's keys; nothing it writes outside `public/` and `data/` is staged |

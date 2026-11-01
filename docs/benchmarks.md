@@ -136,7 +136,7 @@ Total $2.83. Two lessons. A form that shows one record can be rebuilt from its d
 
 ## Browser drivers, replay time and flakiness (2026-11-01)
 
-`bun run bench --runs 20` in a Linux container (4 vCPU, 16 GB, Bun 1.4.4, Chrome for Testing 153, headless). Each run opens the driver, proves the VS3 proof on the one-cent fixture (a difference expected) and on the fixed one (parity expected), then closes it: 40 proofs per driver. A proof replays each scenario twice, so one proof is two replays plus the diff. No model call.
+`bun run bench --runs 20` in a Linux container (4 vCPU, 16 GB, Bun 1.4.4, Chrome for Testing 153, headless). Each of the 20 iterations proves the VS3 proof twice, on the one-cent fixture (a difference expected) and on the fixed one (parity expected), and opens and closes the driver around each proof: 40 proofs and 40 driver sessions per driver. Median and p90 are nearest-rank values (the 20th and the 36th of 40). A proof replays each scenario twice, so one proof is two replays plus the diff. No model call.
 
 | driver (`PARITY_BROWSER`) | proofs | median | p90 | range | flaky |
 |---|---|---|---|---|---|
@@ -171,4 +171,4 @@ From the runs documented above; the send log of each run has the call-by-call de
 | code | Muse Code | 10 builds and repairs, VS3 and FrontAccounting | $13.67 | parity at the first build on 3 screens of 5 (VS3 invoice, FrontAccounting customers, the invoice ported to the template); the D3 invoice after 3 iterations and a repair, the items after a fix in Parity and one repair; every fuzz difference closed |
 | open | Muse Spark Open on Baseten | none | $0 | not verified: no key |
 
-Muse Code is 90 % of the spend, and within it the self-checking rebuild loop (D3, $6.73) is half: targeted repairs with the difference as evidence cost $0.30 to $0.50 each.
+Muse Code is 90 % of the spend itemized here (76 % of the $18.07 ledger total, which includes the reruns), and within it the self-checking rebuild loop (D3, $6.73) is half: targeted repairs with the difference as evidence cost $0.30 to $0.50 each.

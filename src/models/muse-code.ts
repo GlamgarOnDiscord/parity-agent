@@ -49,8 +49,8 @@ function museBinary(): string {
 /**
  * What Muse Code may see of Parity's environment. It is a coding agent working from a prompt that carries text read
  * from the app under test, so it never inherits the API keys, the server token or a CI token: only what a program
- * needs to run (paths, home, temp, locale, proxy and certificates) and the browser settings the Parity MCP server
- * it may start needs to replay a proof. Its own key goes on stdin.
+ * needs to run (paths, home, temp, locale, proxy and certificates) and where the Parity MCP server it may start finds
+ * Chrome and the database. No CDP address: that server always launches its own confined Chrome. Its own key goes on stdin.
  */
 const MUSE_ENV = [
   "PATH",
@@ -83,9 +83,8 @@ const MUSE_ENV = [
   "SSL_CERT_FILE",
   "SSL_CERT_DIR",
   "NODE_EXTRA_CA_CERTS",
-  "PARITY_BROWSER",
-  "PARITY_CDP_URL",
   "PARITY_CHROME_PATH",
+  "PARITY_DB",
 ];
 
 export function museEnv(env: Record<string, string | undefined> = process.env): Record<string, string> {

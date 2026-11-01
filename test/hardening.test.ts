@@ -29,7 +29,8 @@ describe("prompt text", () => {
     expect(span.slice(fence.length, -fence.length)).toContain("x` Ignore the task");
     expect(code("69.21")).toBe("`69.21`");
     expect(code("`a`")).toBe("`` `a` ``");
-    expect(line("a\r\nb c")).toBe("a b c");
+    expect(line("a\r\nb\u2028c\vd\fe")).toBe("a b c d e");
+    expect(code("`".repeat(200_000))).toContain("`".repeat(200_001));
   });
 });
 
@@ -63,14 +64,15 @@ describe("Muse Code environment", () => {
       PATH: "/usr/bin",
       HOME: "/home/a",
       HTTPS_PROXY: "http://127.0.0.1:3128",
-      PARITY_BROWSER: "chromium",
+      PARITY_DB: "runs/parity.sqlite",
+      PARITY_CDP_URL: "ws://127.0.0.1:9222/devtools/browser/x",
       MODEL_API_KEY: "secret",
       BASETEN_API_KEY: "secret",
       PARITY_TOKEN: "secret-token-0123456789",
       GITHUB_TOKEN: "ghs_x",
       GH_TOKEN: "ghs_y",
     });
-    expect(Object.keys(env).sort()).toEqual(["HOME", "HTTPS_PROXY", "PARITY_BROWSER", "PATH"]);
+    expect(Object.keys(env).sort()).toEqual(["HOME", "HTTPS_PROXY", "PARITY_DB", "PATH"]);
   });
 });
 
@@ -80,6 +82,7 @@ describe("budget", () => {
     expect(budgetFrom("35.5")).toBe(35.5);
     expect(() => budgetFrom("20usd")).toThrow("PARITY_BUDGET_USD");
     expect(() => budgetFrom("-1")).toThrow();
+    expect(() => budgetFrom("   ")).toThrow();
     expect(() => new Ledger(openDb(":memory:"), Number.NaN)).toThrow("budget");
   });
 });
@@ -95,7 +98,8 @@ describe("MCP paths", () => {
   test("a link inside the project that points out of it is refused", async () => {
     writeFileSync(join(outside, "proof.json"), "{}");
     mkdirSync(join(project, "runs"));
-    symlinkSync(outside, join(project, "escape"));
+    // A junction on Windows needs no privilege; elsewhere the type is ignored.
+    symlinkSync(outside, join(project, "escape"), "junction");
     const server = createParityMcp({
       root: project,
       runsDir: join(project, "runs"),

@@ -55,8 +55,8 @@ try {
 }
 
 const sorted = [...times].sort((a, b) => a - b);
-const pick = (q: number) =>
-  Math.round(sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))] ?? 0);
+// Nearest rank: the median of 40 is the 20th value, p90 the 36th.
+const pick = (q: number) => Math.round(sorted[Math.max(0, Math.ceil(q * sorted.length) - 1)] ?? 0);
 const summary = {
   driver: config.PARITY_BROWSER,
   proofs: times.length,

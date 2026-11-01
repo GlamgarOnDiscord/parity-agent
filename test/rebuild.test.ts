@@ -78,7 +78,7 @@ describe("proofFromCapture", () => {
     ]);
     expect(spec).toContain("`Total = round({Subtotal} * 1.05 * 1.09975, 2)`");
     expect(spec).toContain("`Total` = `$69.21`");
-    expect(spec).toContain('Item "HW001" -> Unit price `$19.98`');
+    expect(spec).toContain('`Item "HW001" -> Unit price`: `$19.98`');
     expect(spec).not.toContain('Quantity "3" -> Unit price');
   });
 });
@@ -118,7 +118,7 @@ describe("repair prompt", () => {
       { volatile: [], equal: false, checkpoints: [{ scenario: "inv-fuzz-a1", step: 3, screen: "s", diff }] },
       proof,
     );
-    expect(prompt).toContain("after: Item Code = 202; click Add Item");
-    expect(prompt).toContain("`Item Description` (line row-1): the legacy app shows `Maintenance`");
+    expect(prompt).toContain("after: `Item Code = 202`; `click Add Item`");
+    expect(prompt).toContain("`Item Description` (line `row-1`): the legacy app shows `Maintenance`");
   });
 });

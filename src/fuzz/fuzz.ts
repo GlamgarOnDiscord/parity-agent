@@ -1,7 +1,7 @@
 import { diffScreens, type ScreenDiff } from "../diff/diff";
 import type { AppDriver } from "../drivers/types";
 import { matchScreens } from "../fields/match";
-import { code, line } from "../models/prompt-text";
+import { code } from "../models/prompt-text";
 import type { Adapter, Checkpoint, Proof } from "../proof/schema";
 import { replay } from "../replay/replay";
 import {
@@ -168,7 +168,8 @@ export function addFailures(
   return { proof: next, added };
 }
 
-const cell = (v: string) => line(v).replaceAll("|", "\\|").trim();
+// Each cell is a code span, its pipes escaped so the table keeps its columns.
+const cell = (v: string) => code(v.trim()).replaceAll("|", "\\|");
 const NUMBER = /^-?[\d\s.,]*\d$/;
 
 /**

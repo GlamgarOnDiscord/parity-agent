@@ -42,7 +42,8 @@ export function createParityMcp(o: ParityMcpOptions) {
     const full = resolve(root, p);
     const real = existsSync(full) ? realpathSync(full) : full;
     const within = (x: string, r: string) => x === r || x.startsWith(r + sep);
-    return within(full, root) && within(real, realRoot) ? full : null;
+    // The real path is what gets opened, so a link swapped after this check cannot redirect it.
+    return within(full, root) && within(real, realRoot) ? real : null;
   };
   const server = new McpServer({ name: "parity", version: "0.2.0" });
 

@@ -1,6 +1,6 @@
 # X thread: the one cent
 
-Drafted for the submission day (Nov 4, 17:00 Paris, [founder/launch.md](../founder/launch.md)). Each post under 280 characters; every number is in [benchmarks.md](benchmarks.md). The founder posts it from their own account; nothing here is posted automatically.
+Drafted for the submission day (Nov 4, 17:00 Paris, [founder/launch.md](../founder/launch.md)). Each post under 280 characters; every number is measured: the runs are in [benchmarks.md](benchmarks.md) and the README, and the spend ($18.07 as logged on Oct 30) in [sprints.md](sprints.md). The founder posts it from their own account; nothing here is posted automatically.
 
 **1/** (with the 30-second square cut of the video)
 
@@ -34,7 +34,7 @@ Matching and comparison are plain code. AI captures, proposes and explains. Code
 
 **6/**
 
-Not a hand-picked demo: on FrontAccounting, an app I did not write, Parity fuzzed the rebuild against the live app, found 3 items the recording never showed, shrank each to a one-line invoice, and one $0.46 repair closed them. 52 fresh cases at parity.
+Not a hand-picked demo: on FrontAccounting, an app I did not write, Parity fuzzed the rebuild against the live app, found 3 items the recording never showed, shrank each to a one- or two-line invoice, and one $0.46 repair closed them. 52 fresh cases at parity.
 
 **7/**
 
