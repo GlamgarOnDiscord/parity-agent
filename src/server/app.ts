@@ -75,6 +75,10 @@ export function createApp(ledger: Ledger, options: AppOptions) {
   });
   // Browser sessions: a one-time launch key, printed at startup, is exchanged for an HttpOnly cookie.
   const session = crypto.randomUUID();
+  const SESSION_HOURS = 12;
+  let sessionUntil = 0;
+  // Checked here, not only by the browser: a cookie copied by another local service stops working with it.
+  const validSession = (value: string | undefined) => value === session && Date.now() < sessionUntil;
   let launchKey: string | null = options.launchKey ?? null;
   const SESSION_COOKIE = "parity_session";
 
@@ -82,14 +86,21 @@ export function createApp(ledger: Ledger, options: AppOptions) {
     if (!launchKey || c.req.query("k") !== launchKey)
       return c.text("This link was already used or is wrong.", 403);
     launchKey = null;
-    setCookie(c, SESSION_COOKIE, session, { httpOnly: true, sameSite: "Strict", path: "/" });
+    sessionUntil = Date.now() + SESSION_HOURS * 3600_000;
+    // Cookies ignore ports, so other local services see it too: it lasts a working day, not forever.
+    setCookie(c, SESSION_COOKIE, session, {
+      httpOnly: true,
+      sameSite: "Strict",
+      path: "/",
+      maxAge: 12 * 3600,
+    });
     const run = c.req.query("run");
     return c.redirect(run && RUN.test(run) ? `/review/${run}` : "/");
   });
 
   app.use("/api/*", async (c, next) => {
     const bearer = c.req.header("authorization") === `Bearer ${options.token}`;
-    const cookie = getCookie(c, SESSION_COOKIE) === session;
+    const cookie = validSession(getCookie(c, SESSION_COOKIE));
     if (!bearer && !cookie) return c.json({ error: "unauthorized" }, 401);
     if (c.req.method === "POST" && !c.req.header("content-type")?.startsWith("application/json")) {
       return c.json({ error: "expected application/json" }, 415);
@@ -111,7 +122,7 @@ export function createApp(ledger: Ledger, options: AppOptions) {
   app.get("/review/:run", (c) => {
     const run = c.req.param("run");
     if (!RUN.test(run)) return c.text("bad run", 400);
-    if (getCookie(c, SESSION_COOKIE) !== session)
+    if (!validSession(getCookie(c, SESSION_COOKIE)))
       return c.text("Open the link printed by the server first.", 401);
     return c.html(reviewPage(run));
   });
@@ -119,7 +130,7 @@ export function createApp(ledger: Ledger, options: AppOptions) {
   app.get("/migrate/:run", async (c) => {
     const run = c.req.param("run");
     if (!RUN.test(run)) return c.text("bad run", 400);
-    if (getCookie(c, SESSION_COOKIE) !== session)
+    if (!validSession(getCookie(c, SESSION_COOKIE)))
       return c.text("Open the link printed by the server first.", 401);
     const f = Bun.file(join(resolve(options.runsDir, run), "board.json"));
     const board = BoardSchema.safeParse((await f.exists()) ? await f.json().catch(() => null) : null);
@@ -130,7 +141,7 @@ export function createApp(ledger: Ledger, options: AppOptions) {
   app.get("/diff/:run", async (c) => {
     const run = c.req.param("run");
     if (!RUN.test(run)) return c.text("bad run", 400);
-    if (getCookie(c, SESSION_COOKIE) !== session)
+    if (!validSession(getCookie(c, SESSION_COOKIE)))
       return c.text("Open the link printed by the server first.", 401);
     const dir = resolve(options.runsDir, run);
     const json = async <T>(name: string): Promise<T | undefined> => {

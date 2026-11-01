@@ -296,6 +296,8 @@ class BrowserDriver implements AppDriver {
   }
 
   async close() {
+    // A browser Parity did not launch outlives the driver: leave it without the context this run opened.
+    await this.context.close().catch(() => {});
     await this.browser.disconnect().catch(() => {});
     await this.cleanup();
   }

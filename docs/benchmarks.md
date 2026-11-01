@@ -133,3 +133,42 @@ D6 spend so far: $0.91.
 
 Total $2.83. Two lessons. A form that shows one record can be rebuilt from its data without any model: a ten-line generic screen proved the customers too; Muse Code earns its cost on layout and on screens with logic. And a fault on Parity's side (how a record is picked) cost three paid runs before the replay error was read; repairs now stop at the budget, and the board shows the spend per screen.
 
+
+## Browser drivers, replay time and flakiness (2026-11-01)
+
+`bun run bench --runs 20` in a Linux container (4 vCPU, 16 GB, Bun 1.4.4, Chrome for Testing 153, headless). Each of the 20 iterations proves the VS3 proof twice, on the one-cent fixture (a difference expected) and on the fixed one (parity expected), and opens and closes the driver around each proof: 40 proofs and 40 driver sessions per driver. Median and p90 are nearest-rank values (the 20th and the 36th of 40). A proof replays each scenario twice, so one proof is two replays plus the diff. No model call.
+
+| driver (`PARITY_BROWSER`) | proofs | median | p90 | range | flaky |
+|---|---|---|---|---|---|
+| `chromium`: Chrome launched by Parity, throwaway profile, egress guard | 40 | 3.56 s | 3.68 s | 3.47 to 3.73 s | 0 |
+| `cdp`: the same Chrome already running, attached over CDP | 40 | 3.19 s | 3.26 s | 3.10 to 3.32 s | 0 |
+| `lightpanda` | not measured | | | | |
+
+What it says: launching a fresh confined Chrome costs about 0.4 s per proof, a tenth of it; the rest is the replay itself, so a faster engine would have to replay faster, not start faster. Since the review of #113 the driver closes its context before it disconnects, so the attached browser is left without the pages of the runs; the figures above were measured with that fix. The default stays `chromium`, because only a browser Parity launches gets the egress guard: during the `cdp` run the unconfined Chrome tried to reach `mtalk.google.com` on its own, which the guarded one cannot.
+
+Lightpanda was not measured: running a downloaded nightly binary was not allowed in that container. To measure it where it is: `lightpanda serve --host 127.0.0.1 --port 9222`, then `PARITY_BROWSER=lightpanda PARITY_CDP_URL=ws://127.0.0.1:9222 bun run bench --runs 20`.
+
+Earlier figure for comparison: on the Windows laptop one proof of the same fixture took about 1 s (README), the FrontAccounting invoice 3.3 s per run.
+
+## Noise per app
+
+| app | fields compared | noisy | what the noise is |
+|---|---|---|---|
+| Virtual Salesman 3 (reference from the recording) and its rebuild | 10 | 2 | `Printed at` and `Reference`, a timestamp and an invoice number |
+| FrontAccounting 2.4.20 invoice, 5 live replays | 63 | 4 | the next invoice number and the pre-filled entry row |
+| FrontAccounting invoice, 3 live replays through the D3 adapter | 65 | 0 | the entry row is grouped apart by the page reader |
+
+## Model cost and accuracy per role
+
+From the runs documented above; the send log of each run has the call-by-call detail. The ledger total over the hackathon was $18.07 on 2026-10-30; what is not listed here went to reruns while Parity itself was being fixed.
+
+| role | model | documented runs | spend | accuracy measured |
+|---|---|---|---|---|
+| models check | all five | 5 calls | $0.04 | every format verified ([meta-api.md](meta-api.md)) |
+| transcribe, segment, structured (capture and rules) | Muse Voice Transcribe, SAM 3.1, Muse Spark | VS3 capture and rules with reruns; FrontAccounting capture | $1.12, $0.10 | FrontAccounting: 5 of 6 hand-observed rules, no wrong rule; VS3: 6 rules, 5 formulas checked by code, no contradiction |
+| hard | Muse Wonder | called on contradictions only; none in these runs | in the above | none to settle |
+| computer | Muse Spark computer use | 2 explorations, 20 steps | $0.22 | 5 screens the recording never showed; 1 turned into a scenario at parity on FrontAccounting |
+| code | Muse Code | 10 builds and repairs, VS3 and FrontAccounting | $13.67 | parity at the first build on 3 screens of 5 (VS3 invoice, FrontAccounting customers, the invoice ported to the template); the D3 invoice after 3 iterations and a repair, the items after a fix in Parity and one repair; every fuzz difference closed |
+| open | Muse Spark Open on Baseten | none | $0 | not verified: no key |
+
+Muse Code is 90 % of the spend itemized here (76 % of the $18.07 ledger total, which includes the reruns), and within it the self-checking rebuild loop (D3, $6.73) is half: targeted repairs with the difference as evidence cost $0.30 to $0.50 each.

@@ -1,7 +1,15 @@
 import type { ProveResult } from "../replay/prove";
 
 /** Text from an app goes into Markdown: keep it on one line and out of table and link syntax. */
-const cell = (s: string) => s.replace(/[\r\n\u2028\u2029]+/g, " ").replace(/[|`*_[\]<>\\]/g, (c) => `\\${c}`);
+const cell = (s: string) =>
+  s
+    .replace(/[\r\n\u2028\u2029]+/g, " ")
+    .replace(/[|`*_[\]<>\\]/g, (c) => `\\${c}`)
+    // GitHub turns @name into a mention, #12 into an issue link and bare addresses into links: a zero-width
+    // space after the trigger keeps the text as it was shown and inert.
+    .replace(/([@#])(?=\w)/g, "$1\u200b")
+    .replace(/:\/\//g, ":\u200b//")
+    .replace(/\bwww\./gi, (w) => `${w.slice(0, 3)}\u200b.`);
 
 /**
  * The verdict in Markdown, for a pull request comment or a CI step summary: the line a reviewer reads first, then

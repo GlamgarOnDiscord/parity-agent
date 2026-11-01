@@ -23,6 +23,7 @@
     "record:reference": "bun scripts/record-reference.ts",
     "explore": "bun scripts/explore.ts",
     "report": "bun scripts/report.ts",
+    "bench": "bun scripts/bench-drivers.ts",
     "sample:recording": "bun scripts/make-sample-recording.ts",
     "parity": "bun bin/parity.ts"
   },
