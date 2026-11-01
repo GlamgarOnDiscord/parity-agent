@@ -20,6 +20,7 @@ import { requireKey } from "../config";
 import { openBrowser } from "../drivers";
 import type { Ledger } from "../models/ledger";
 import { runMuseCode } from "../models/muse-code";
+import { code, line } from "../models/prompt-text";
 import type { Proof } from "../proof/schema";
 import { type ProveResult, prove } from "../replay/prove";
 
@@ -170,6 +171,7 @@ function inputsBefore(proof: Proof, scenarioId: string, step: number): string {
   return (scenario?.steps.slice(0, step) ?? [])
     .map((s) => (s.do === "fill" ? `${s.field} = ${s.value}` : s.do === "click" ? `click ${s.target}` : null))
     .filter(Boolean)
+    .map((s) => line(s as string))
     .join("; ");
 }
 
@@ -183,17 +185,17 @@ export function repairPrompt(result: ProveResult, proof: Proof): string {
     if (different.length === 0 && c.diff.missingInRebuilt.length === 0) continue;
     lines.push(
       "",
-      `Scenario \`${c.scenario}\`, after: ${inputsBefore(proof, c.scenario, c.step) || "opening"}`,
+      `Scenario ${code(c.scenario)}, after: ${inputsBefore(proof, c.scenario, c.step) || "opening"}`,
     );
     for (const f of different) {
       const at = f.legacy.group ? ` (line ${f.legacy.group})` : "";
       lines.push(
-        `- \`${f.legacy.label}\`${at}: the legacy app shows \`${f.legacy.value}\`, the rebuilt app shows \`${f.rebuilt.value}\``,
+        `- ${code(f.legacy.label)}${at}: the legacy app shows ${code(f.legacy.value)}, the rebuilt app shows ${code(f.rebuilt.value)}`,
       );
     }
     for (const f of c.diff.missingInRebuilt) {
       lines.push(
-        `- \`${f.label}\` (legacy value \`${f.value}\`) was not found on the rebuilt screen: check its label`,
+        `- ${code(f.label)} (legacy value ${code(f.value)}) was not found on the rebuilt screen: check its label`,
       );
     }
   }

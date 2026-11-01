@@ -82,7 +82,13 @@ export function createApp(ledger: Ledger, options: AppOptions) {
     if (!launchKey || c.req.query("k") !== launchKey)
       return c.text("This link was already used or is wrong.", 403);
     launchKey = null;
-    setCookie(c, SESSION_COOKIE, session, { httpOnly: true, sameSite: "Strict", path: "/" });
+    // Cookies ignore ports, so other local services see it too: it lasts a working day, not forever.
+    setCookie(c, SESSION_COOKIE, session, {
+      httpOnly: true,
+      sameSite: "Strict",
+      path: "/",
+      maxAge: 12 * 3600,
+    });
     const run = c.req.query("run");
     return c.redirect(run && RUN.test(run) ? `/review/${run}` : "/");
   });

@@ -46,6 +46,57 @@ function museBinary(): string {
   throw new Error("Muse Code not found; install it or set PARITY_MUSE_PATH to the executable");
 }
 
+/**
+ * What Muse Code may see of Parity's environment. It is a coding agent working from a prompt that carries text read
+ * from the app under test, so it never inherits the API keys, the server token or a CI token: only what a program
+ * needs to run (paths, home, temp, locale, proxy and certificates) and the browser settings the Parity MCP server
+ * it may start needs to replay a proof. Its own key goes on stdin.
+ */
+const MUSE_ENV = [
+  "PATH",
+  "Path",
+  "PATHEXT",
+  "HOME",
+  "USERPROFILE",
+  "APPDATA",
+  "LOCALAPPDATA",
+  "XDG_CONFIG_HOME",
+  "XDG_DATA_HOME",
+  "XDG_CACHE_HOME",
+  "XDG_RUNTIME_DIR",
+  "TMPDIR",
+  "TMP",
+  "TEMP",
+  "SystemRoot",
+  "SYSTEMROOT",
+  "ComSpec",
+  "windir",
+  "LANG",
+  "LC_ALL",
+  "TERM",
+  "HTTPS_PROXY",
+  "https_proxy",
+  "HTTP_PROXY",
+  "http_proxy",
+  "NO_PROXY",
+  "no_proxy",
+  "SSL_CERT_FILE",
+  "SSL_CERT_DIR",
+  "NODE_EXTRA_CA_CERTS",
+  "PARITY_BROWSER",
+  "PARITY_CDP_URL",
+  "PARITY_CHROME_PATH",
+];
+
+export function museEnv(env: Record<string, string | undefined> = process.env): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const key of MUSE_ENV) {
+    const value = env[key];
+    if (value !== undefined) out[key] = value;
+  }
+  return out;
+}
+
 interface UsageModel {
   model: string;
   input_tokens: number;
@@ -95,7 +146,7 @@ export async function runMuseCode(options: MuseCodeOptions, ledger: Ledger): Pro
       "--prompt-file",
       promptFile,
     ],
-    { stdin: "pipe", stdout: "pipe", stderr: "pipe" },
+    { stdin: "pipe", stdout: "pipe", stderr: "pipe", env: museEnv() },
   );
   proc.stdin.write(options.apiKey);
   await proc.stdin.end();

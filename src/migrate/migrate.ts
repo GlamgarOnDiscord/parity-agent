@@ -4,6 +4,7 @@ import { z } from "zod";
 import { type Config, requireKey } from "../config";
 import type { Ledger } from "../models/ledger";
 import { runMuseCode } from "../models/muse-code";
+import { code, line } from "../models/prompt-text";
 import { type Proof, ProofSchema, StepSchema } from "../proof/schema";
 import { proveApp, repairPrompt } from "../rebuild/rebuild";
 import type { ProveResult } from "../replay/prove";
@@ -179,9 +180,10 @@ function sampleOf(proof: Proof, max = 2): string {
               ? `${s.field} = ${s.value}`
               : `click ${s.target}`,
         )
+        .map(line)
         .join("; ");
       const fields = c.screen.fields
-        .map((f) => `  - \`${f.label}\`${f.group ? ` (line ${f.group})` : ""}: \`${f.value}\``)
+        .map((f) => `  - ${code(f.label)}${f.group ? ` (line ${f.group})` : ""}: ${code(f.value)}`)
         .join("\n");
       return `After: ${how}\n${fields}`;
     })
@@ -194,7 +196,7 @@ export function buildPrompt(m: Migration, screen: MigrationScreen, proof: Proof,
     .map((id) => {
       const e = entities.find((x) => x.id === id);
       return e
-        ? `- \`${id}\`: ${e.records.length} records in data/${id}.json, picked by "${e.selector}"; fields: ${e.fields.slice(0, 30).join(", ")}`
+        ? `- ${code(id)}: ${e.records.length} records in data/${id}.json, picked by "${line(e.selector)}"; fields: ${line(e.fields.slice(0, 30).join(", "))}`
         : "";
     })
     .filter(Boolean)
@@ -203,12 +205,12 @@ export function buildPrompt(m: Migration, screen: MigrationScreen, proof: Proof,
   const lines = [
     `You are migrating one screen of ${m.title} into the modern app in this folder. Read CONTRACT.md, then the kit in public/app.js. Write only public/screens/${screen.id}.js.`,
     "",
-    `Screen \`${screen.id}\`: "${screen.title}".`,
+    `Screen ${code(screen.id)}: "${line(screen.title)}".`,
     entity
-      ? `It shows one record of \`${entity.id}\` at a time, picked with the list "${entity.selector}" whose choices are the records' keys${
+      ? `It shows one record of ${code(entity.id)} at a time, picked with the list "${line(entity.selector)}" whose choices are the records' keys${
           entity.param ? `; the address may carry ?${entity.param}=<value>, which opens that record` : ""
         }. Picking a record shows its fields, read from the data, never from code.`
-      : `Legacy address: \`${screen.path}\`.`,
+      : `Legacy address: ${code(screen.path ?? "")}.`,
     "",
     "Migrated data available to this screen:",
     data || "- none",
@@ -222,7 +224,7 @@ export function buildPrompt(m: Migration, screen: MigrationScreen, proof: Proof,
   if (screen.port) {
     lines.push(
       "",
-      `Port the logic of \`${screen.port}\` (copied next to this screen as reference/${screen.id}.js): its computations,`,
+      `Port the logic of ${code(screen.port)} (copied next to this screen as reference/${screen.id}.js): its computations,`,
       "rounding and labels are proven. Replace any catalogue, price or description written in it by the migrated data.",
     );
   }

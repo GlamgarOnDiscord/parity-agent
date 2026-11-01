@@ -1,6 +1,7 @@
 import { diffScreens, type ScreenDiff } from "../diff/diff";
 import type { AppDriver } from "../drivers/types";
 import { matchScreens } from "../fields/match";
+import { code, line } from "../models/prompt-text";
 import type { Adapter, Checkpoint, Proof } from "../proof/schema";
 import { replay } from "../replay/replay";
 import {
@@ -167,7 +168,7 @@ export function addFailures(
   return { proof: next, added };
 }
 
-const cell = (v: string) => v.replaceAll("|", "\\|").trim();
+const cell = (v: string) => line(v).replaceAll("|", "\\|").trim();
 const NUMBER = /^-?[\d\s.,]*\d$/;
 
 /**
@@ -209,10 +210,10 @@ export async function examplesAround(
     (found.some((f) => f?.verdict === "different") ? differ : agree).push(row);
   }
   const rows = [...differ, ...agree.slice(0, 4)];
-  const head = `| Inputs | ${labels.map((l) => `${l}, legacy | ${l}, rebuilt`).join(" | ")} |`;
+  const head = `| Inputs | ${labels.map((l) => `${cell(l)}, legacy | ${cell(l)}, rebuilt`).join(" | ")} |`;
   const rule = `|${" --- |".repeat(1 + labels.length * 2)}`;
   return [
-    `Cases around the difference on \`${labels.join("`, `")}\`, played on both apps ("same" where they agree).`,
+    `Cases around the difference on ${labels.map(code).join(", ")}, played on both apps ("same" where they agree).`,
     "One formula, with its rounding steps, has to give every legacy value below: find it before you change code.",
     "",
     head,
