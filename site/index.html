@@ -105,7 +105,7 @@ bun run report --proof fixtures/proofs/vs3-invoice.json --fixture</pre>
     <tr><td>FrontAccounting, an app nobody here wrote, invoice rebuilt and proved against the live app</td><td>65 of 65 fields</td></tr>
     <tr><td>Fuzzing that rebuild against live FrontAccounting</td><td>3 differences the recording never showed, shrunk, closed by a $0.46 repair</td></tr>
     <tr><td>Migration mode: customers, items and sales invoice on migrated records</td><td>28/28, 113/113, 258/258, $2.83</td></tr>
-    <tr><td>Proof of the example invoice, 40 proofs per driver</td><td>3.6 s median, 0 flaky</td></tr>
+    <tr><td>Proof of the example invoice, 40 proofs per driver</td><td>3.56 s median launched by Parity, 3.19 s attached; 0 flaky</td></tr>
     </tbody>
   </table>
   <p>Method and every figure: <a href="https://github.com/GlamgarOnDiscord/parity-agent/blob/main/docs/benchmarks.md">benchmarks</a>. Threat model: <a href="https://github.com/GlamgarOnDiscord/parity-agent/blob/main/docs/threat-model.md">what Parity protects and what it does not</a>.</p>
