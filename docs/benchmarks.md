@@ -140,11 +140,11 @@ Total $2.83. Two lessons. A form that shows one record can be rebuilt from its d
 
 | driver (`PARITY_BROWSER`) | proofs | median | p90 | range | flaky |
 |---|---|---|---|---|---|
-| `chromium`: Chrome launched by Parity, throwaway profile, egress guard | 40 | 3.57 s | 3.67 s | 3.44 to 3.71 s | 0 |
-| `cdp`: the same Chrome already running, attached over CDP | 40 | 3.42 s | 3.54 s | 3.18 to 3.65 s | 0 |
+| `chromium`: Chrome launched by Parity, throwaway profile, egress guard | 40 | 3.56 s | 3.68 s | 3.47 to 3.73 s | 0 |
+| `cdp`: the same Chrome already running, attached over CDP | 40 | 3.19 s | 3.26 s | 3.10 to 3.32 s | 0 |
 | `lightpanda` | not measured | | | | |
 
-What it says: launching a fresh confined Chrome costs about 0.15 s per proof; nearly all the time is the replay itself, so a faster engine would have to replay faster, not start faster. The default stays `chromium`, because only a browser Parity launches gets the egress guard: during the `cdp` run the unconfined Chrome tried to reach `mtalk.google.com` on its own, which the guarded one cannot.
+What it says: launching a fresh confined Chrome costs about 0.4 s per proof, a tenth of it; the rest is the replay itself, so a faster engine would have to replay faster, not start faster. Since the review of #113 the driver closes its context before it disconnects, so the attached browser is left without the pages of the runs; the figures above were measured with that fix. The default stays `chromium`, because only a browser Parity launches gets the egress guard: during the `cdp` run the unconfined Chrome tried to reach `mtalk.google.com` on its own, which the guarded one cannot.
 
 Lightpanda was not measured: running a downloaded nightly binary was not allowed in that container. To measure it where it is: `lightpanda serve --host 127.0.0.1 --port 9222`, then `PARITY_BROWSER=lightpanda PARITY_CDP_URL=ws://127.0.0.1:9222 bun run bench --runs 20`.
 

@@ -101,7 +101,7 @@ bun run prove --proof fixtures/scenarios/frontaccounting-invoice.proof.json --ur
 | FrontAccounting invoice, 5 replays                                               | 63 fields, 4 noisy, 3.3 s per run                           |
 | Exploration of FrontAccounting by Muse Spark computer use                        | 12 steps, 4 screens the recording never showed, $0.153      |
 | Report on a rebuild that adds rounded taxes                                      | 1 difference: 69.21 before, 69.22 after                     |
-| Proof of the example invoice, 40 proofs per driver, Linux container              | 3.57 s median launched by Parity, 3.42 s attached; 0 flaky  |
+| Proof of the example invoice, 40 proofs per driver, Linux container              | 3.56 s median launched by Parity, 3.19 s attached; 0 flaky  |
 | Fuzzing the FrontAccounting rebuild against the live app, 12 invoices            | 3 items the recording never showed, each shrunk to one or two lines; fixed by one $0.46 repair, then 52 fresh invoices at parity |
 
 Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behaviour: [docs/meta-api.md](docs/meta-api.md).
