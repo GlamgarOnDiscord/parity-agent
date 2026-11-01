@@ -12,6 +12,8 @@ The first plan held one sprint per day and S1 to S8 landed on the first day (PRs
 
 Status on 2026-10-30: D2 to D7 done, two days ahead (PRs #85 to #111). Spend logged: $18.07; the local cap `PARITY_BUDGET_USD` was raised from $20 to $35 for migration mode. Left: D8 video, D9 proof for strangers and polish (VS3 under Wine moved there from D6), D10 submit.
 
+Status on 2026-11-01: everything in D8 and D9 that the repository can hold is done: the video script with the command behind each shot, captions, the X thread, the landing page, driver and role benchmarks, the threat model and a security pass, a clean-clone run in a Linux container, and the submission fields. Left for the founder, because they need a person or a machine this repository does not have: filming, voice and export of the video, the clean-clone run on Windows, VS3 under Wine (the binary is not redistributed), Lightpanda measured where its binary may run, and D10 itself.
+
 ### D2 Keep proving (Oct 27)
 
 - Offline proof: replay, diff and report run with the network cut, checked by a test (S5 exit, still open)
@@ -76,7 +78,7 @@ Exit: three FrontAccounting screens (customers, items, sales invoice) rebuilt in
 - Voice and music, captions, export under 3:00
 - X thread drafted around the one-cent story (Most Viral on X bonus)
 
-Exit: the final video is exported under 3:00.
+Exit: the final video is exported under 3:00. (script, shots with their commands, captions and the X thread done in [video.md](video.md), [video.srt](video.srt) and [x-thread.md](x-thread.md); filming, voice and export by the founder)
 
 ### D9 Proof for strangers, buffer and polish (Nov 3)
 
@@ -86,13 +88,16 @@ Moved from D7 when migration mode took that day:
 - Benchmarks: replay time and flakiness per browser driver (Puppeteer, Lightpanda), model cost and accuracy per role, noise per app
 - Security pass over the whole repository and the threat model written down
 - Network-cut demo and the send log as a short clip
-Exit: a stranger lands on the page, runs the two-minute start and gets the cent. Spend: none.
+
+Exit: a stranger lands on the page, runs the two-minute start and gets the cent. Spend: none. (done except the clip and Lightpanda: `site/` published by the Pages workflow; `bun run bench`, 0 flaky of 40 proofs per driver; [threat-model.md](threat-model.md); the offline check run in a Linux container, and fixed; the clip is shot 9 of the video)
 
 Then the buffer:
 
 - Fixes from a full clean-clone run on Windows and in a Linux container
 - README, decisions and benchmarks final; issues closed or labelled
 - Submission form fields drafted
+
+(done in a Linux container and in [submission.md](submission.md); Windows still to run)
 
 ### D10 Submit (Nov 4)
 
