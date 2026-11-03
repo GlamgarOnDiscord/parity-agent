@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
@@ -15,6 +15,7 @@ import { workedExample } from "../rules/extract";
 import type { RuleStore } from "../rules/store";
 import { BoardSchema, boardPage } from "./board";
 import { type DiffInput, diffPage, type SavedResult } from "./diff";
+import { homePage } from "./home";
 import type { RepairJobs } from "./repair";
 import { reviewPage } from "./review";
 
@@ -109,6 +110,30 @@ export function createApp(ledger: Ledger, options: AppOptions) {
   });
 
   app.get("/health", (c) => c.json({ ok: true }));
+
+  // Where the launch link lands: the runs of this folder and the screens each one has.
+  app.get("/", (c) => {
+    if (!validSession(getCookie(c, SESSION_COOKIE)))
+      return c.text("Open the link printed by the server first.", 401);
+    const root = resolve(options.runsDir);
+    const folders = existsSync(root)
+      ? readdirSync(root, { withFileTypes: true })
+          .filter((d) => d.isDirectory() && RUN.test(d.name))
+          .map((d) => d.name)
+      : [];
+    const names = [...new Set([...options.rules.runs().map((r) => r.runId), ...folders])].sort();
+    const has = (run: string, file: string) => existsSync(join(root, run, file));
+    return c.html(
+      homePage(
+        names.map((run) => ({
+          run,
+          rules: options.rules.list(run).length > 0 || has(run, "capture.json"),
+          diff: has(run, "proof.json"),
+          migration: has(run, "board.json"),
+        })),
+      ),
+    );
+  });
 
   // The two faces of the brand, served from this repository: no font is fetched from anywhere else.
   app.get("/assets/fonts/:file", (c) => {
