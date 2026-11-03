@@ -113,8 +113,9 @@ export function ticks(parts: { n: number; cls: string }[], total: number) {
 
 export interface ShellOptions {
   title: string;
+  /** The run the page belongs to; empty on the list of runs. */
   run: string;
-  active: "rules" | "diff";
+  active: "rules" | "diff" | "migrate" | "home";
   css: string;
   body: string;
   script?: string;
@@ -124,7 +125,7 @@ export interface ShellOptions {
 /** The page frame both screens share. No external resource: fonts come from this server, scripts are inline. */
 export function shell(o: ShellOptions): string {
   const r = encodeURIComponent(o.run);
-  const link = (href: string, name: string, label: string, key: "rules" | "diff", count?: number) =>
+  const link = (href: string, name: string, label: string, key: ShellOptions["active"], count?: number) =>
     `<a href="${href}"${o.active === key ? ' aria-current="page"' : ""}>${icon(name)}${label}${
       count !== undefined ? `<span class="count">${count}</span>` : ""
     }</a>`;
@@ -133,7 +134,7 @@ export function shell(o: ShellOptions): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(o.title)} · ${esc(o.run)} · Parity</title>
+<title>${esc(o.title)}${o.run ? ` · ${esc(o.run)}` : ""} · Parity</title>
 <link rel="preload" href="/assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <style>${CSS}${o.css}</style>
 </head>
@@ -141,9 +142,16 @@ export function shell(o: ShellOptions): string {
 <div class="shell">
 <nav class="nav" aria-label="Parity">
   <div class="brand">${LOGO}Parity</div>
-  <h2>Run <span class="mono">${esc(o.run)}</span></h2>
+  ${link("/", "eye", "All runs", "home")}
+  ${
+    o.run
+      ? `<h2>Run <span class="mono">${esc(o.run)}</span></h2>
   ${link(`/review/${r}`, "rules", "Rules", "rules", o.counts?.rules)}
-  ${link(`/diff/${r}`, "diff", "Diff", "diff", o.counts?.differences)}
+  ${link(`/diff/${r}`, "diff", "Diff", "diff", o.counts?.differences)}${
+    o.active === "migrate" ? link(`/migrate/${r}`, "check", "Migration", "migrate") : ""
+  }`
+      : ""
+  }
   <div class="foot">Local on <b>127.0.0.1</b>. Replays and diffs never leave this machine.</div>
 </nav>
 <main>${o.body}</main>

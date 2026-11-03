@@ -75,7 +75,7 @@ export function boardPage(b: Board): string {
   return shell({
     title: "Migration",
     run: b.name,
-    active: "diff",
+    active: "migrate",
     css: CSS,
     body: `<div class="top"><span class="crumbs">Migration / <span class="run">${esc(b.name)}</span></span></div>
 <div class="board">
