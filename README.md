@@ -35,7 +35,7 @@ Needs [Bun](https://bun.sh) 1.3 or later and Chrome or Chromium (`PARITY_CHROME_
 git clone https://github.com/GlamgarOnDiscord/parity-agent.git
 cd parity-agent
 bun install
-bun test                                                           # 139 tests, some in headless Chrome
+bun test                                                           # 140 tests, some in headless Chrome
 bun run prove                                                      # the one-cent difference, field by field
 bun run prove --fixed                                              # the corrected rebuild: parity
 bun run report --proof fixtures/proofs/vs3-invoice.json --fixture  # writes runs/report.html

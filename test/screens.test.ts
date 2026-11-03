@@ -80,6 +80,15 @@ describe("app screens", () => {
     expect(html).toContain("69.22");
   });
 
+  test("the launch link lands on the list of runs, with the screens each one has", async () => {
+    const open = await get("/open?k=k-0123456789abcdef");
+    expect(open.status).toBe(403);
+    expect((await get("/")).status).toBe(401);
+    const home = await get("/", { cookie });
+    expect(home.status).toBe(200);
+    expect(await home.text()).toContain('<a href="/diff/inv">Diff</a>');
+  });
+
   test("text from the apps and the proof is escaped on the diff screen", async () => {
     const html = await (await get("/diff/inv", { cookie })).text();
     expect(html).not.toContain(evil);
