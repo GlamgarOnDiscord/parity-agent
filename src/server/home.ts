@@ -9,7 +9,7 @@ export interface RunEntry {
 }
 
 const CSS = `
-.runs { max-width: 880px; display: grid; gap: 16px; }
+.runs { max-width: 880px; display: grid; gap: 16px; padding: 24px 28px 48px; }
 .runs table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .runs th { text-align: left; color: var(--t3); font-weight: 500; padding: 10px 16px; border-bottom: 1px solid var(--line); }
 .runs td { padding: 12px 16px; border-bottom: 1px solid var(--line); }

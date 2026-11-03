@@ -49,13 +49,6 @@ h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin: 0; disp
 .lede { color: var(--t2); margin: 4px 0 0; max-width: 90ch; }
 .verdict { display: inline-flex; align-items: center; gap: 8px; font: 600 13px var(--mono); padding: 4px 10px; border-radius: 999px; }
 .verdict.ok { background: rgba(34, 197, 94, .12); color: #86efac; } .verdict.bad { background: rgba(239, 68, 68, .14); color: #fca5a5; }
-.meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.meter { padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
-.meter header { display: flex; justify-content: space-between; color: var(--t2); }
-.meter .big { font: 500 28px/1 var(--mono); letter-spacing: -0.02em; }
-.meter .big small { font-size: 14px; color: var(--t3); margin-left: 6px; }
-.meter p { margin: 0; color: var(--t3); font-size: 12px; }
-.meter p b { color: var(--t2); font-weight: 500; }
 .col { display: grid; gap: 14px; align-content: start; }
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
 .panel header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }

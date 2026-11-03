@@ -41,7 +41,7 @@ const STATE: Record<Board["screens"][number]["state"], { label: string; cls: str
 };
 
 const CSS = `
-.board { display: grid; gap: 16px; max-width: 1100px; }
+.board { display: grid; gap: 16px; max-width: 1100px; padding: 24px 28px 48px; }
 .board table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .board th { text-align: left; color: var(--t3); font-weight: 500; padding: 10px 16px; border-bottom: 1px solid var(--line); }
 .board td { padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }

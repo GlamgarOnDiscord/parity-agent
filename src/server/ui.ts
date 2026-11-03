@@ -82,6 +82,13 @@ main { min-width: 0; background: var(--app); }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--t3); flex: none; }
 .dot.ok { background: var(--green); } .dot.bad { background: var(--red); } .dot.warn { background: var(--amber); }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+.meters { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.meter { padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
+.meter header { display: flex; justify-content: space-between; color: var(--t2); }
+.meter .big { font: 500 28px/1 var(--mono); letter-spacing: -0.02em; }
+.meter .big small { font-size: 14px; color: var(--t3); margin-left: 6px; }
+.meter p { margin: 0; color: var(--t3); font-size: 12px; }
+.meter p b { color: var(--t2); font-weight: 500; }
 .ticks { display: grid; grid-template-columns: repeat(32, 1fr); gap: 2px; height: 10px; }
 .ticks i { border-radius: 1px; background: #2a2a30; }
 .ticks i.on { background: var(--blue); } .ticks i.part { background: rgba(76, 111, 255, .45); }
