@@ -48,7 +48,7 @@
     --line-2: rgba(16, 24, 40, 0.14);
     --t1: #11131a;
     --t2: #4d5363;
-    --t3: #8a90a0;
+    --t3: #646b7b;
     --accent: #4b63f5;
     --accent-2: #8b5cf6;
     --accent-soft: rgba(75, 99, 245, 0.14);
@@ -108,6 +108,7 @@ body {
   top: 0;
   align-self: start;
   height: 100vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 2px;

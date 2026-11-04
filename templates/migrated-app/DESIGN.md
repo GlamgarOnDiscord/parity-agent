@@ -28,11 +28,11 @@ These recur across the best current CRM and invoicing screens; use them.
 2. Group by meaning, not by legacy order: three to five cards with short nouns as titles (Identity, Contact, Terms, Accounts, Lines, Totals).
 3. Fields that belong together sit side by side (amount next to currency, start next to end).
 4. Empty and error states say what to do: "No customer picked yet: press / to pick one."
-5. Keyboard first: `/` focuses the record list (the kit does it); tab order follows reading order.
+5. Keyboard first: `/` or Ctrl K focuses the record list (the kit does it); tab order follows reading order.
 
 ## Hard limits (the proof depends on them)
 
 - Labels and values exactly as the legacy screen shows them, colon included; regrouping never renames.
 - Every legacy field stays on the screen, even the dull ones: put them in a last card or a side `details` list ("Other").
 - No value written in code: everything comes from `kit.data` and `kit.record`.
-- The hero and pills are decoration: the same values must also be present as fields.
+- The hero and pills are decoration: the same values must also be present as fields, and they show only values from the record (no fallback words such as "Customer" when a value is blank).

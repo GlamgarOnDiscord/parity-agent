@@ -10,6 +10,14 @@ export async function render(root, kit) {
   ];
   const figures = ["Credit Limit:"];
 
+  // A status word maps to a tone only when its meaning is clear; anything else stays neutral.
+  const tone = (status) =>
+    /hold|stop|block|over|bad|closed/i.test(status)
+      ? "bad"
+      : /good|ok|active|open/i.test(status)
+        ? "ok"
+        : undefined;
+
   const draw = (key) => {
     const record = records.find((r) => r.key === key);
     const picker = ui.picker(
@@ -29,7 +37,7 @@ export async function render(root, kit) {
       ui.hero({
         title: v("Customer Name:") || record.key,
         subtitle: [v("Sales Type/Price List:"), v("Payment Terms:")].filter(Boolean).join(" · "),
-        pills: [ui.pill(v("Credit Status:") || "Customer", "ok")],
+        pills: v("Credit Status:") ? [ui.pill(v("Credit Status:"), tone(v("Credit Status:")))] : [],
       }),
       ui.stats(figures.map((label) => [label, v(label)])),
     );

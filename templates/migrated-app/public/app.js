@@ -231,7 +231,9 @@
   window.parity = kit;
 
   document.addEventListener("keydown", (e) => {
-    if (e.key !== "/" || /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName ?? "")) return;
+    const search = e.key.toLowerCase() === "k" && (e.ctrlKey || e.metaKey);
+    if (!search && (e.key !== "/" || /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName ?? "")))
+      return;
     const list = document.querySelector(".picker select");
     if (list) {
       e.preventDefault();
