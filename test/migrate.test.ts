@@ -6,7 +6,7 @@ import { loadConfig } from "../src/config";
 import { openBrowser } from "../src/drivers";
 import type { AppDriver } from "../src/drivers/types";
 import { crawl, UNSAFE } from "../src/migrate/inventory";
-import { estimate, MigrationSchema, roles, scaffold } from "../src/migrate/migrate";
+import { directionFor, estimate, MigrationSchema, roles, scaffold } from "../src/migrate/migrate";
 import { isInternal, pickSteps, readRecords, recordScenarios } from "../src/migrate/records";
 import { ProofSchema } from "../src/proof/schema";
 import { proveApp } from "../src/rebuild/rebuild";
@@ -207,6 +207,16 @@ describe("a workspace Muse Code has edited", () => {
     expect(readFileSync(join(app, font)).equals(readFileSync(join("templates", "migrated-app", font)))).toBe(
       true,
     );
+  });
+
+  test("each app gets a direction from its domain, written on the shell, unless the migration names one", () => {
+    const app = join(dir, "direction");
+    scaffold(app, m, []);
+    expect(readFileSync(join(app, "public", "index.html"), "utf8")).toContain('data-direction="signal"');
+    const invoices = { ...m, title: "Invoicing" };
+    expect(directionFor(invoices)).toBe("counting-house");
+    expect(directionFor({ ...m, title: "Old CRM" })).toBe("paper");
+    expect(directionFor({ ...invoices, direction: "ledger" })).toBe("ledger");
   });
 
   test("a link put in place of a fixed file is replaced, never written through", () => {
