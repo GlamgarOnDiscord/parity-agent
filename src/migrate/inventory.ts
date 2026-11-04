@@ -13,6 +13,8 @@ export interface InventoryScreen {
   links: string[];
   /** Screens reached from the same menu share a group (FrontAccounting: Sales, Items and Inventory...). */
   menu?: string;
+  /** The words of the first link that led here: old apps often give every page the same title. */
+  name?: string;
 }
 
 export interface Inventory {
@@ -66,6 +68,7 @@ export async function crawl(
   const screens: InventoryScreen[] = [];
   const skipped: string[] = [];
   const menuOf = new Map<string, string>();
+  const nameOf = new Map<string, string>();
   while (queue.length > 0 && screens.length < (options.maxScreens ?? 60)) {
     const path = queue.shift() as string;
     try {
@@ -98,9 +101,15 @@ export async function crawl(
         seen.add(l.path);
         queue.push(l.path);
         if (!menuOf.has(l.path)) menuOf.set(l.path, screen.title || path);
+        if (l.text && !nameOf.has(l.path)) nameOf.set(l.path, l.text.slice(0, 80));
       }
     }
-    screens.push({ path, ...summary(screen, out, selectors), menu: menuOf.get(path) });
+    screens.push({
+      path,
+      ...summary(screen, out, selectors),
+      menu: menuOf.get(path),
+      name: nameOf.get(path),
+    });
   }
   return { origin, at: new Date().toISOString(), screens, skipped };
 }

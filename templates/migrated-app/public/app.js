@@ -79,7 +79,39 @@
         "div",
         { class: "picker" },
         ui.field(label, selected, { choices, onchange: (e) => onPick(e.target.value) }),
+        h("span", { class: "hint" }, h("kbd", { text: "/" }), " to pick"),
       );
+    },
+    /** A status, as a dot and a word: tone is "ok", "warn", "bad" or nothing. Not a field: it is not compared. */
+    pill(text, tone) {
+      return h("span", { class: tone ? `pill ${tone}` : "pill", text });
+    },
+    /** Key figures in a row, each an <output data-field>: only for values the legacy screen shows. */
+    stats(pairs) {
+      return h(
+        "div",
+        { class: "stats" },
+        ...pairs.map(([label, value]) =>
+          h(
+            "div",
+            { class: "stat" },
+            h("span", { class: "label", text: label }),
+            h("output", { "data-field": label, text: value }),
+          ),
+        ),
+      );
+    },
+    /** Every field of a record in one card, check boxes for "true"/"false": the plain form a screen starts from. */
+    form(title, fields, opts = {}) {
+      const skip = new Set(opts.skip ?? []);
+      const items = fields
+        .filter((f) => !skip.has(f.label) && !f.group)
+        .map((f) =>
+          ui.field(f.label, f.value, {
+            kind: f.value === "true" || f.value === "false" ? "checkbox" : undefined,
+          }),
+        );
+      return ui.card(title, ui.grid(...items)).el;
     },
     /** A grid: one <tr data-group="row-N"> per line, each cell an <output data-field="Column">. */
     table(columns, rows) {
@@ -141,11 +173,24 @@
       return f ? f.value : "";
     },
     query: new URLSearchParams(location.search),
+    /** The line under the screen title, for the record shown (a name, a code). */
+    subtitle(text) {
+      document.getElementById("screen-sub").textContent = text ?? "";
+    },
     go(path) {
       location.assign(path);
     },
   };
   window.parity = kit;
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "/" || /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName ?? "")) return;
+    const list = document.querySelector(".picker select");
+    if (list) {
+      e.preventDefault();
+      list.focus();
+    }
+  });
 
   async function start() {
     const screens = await json("/screens.json").catch(() => []);

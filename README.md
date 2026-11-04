@@ -35,7 +35,7 @@ Needs [Bun](https://bun.sh) 1.3 or later and Chrome or Chromium (`PARITY_CHROME_
 git clone https://github.com/GlamgarOnDiscord/parity-agent.git
 cd parity-agent
 bun install
-bun test                                                           # 145 tests, some in headless Chrome
+bun test                                                           # 146 tests, some in headless Chrome
 bun run prove                                                      # the one-cent difference, field by field
 bun run prove --fixed                                              # the corrected rebuild: parity
 bun run report --proof fixtures/proofs/vs3-invoice.json --fixture  # writes runs/report.html
@@ -109,6 +109,8 @@ Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behav
 ## Migrating a whole app, screen by screen
 
 The simple way: `bun run dev`, open the link it prints, then **Rebuild an app**. Three steps on one page: where the old app is (and its login, if any), which of the screens Parity found should be rebuilt, then go. Finding the screens and reading the records are free; the rebuild shows its price first, asks for a budget and a second click, and ends on the board. On a small CRM with a login, the whole page took one customer screen to a proved rebuild (9 of 9 fields, 3 records) for $0.25.
+
+Rebuilt screens are modern by construction: the template's kit (Geist, hairlines, dense tables, status pills, light and dark) carries the look, and Muse Code reads a design skill, `DESIGN.md`, and two reference screens before writing each one ([decision D6](docs/decisions.md)). On the small CRM, the screen it wrote with them put the credit limit first, grouped the rest by meaning, and still proved 9 of 9 fields, $0.26.
 
 The same steps from the terminal:
 

@@ -102,14 +102,25 @@ export function roles(m: Migration, explore: boolean): { step: string; model: st
 
 const TEMPLATE = resolve("templates/migrated-app");
 /** Files of the template a build may not change: restored after every Muse Code run. */
-const FIXED = ["public/app.js", "public/index.html", "public/style.css", "CONTRACT.md"];
+const FIXED = [
+  "public/app.js",
+  "public/index.html",
+  "public/style.css",
+  "public/fonts/Geist-Variable.woff2",
+  "public/fonts/GeistMono-Variable.woff2",
+  "CONTRACT.md",
+  // The design skill Muse Code reads before a screen: the rules, and two screens that apply them.
+  "DESIGN.md",
+  "reference/design/record.js",
+  "reference/design/document.js",
+];
 
 /**
  * Write a file of the app without following anything Muse Code may have put in its place: every directory on the
  * way must be a real directory, and whatever sits at the path (a symbolic link, a hard link, a folder) is removed
  * first, so the write can only create a new file inside the app.
  */
-function put(appDir: string, rel: string, content: string): void {
+function put(appDir: string, rel: string, content: string | Uint8Array): void {
   const root = resolve(appDir);
   const dest = resolve(root, rel);
   if (!dest.startsWith(root + sep)) throw new Error(`refusing to write outside the app: ${rel}`);
@@ -156,13 +167,14 @@ const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(
  */
 function restoreFixed(appDir: string, title: string) {
   for (const f of FIXED) {
-    let content = readFileSync(join(TEMPLATE, f), "utf8");
-    if (f === "public/index.html") {
-      content = content
-        .replace("<title>Rebuilt app</title>", `<title>${escapeHtml(title)}</title>`)
-        .replace('<span id="app-name">Rebuilt app</span>', `<span id="app-name">${escapeHtml(title)}</span>`);
+    if (f !== "public/index.html") {
+      put(appDir, f, readFileSync(join(TEMPLATE, f)));
+      continue;
     }
-    put(appDir, f, content);
+    const html = readFileSync(join(TEMPLATE, f), "utf8")
+      .replace("<title>Rebuilt app</title>", `<title>${escapeHtml(title)}</title>`)
+      .replace('<span id="app-name">Rebuilt app</span>', `<span id="app-name">${escapeHtml(title)}</span>`);
+    put(appDir, f, html);
   }
 }
 
@@ -204,7 +216,7 @@ export function buildPrompt(m: Migration, screen: MigrationScreen, proof: Proof,
     .join("\n");
   const entity = entities.find((e) => e.id === screen.entity);
   const lines = [
-    `You are migrating one screen of ${m.title} into the modern app in this folder. Read CONTRACT.md, then the kit in public/app.js. Write only public/screens/${screen.id}.js.`,
+    `You are migrating one screen of ${m.title} into the modern app in this folder. Read CONTRACT.md, DESIGN.md and the two reference screens in reference/design/, then the kit in public/app.js. Write only public/screens/${screen.id}.js.`,
     "",
     `Screen ${code(screen.id)}: ${code(screen.title)}.`,
     entity
@@ -219,8 +231,8 @@ export function buildPrompt(m: Migration, screen: MigrationScreen, proof: Proof,
     "What the legacy screen shows, field by field, labels exactly as written:",
     sampleOf(proof),
     "",
-    "Values `true`/`false` are check boxes. Fields marked with a line are rows of a table. Group the fields in cards",
-    "the way a modern business app would (identity, contact, terms...), but keep every label and value as above.",
+    "Values `true`/`false` are check boxes. Fields marked with a line are rows of a table. Follow DESIGN.md: group the",
+    "fields by meaning in a few titled cards, key figures first, every label and value exactly as above.",
   ];
   if (screen.port) {
     lines.push(
