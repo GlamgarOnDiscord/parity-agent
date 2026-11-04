@@ -1,12 +1,22 @@
-// Reference screen: one record picked from a list, grouped by meaning. Copy the structure, not the labels.
+// Reference screen: one record picked from a list. Picker, identity, key figures, two columns. Copy the structure,
+// not the labels.
 export async function render(root, kit) {
   const { ui } = kit;
   const records = await kit.data("customers");
-  const groups = [
+  const editable = [
     ["Identity", ["Customer Name:", "Customer Short Name:", "GSTNo:"]],
     ["Contact", ["Address:", "Phone:", "E-mail:"]],
     ["Terms", ["Sales Type/Price List:", "Payment Terms:", "Discount Percent:", "Credit Status:"]],
   ];
+  const figures = ["Credit Limit:"];
+
+  // A status word maps to a tone only when its meaning is clear; anything else stays neutral.
+  const tone = (status) =>
+    /hold|stop|block|over|bad|closed/i.test(status)
+      ? "bad"
+      : /good|ok|active|open/i.test(status)
+        ? "ok"
+        : undefined;
 
   const draw = (key) => {
     const record = records.find((r) => r.key === key);
@@ -22,17 +32,24 @@ export async function render(root, kit) {
       root.append(ui.empty("No customer picked yet: press / to pick one."));
       return;
     }
-    // Key figures first, with their exact legacy labels.
-    root.append(ui.stats([["Credit Limit:", kit.value(record, "Credit Limit:")]]));
-    const used = new Set(["Credit Limit:"]);
-    for (const [title, labels] of groups) {
+    const v = (label) => kit.value(record, label);
+    root.append(
+      ui.hero({
+        title: v("Customer Name:") || record.key,
+        subtitle: [v("Sales Type/Price List:"), v("Payment Terms:")].filter(Boolean).join(" · "),
+        pills: v("Credit Status:") ? [ui.pill(v("Credit Status:"), tone(v("Credit Status:")))] : [],
+      }),
+      ui.stats(figures.map((label) => [label, v(label)])),
+    );
+    const used = new Set(figures);
+    const main = editable.flatMap(([title, labels]) => {
       const fields = record.fields.filter((f) => labels.includes(f.label));
       for (const f of fields) used.add(f.label);
-      if (fields.length) root.append(ui.form(title, fields));
-    }
-    // Every other legacy field stays on the screen.
+      return fields.length ? [ui.form(title, fields)] : [];
+    });
+    // Every other legacy field stays on the screen, read-only, in the side column.
     const rest = record.fields.filter((f) => !used.has(f.label));
-    if (rest.length) root.append(ui.form("Other", rest));
+    root.append(ui.split(main, rest.length ? [ui.details("Other", rest)] : []));
   };
   draw(kit.query.get("customer") ?? "");
 }
