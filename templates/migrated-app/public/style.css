@@ -75,14 +75,24 @@ body {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(900px 520px at 85% -10%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%),
-    radial-gradient(700px 480px at 20% 110%, color-mix(in srgb, var(--accent-2) 16%, transparent), transparent 70%);
+    radial-gradient(
+      900px 520px at 85% -10%,
+      color-mix(in srgb, var(--accent) 26%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      700px 480px at 20% 110%,
+      color-mix(in srgb, var(--accent-2) 16%, transparent),
+      transparent 70%
+    );
 }
 .backdrop::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: radial-gradient(ellipse at 70% 0%, #000 0%, transparent 65%);
   opacity: 0.6;
@@ -122,7 +132,9 @@ body {
   height: 24px;
   border-radius: 7px;
   background: var(--accent);
-  box-shadow: 0 0 0 1px var(--line-2), 0 6px 18px color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow:
+    0 0 0 1px var(--line-2),
+    0 6px 18px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 .search {
   display: flex;
@@ -151,7 +163,9 @@ body {
   padding: 7px 10px;
   border-radius: 9px;
   font-weight: 500;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 .side a.item .glyph {
   display: grid;
@@ -244,7 +258,9 @@ main {
   height: 30px;
   border-radius: 50%;
   background: var(--hover);
-  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--line-2);
+  box-shadow:
+    0 0 0 2px var(--bg),
+    0 0 0 3px var(--line-2);
 }
 .screen {
   display: grid;
@@ -255,11 +271,21 @@ main {
 .screen > * {
   animation: rise 0.45s var(--ease) both;
 }
-.screen > *:nth-child(2) { animation-delay: 0.04s; }
-.screen > *:nth-child(3) { animation-delay: 0.08s; }
-.screen > *:nth-child(4) { animation-delay: 0.12s; }
-.screen > *:nth-child(5) { animation-delay: 0.16s; }
-.screen > *:nth-child(n + 6) { animation-delay: 0.2s; }
+.screen > *:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.screen > *:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.screen > *:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.screen > *:nth-child(5) {
+  animation-delay: 0.16s;
+}
+.screen > *:nth-child(n + 6) {
+  animation-delay: 0.2s;
+}
 @keyframes rise {
   from {
     opacity: 0;
@@ -276,9 +302,13 @@ main {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--r);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 20px 50px -24px rgba(0, 0, 0, 0.55);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 20px 50px -24px rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(14px);
-  transition: border-color 0.2s, transform 0.2s var(--ease);
+  transition:
+    border-color 0.2s,
+    transform 0.2s var(--ease);
 }
 .card:hover {
   border-color: var(--line-2);
@@ -332,7 +362,10 @@ textarea {
   padding: 8px 11px;
   min-height: 36px;
   width: 100%;
-  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
 }
 input:hover,
 select:hover,
@@ -349,8 +382,12 @@ textarea:focus {
 }
 select {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--t3) 50%), linear-gradient(135deg, var(--t3) 50%, transparent 50%);
-  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--t3) 50%),
+    linear-gradient(135deg, var(--t3) 50%, transparent 50%);
+  background-position:
+    calc(100% - 16px) 50%,
+    calc(100% - 11px) 50%;
   background-size: 5px 5px;
   background-repeat: no-repeat;
   padding-right: 30px;
@@ -405,8 +442,12 @@ button {
   padding: 0 16px;
   height: 36px;
   cursor: pointer;
-  box-shadow: 0 8px 22px -8px color-mix(in srgb, var(--accent) 80%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: transform 0.12s var(--ease), filter 0.12s;
+  box-shadow:
+    0 8px 22px -8px color-mix(in srgb, var(--accent) 80%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition:
+    transform 0.12s var(--ease),
+    filter 0.12s;
 }
 button:hover {
   filter: brightness(1.08);
@@ -572,4 +613,81 @@ tr:last-child td {
 .screen div:has(> .picker + .card) {
   display: grid;
   gap: 18px;
+}
+/* Identity header, two-column layout and read-only detail rows, as in current CRM work. */
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  backdrop-filter: blur(14px);
+}
+.hero-avatar {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  font-weight: 650;
+  font-size: 19px;
+  color: #fff;
+  background: var(--accent);
+  box-shadow: 0 10px 30px -10px color-mix(in srgb, var(--accent) 80%, transparent);
+}
+.hero-title {
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+.hero-sub {
+  color: var(--t2);
+  margin-top: 2px;
+}
+.hero-pills {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.split-main,
+.split-aside {
+  display: grid;
+  gap: 18px;
+}
+.details {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.9fr) minmax(0, 1.4fr);
+  margin: 0;
+}
+.details dt,
+.details dd {
+  margin: 0;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+.details dt {
+  color: var(--t2);
+  font-size: 12.5px;
+}
+.details dd output {
+  padding: 0;
+  min-height: 0;
+}
+.details dt:nth-last-child(2),
+.details dd:last-child {
+  border-bottom: 0;
+}
+@media (max-width: 1000px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
 }
