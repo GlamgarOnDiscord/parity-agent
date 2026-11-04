@@ -12,6 +12,8 @@ The first plan held one sprint per day and S1 to S8 landed on the first day (PRs
 
 Status on 2026-10-30: D2 to D7 done, two days ahead (PRs #85 to #111). Spend logged: $18.07; the local cap `PARITY_BUDGET_USD` was raised from $20 to $35 for migration mode. Left: D8 video, D9 proof for strangers and polish (VS3 under Wine moved there from D6), D10 submit.
 
+Status on 2026-11-04: D8 and D9 done except what needs the owner (their own voice on the video, the Baseten key for #21); VS3 under Wine and the network-cut clip cut with reasons. Added on the last day: the Rebuild an app page, the modern template with its design skill, a fix for the launch link landing on a 404. Spend logged: $18.58.
+
 Status on 2026-11-01: everything in D8 and D9 that the repository can hold is done: the video script with the command behind each shot, captions, the X thread, the landing page, driver and role benchmarks, the threat model and a security pass, a clean-clone run in a Linux container, and the submission fields. Left for the founder, because they need a person or a machine this repository does not have: filming, voice and export of the video, the clean-clone run on Windows, VS3 under Wine (the binary is not redistributed), Lightpanda measured where its binary may run, and D10 itself.
 
 ### D2 Keep proving (Oct 27)
