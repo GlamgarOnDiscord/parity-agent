@@ -26,7 +26,8 @@ const inventory: Inventory = {
     },
     {
       path: "/prices",
-      title: "Item prices",
+      title: "Legacy",
+      name: "Item prices",
       labels: ["Price"],
       selectors: [{ field: "stock_id", choices: 6 }],
       links: [],

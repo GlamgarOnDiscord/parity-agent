@@ -196,6 +196,19 @@ describe("a workspace Muse Code has edited", () => {
     screens: [{ id: "a", title: "A", path: "/a", proof: "x.json" }],
   });
 
+  test("the app gets the design skill, the reference screens and the fonts, byte for byte", () => {
+    const app = join(dir, "skill");
+    scaffold(app, m, []);
+    expect(readFileSync(join(app, "DESIGN.md"), "utf8")).toContain("Design rules for migrated screens");
+    expect(readFileSync(join(app, "reference", "design", "record.js"), "utf8")).toContain(
+      "export async function render",
+    );
+    const font = "public/fonts/Geist-Variable.woff2";
+    expect(readFileSync(join(app, font)).equals(readFileSync(join("templates", "migrated-app", font)))).toBe(
+      true,
+    );
+  });
+
   test("a link put in place of a fixed file is replaced, never written through", () => {
     const app = join(dir, "linked");
     scaffold(app, m, []);
