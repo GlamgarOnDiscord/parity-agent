@@ -66,7 +66,7 @@ body {
   min-height: 100%;
   background: var(--bg);
   color: var(--t1);
-  font: 13.5px / 1.5 var(--font);
+  font: var(--base, 13.5px) / 1.5 var(--font);
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.005em;
 }
@@ -691,4 +691,190 @@ tr:last-child td {
   .split {
     grid-template-columns: 1fr;
   }
+}
+
+/* Directions (DESIGN.md): one per app, set on <html data-direction> from the migration. Each fixes its own palette,
+   radius, base size and sidebar, so two rebuilt apps of different domains never share a look. No glow on data
+   surfaces except in night-shift. */
+:root[data-direction] .backdrop {
+  display: none;
+}
+:root[data-direction] .side a.item[aria-current="page"] {
+  background: var(--hover);
+  box-shadow: none;
+}
+:root[data-direction="ledger"] {
+  color-scheme: dark;
+  --bg: #0b0b0c;
+  --panel: #141416;
+  --panel-solid: #141416;
+  --sunk: #1c1c1f;
+  --side: #0b0b0c;
+  --hover: rgba(255, 255, 255, 0.06);
+  --line: #26262a;
+  --line-2: #2e2e33;
+  --t1: #ededed;
+  --t2: #a2a2a8;
+  --t3: #7c7c84;
+  --accent: #4c8dff;
+  --accent-2: #4c8dff;
+  --accent-soft: rgba(76, 141, 255, 0.16);
+  --ok: #3fb950;
+  --warn: #d29922;
+  --bad: #f85149;
+  --r: 8px;
+  --base: 13px;
+}
+:root[data-direction="paper"] {
+  color-scheme: light;
+  --bg: #f7f7f5;
+  --panel: #ffffff;
+  --panel-solid: #ffffff;
+  --sunk: #fafafa;
+  --side: #f7f7f5;
+  --hover: rgba(17, 17, 17, 0.05);
+  --line: #eaeaea;
+  --line-2: #dcdcdc;
+  --t1: #111111;
+  --t2: #5f5f5f;
+  --t3: #737373;
+  --accent: #2747f5;
+  --accent-2: #2747f5;
+  --accent-soft: rgba(39, 71, 245, 0.1);
+  --ok: #15803d;
+  --warn: #a16207;
+  --bad: #b91c1c;
+  --r: 12px;
+  --base: 14px;
+}
+:root[data-direction="paper"] .hero-title {
+  font-size: 34px;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+:root[data-direction="counting-house"] {
+  color-scheme: light;
+  --bg: #f4f1ea;
+  --panel: #fbfaf7;
+  --panel-solid: #fbfaf7;
+  --sunk: #f1ede4;
+  --side: #ebe6dc;
+  --hover: rgba(42, 37, 32, 0.06);
+  --line: #e4ded2;
+  --line-2: #d6cec0;
+  --t1: #2a2520;
+  --t2: #5f574e;
+  --t3: #6f665b;
+  --accent: #c2410c;
+  --accent-2: #c2410c;
+  --accent-soft: rgba(194, 65, 12, 0.1);
+  --ok: #4d7c0f;
+  --warn: #a16207;
+  --bad: #b91c1c;
+  --r: 16px;
+  --base: 14px;
+}
+:root[data-direction="counting-house"] .stat:first-child {
+  background: #2b211b;
+  border-color: #2b211b;
+  --t1: #f4efe6;
+  --t3: #c9bfb1;
+}
+:root[data-direction="signal"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --panel-solid: #ffffff;
+  --sunk: #fafafa;
+  --side: #fafafa;
+  --hover: rgba(0, 0, 0, 0.05);
+  --line: #e5e5e5;
+  --line-2: #d4d4d4;
+  --t1: #0a0a0a;
+  --t2: #525252;
+  --t3: #6b6b6b;
+  --accent: #1f3bd6;
+  --accent-2: #1f3bd6;
+  --accent-soft: rgba(31, 59, 214, 0.1);
+  --ok: #15803d;
+  --warn: #a16207;
+  --bad: #c81e1e;
+  --r: 4px;
+  --base: 13px;
+}
+:root[data-direction="atelier"] {
+  color-scheme: light;
+  --bg: #f5f6fa;
+  --panel: #ffffff;
+  --panel-solid: #ffffff;
+  --sunk: #f8f9fc;
+  --side: #2e5bff;
+  --hover: rgba(46, 91, 255, 0.06);
+  --line: #e6e8f0;
+  --line-2: #d5d9e6;
+  --t1: #151a2d;
+  --t2: #4a5068;
+  --t3: #636a82;
+  --accent: #2e5bff;
+  --accent-2: #2e5bff;
+  --accent-soft: rgba(46, 91, 255, 0.12);
+  --ok: #15803d;
+  --warn: #a16207;
+  --bad: #c81e1e;
+  --r: 14px;
+  --base: 14px;
+}
+:root[data-direction="atelier"] .side {
+  --t1: #ffffff;
+  --t2: rgba(255, 255, 255, 0.86);
+  --t3: rgba(255, 255, 255, 0.78);
+  --hover: rgba(255, 255, 255, 0.16);
+  --line: rgba(255, 255, 255, 0.2);
+  border-color: transparent;
+}
+:root[data-direction="atelier"] .side a.item[aria-current="page"] .glyph {
+  background: #ffffff;
+  color: #2e5bff;
+}
+:root[data-direction="night-shift"] {
+  color-scheme: dark;
+  --bg: #14110f;
+  --panel: #1e1a17;
+  --panel-solid: #1e1a17;
+  --sunk: #241f1b;
+  --side: #14110f;
+  --hover: rgba(242, 236, 230, 0.06);
+  --line: #2e2824;
+  --line-2: #3a332e;
+  --t1: #f2ece6;
+  --t2: #b3aaa1;
+  --t3: #948a80;
+  --accent: #f26a1b;
+  --accent-2: #f26a1b;
+  --accent-soft: rgba(242, 106, 27, 0.16);
+  --ok: #7cc36a;
+  --warn: #e0a43a;
+  --bad: #f0645a;
+  --r: 16px;
+  --base: 13.5px;
+}
+:root[data-direction="night-shift"] .backdrop {
+  display: block;
+}
+:root[data-direction]:not([data-direction="night-shift"]) .stats .stat::after {
+  display: none;
+}
+:root[data-direction] .stats .stat output {
+  font-weight: 500;
+}
+:root[data-direction]:not([data-direction="night-shift"]) .side,
+:root[data-direction]:not([data-direction="night-shift"]) .card,
+:root[data-direction]:not([data-direction="night-shift"]) .stats .stat {
+  backdrop-filter: none;
+}
+:root[data-direction="paper"] .card,
+:root[data-direction="counting-house"] .card,
+:root[data-direction="signal"] .card,
+:root[data-direction="atelier"] .card {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }

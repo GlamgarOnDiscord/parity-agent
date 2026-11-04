@@ -1,34 +1,61 @@
 # Design rules for migrated screens
 
-Read this before writing a screen. The bar is a business tool people would screenshot: the CRM and invoicing work on Dribbble, Behance and Pinterest in 2026 (dark SaaS dashboards, CRM profile pages, modern invoice apps). Quiet, dense, precise, finished. Not a generic admin template. Two working screens show every rule applied: `reference/design/record.js` (one record picked from a list) and `reference/design/document.js` (a document with lines and totals).
+Read this before writing a screen. The bar is a business tool people would screenshot: quiet, dense, precise, finished. The rules come from 134 current CRM, invoicing and back-office references (`docs/design-research.md`); the most useful were shipped products (an Attio-style record page, Midday's transactions, a billing table with status tabs), not concept shots. Two working screens show the rules applied: `reference/design/record.js` (one record picked from a list) and `reference/design/document.js` (a document with lines and totals).
 
-## Patterns taken from the references
+## The app's direction
 
-These recur across the best current CRM and invoicing screens; use them.
+Every rebuilt app has one visual direction, set on `<html data-direction>` by Parity from the app's domain (or named in `migration.json`). The shell already applies its palette, radius, base size and sidebar; a screen never overrides them. The direction decides what the screen leans on:
 
-- **Identity first.** A record screen opens on `kit.ui.hero({ title, subtitle, pills })`: initials in an accent tile, the record's name in large type, one line under it (company, code, city), status pills on the right. The legacy picker sits just above it, the record name repeats in `kit.subtitle()`.
-- **Key figures as tiles.** Two to four numbers the user scans first (credit limit, balance, price, quantity on hand) in `kit.ui.stats([...])`, right under the hero.
-- **Two columns.** `kit.ui.split(main, aside)`: the main column holds the editable cards (identity, contact, terms); the side column holds read-only summaries (`kit.ui.details`) such as accounts, classification, dates. Never one long column of every field.
-- **Read-only values read as a list.** Values the user does not type (codes, accounts, dates, computed amounts) go in `kit.ui.details(title, fields)`: label left, value right, hairline between rows. Editable values stay inputs in `kit.ui.form`.
-- **Documents lead with the amount.** An invoice or order shows its total in the hero or a stat tile, then who it is billed to, then the lines as a table with numbers right-aligned, then the totals block bottom right.
-- **One accent, used for meaning.** The accent marks the selected item, the primary action and the identity tile. Green, amber and red only for status. Everything else is greyscale on the dark surface.
+| Direction | Fits | Lean on |
+|---|---|---|
+| `ledger` | ops, monitoring, logistics, tickets | dark, dense rows, bare numbers, charts in grey with one highlighted value |
+| `paper` | CRM, contacts, HR, documents | light and airy, a large record name, records that read like a document |
+| `counting-house` | invoicing, accounting, stock, ERP | warm sand and rust, the first key figure as the one dark inverse tile, totals large |
+| `signal` | B2B admin, analytics, anything else | white and grey, one cobalt accent on the single most important thing |
+| `atelier` | booking, education, small shops | a blue sidebar, white content, tinted status pills |
+| `night-shift` | premium displays | warm dark, one copper accent with a soft glow |
 
-## What makes a screen look generic, and is refused
+## Patterns per screen type
 
-- Every field in one long grid, in the legacy order, under one title "Details".
-- Cards inside cards, a card per field, borders on everything.
-- Gradient text, rainbow headers, glow on everything, emoji, icons that mean nothing.
-- Placeholder copy: "Lorem", "Welcome back", "Manage your data easily".
-- Centered layouts, giant inputs, 16 px body text, rounded-full buttons.
-- Inline styles that change the kit's sizes, colors or spacing.
+**Record (customer, item, supplier).**
+- Picker first, then `kit.ui.hero({ title, subtitle, pills })`: initials, the record's name, one meta line (code, terms, city), status pills on the right. The record name repeats in `kit.subtitle()`.
+- A facts strip right under it: two to four numbers the user scans first (credit limit, balance, price, on hand) in `kit.ui.stats([...])`. Never four identical tiles as the only idea on the page.
+- `kit.ui.split(main, aside)`: editable cards in the main column (Identity, Contact, Terms); read-only values in the side column as `kit.ui.details` label/value rows (accounts, classification, dates). No stacked full-width inputs for values the user does not type.
+
+**Document with lines (invoice, order, quote).**
+- Lead with the amount: the total in a stat tile or the hero, then who it is billed to, then the lines.
+- Lines as `kit.ui.table`, identifier column first, amounts right-aligned with tabular figures (`num: true`).
+- Totals with `kit.ui.totals`, right-aligned under the table, the total last.
+
+**List.** Title, then the table; statuses as pills with a closed set of tones; at most one row tint, for exceptions only.
+
+## Color and type
+
+- One accent, used for meaning: the selected item, the primary action, the identity tile. At most one saturated element per screen; a second filled colored card is a defect.
+- Status tones are closed: `ok`, `warn`, `bad`, or none. Map a status word to a tone only when its meaning is clear; an unknown word stays neutral. Time-based statuses keep their age as the legacy screen shows it ("Overdue 58 days").
+- Every number in tables, figures and totals is tabular (the kit does it). Sentence case everywhere; uppercase only for tiny group labels.
+
+## Empty and error states
+
+- Inside the real screen: the picker and cards stay, the empty state sits where the data would be.
+- Say what is missing and what to do, in one line: "No customer picked yet: press / to pick one." At most two actions.
+- A failed load says so and keeps the error text visible (the kit does it).
+
+## Refused: the marks of a generic or AI-made screen
+
+- Every field in one long grid in the legacy order under one title "Details"; cards inside cards; a card per field.
+- "Welcome back" headers, upgrade cards, placeholder names (John Doe, Acme), "Lorem", emoji.
+- Gradient text, purple-to-blue gradients, glass and glow on data surfaces, neon on every series.
+- Four identical stat tiles with an icon and a green "+12%"; more than five status colors in one table.
+- Text links "View Edit Delete" repeated on every row; bold 700 body numbers; uppercase buttons.
+- Inline styles that change the kit's sizes, colors, radius or spacing: the direction owns them.
 
 ## What a good screen does
 
-1. One question per screen, answered at the top: picker, then hero, then stats.
+1. One question per screen, answered at the top: picker, then hero, then figures.
 2. Group by meaning, not by legacy order: three to five cards with short nouns as titles (Identity, Contact, Terms, Accounts, Lines, Totals).
 3. Fields that belong together sit side by side (amount next to currency, start next to end).
-4. Empty and error states say what to do: "No customer picked yet: press / to pick one."
-5. Keyboard first: `/` or Ctrl K focuses the record list (the kit does it); tab order follows reading order.
+4. Keyboard first: `/` or Ctrl K focuses the record list (the kit does it); tab order follows reading order.
 
 ## Hard limits (the proof depends on them)
 
