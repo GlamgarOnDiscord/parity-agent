@@ -80,7 +80,7 @@ Exit: three FrontAccounting screens (customers, items, sales invoice) rebuilt in
 - Voice and music, captions, export under 3:00
 - X thread drafted around the one-cent story (Most Viral on X bonus)
 
-Exit: the final video is exported under 3:00. (script, shots with their commands, captions and the X thread done in [video.md](video.md), [video.srt](video.srt) and [x-thread.md](x-thread.md); filming, voice and export by the founder)
+Exit: the final video is exported under 3:00. (done Nov 4: an animated 2:59 cut in English with real screens and real numbers, voice and burnt-in captions, uploaded for the submission; script, captions and the X thread in [video.md](video.md), [video.srt](video.srt) and [x-thread.md](x-thread.md))
 
 ### D9 Proof for strangers, buffer and polish (Nov 3)
 
@@ -91,7 +91,7 @@ Moved from D7 when migration mode took that day:
 - Security pass over the whole repository and the threat model written down
 - Network-cut demo and the send log as a short clip
 
-Exit: a stranger lands on the page, runs the two-minute start and gets the cent. Spend: none. (done except the clip and Lightpanda: `site/` published by the Pages workflow; `bun run bench`, 0 flaky of 40 proofs per driver; [threat-model.md](threat-model.md); the offline check run in a Linux container, and fixed; the clip is shot 9 of the video)
+Exit: a stranger lands on the page, runs the two-minute start and gets the cent. Spend: none. (done; the clip was cut, Lightpanda measured on Nov 4: `site/` published by the Pages workflow; `bun run bench`, 0 flaky of 40 proofs per driver; [threat-model.md](threat-model.md); the offline check run in a Linux container, and fixed; the clip is shot 9 of the video)
 
 Then the buffer:
 
@@ -99,7 +99,7 @@ Then the buffer:
 - README, decisions and benchmarks final; issues closed or labelled
 - Submission form fields drafted
 
-(done in a Linux container and in [submission.md](submission.md); Windows still to run)
+(done in a Linux container and on Windows (#82), and in [submission.md](submission.md))
 
 ### D10 Submit (Nov 4)
 
