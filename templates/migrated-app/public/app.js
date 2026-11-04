@@ -153,6 +153,53 @@
         ]),
       );
     },
+    /**
+     * The record's identity at the top of a screen: initials, its name in large type, a line under it, status pills.
+     * Not compared by the proof: the same values stay in the fields below.
+     */
+    hero({ title, subtitle, initials, pills = [] }) {
+      const ini = (initials ?? title ?? "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((w) => w[0].toUpperCase())
+        .join("");
+      return h(
+        "header",
+        { class: "hero" },
+        h("div", { class: "hero-avatar", "aria-hidden": "true", text: ini }),
+        h(
+          "div",
+          {},
+          h("div", { class: "hero-title", text: title ?? "" }),
+          h("div", { class: "hero-sub", text: subtitle ?? "" }),
+        ),
+        h("div", { class: "hero-pills" }, ...pills),
+      );
+    },
+    /** Two columns: the main cards, and a narrower side column for a summary or related records. */
+    split(main, aside) {
+      return h(
+        "div",
+        { class: "split" },
+        h("div", { class: "split-main" }, ...main),
+        h("aside", { class: "split-aside" }, ...aside),
+      );
+    },
+    /** A read-only card of label and value rows, each value an <output data-field> the proof compares. */
+    details(title, fields) {
+      return ui.card(
+        title,
+        h(
+          "dl",
+          { class: "details" },
+          ...fields.flatMap((f) => [
+            h("dt", { text: f.label }),
+            h("dd", {}, h("output", { "data-field": f.label, "data-group": f.group, text: f.value ?? "" })),
+          ]),
+        ),
+      ).el;
+    },
     empty(text) {
       return h("div", { class: "empty", text });
     },
@@ -184,7 +231,9 @@
   window.parity = kit;
 
   document.addEventListener("keydown", (e) => {
-    if (e.key !== "/" || /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName ?? "")) return;
+    const search = e.key.toLowerCase() === "k" && (e.ctrlKey || e.metaKey);
+    if (!search && (e.key !== "/" || /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName ?? "")))
+      return;
     const list = document.querySelector(".picker select");
     if (list) {
       e.preventDefault();
@@ -200,12 +249,20 @@
       nav.append(h("h2", { text: m }));
       for (const s of screens.filter((x) => (x.menu || "Screens") === m)) {
         nav.append(
-          h("a", {
-            class: "item",
-            href: s.path,
-            "aria-current": location.pathname === s.path.split("?")[0] ? "page" : undefined,
-            text: s.title,
-          }),
+          h(
+            "a",
+            {
+              class: "item",
+              href: s.path,
+              "aria-current": location.pathname === s.path.split("?")[0] ? "page" : undefined,
+            },
+            h("span", {
+              class: "glyph",
+              "aria-hidden": "true",
+              text: s.title.trim().charAt(0).toUpperCase(),
+            }),
+            h("span", { text: s.title }),
+          ),
         );
       }
     }
@@ -218,6 +275,7 @@
       return;
     }
     document.getElementById("screen-title").textContent = here.title;
+    document.getElementById("crumb-menu").textContent = here.menu || "";
     document.title = here.title;
     try {
       const mod = await import(`/screens/${here.id}.js`);
