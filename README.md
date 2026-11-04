@@ -35,7 +35,7 @@ Needs [Bun](https://bun.sh) 1.3 or later and Chrome or Chromium (`PARITY_CHROME_
 git clone https://github.com/GlamgarOnDiscord/parity-agent.git
 cd parity-agent
 bun install
-bun test                                                           # 140 tests, some in headless Chrome
+bun test                                                           # 145 tests, some in headless Chrome
 bun run prove                                                      # the one-cent difference, field by field
 bun run prove --fixed                                              # the corrected rebuild: parity
 bun run report --proof fixtures/proofs/vs3-invoice.json --fixture  # writes runs/report.html
@@ -107,6 +107,10 @@ bun run prove --proof fixtures/scenarios/frontaccounting-invoice.proof.json --ur
 Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behaviour: [docs/meta-api.md](docs/meta-api.md).
 
 ## Migrating a whole app, screen by screen
+
+The simple way: `bun run dev`, open the link it prints, then **Rebuild an app**. Three steps on one page: where the old app is (and its login, if any), which of the screens Parity found should be rebuilt, then go. Finding the screens and reading the records are free; the rebuild shows its price first, asks for a budget and a second click, and ends on the board. On a small CRM with a login, the whole page took one customer screen to a proved rebuild (9 of 9 fields, 3 records) for $0.25.
+
+The same steps from the terminal:
 
 Off by default, because it spends. `parity migrate inventory` crawls the legacy app by its links and lists every screen, its fields and the lists that pick a record, with no model call. `plan` prints the cost per screen and which Meta model does what. `prepare` reads every record through the legacy app's own forms into `data/*.json`, which the rebuilt app loads into SQLite, and turns each record into a scenario of the proof. `run --budget 6 --yes` has Muse Code build each screen from a modern template, proves it, and stops before crossing the budget. `prove` checks the screens again for free; the board at `/migrate/<run>` shows each screen, its proof and its spend.
 
