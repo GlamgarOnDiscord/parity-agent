@@ -55,8 +55,36 @@ export const MigrationSchema = z.object({
     .default([]),
   maxRepairs: z.number().int().min(0).max(5).default(2),
   maxSteps: z.number().int().min(4).max(40).default(16),
+  /** The visual direction of the rebuilt app (DESIGN.md); chosen from the app's domain when left out. */
+  direction: z.enum(["ledger", "paper", "counting-house", "signal", "atelier", "night-shift"]).optional(),
 });
 export type Migration = z.infer<typeof MigrationSchema>;
+export type Direction = NonNullable<Migration["direction"]>;
+
+/**
+ * The direction a rebuilt app takes when the migration does not name one: from the words of its title, screens and
+ * entities, so two apps of different domains do not come out with the same look. Plain code, same answer every run.
+ */
+export function directionFor(m: Migration): Direction {
+  if (m.direction) return m.direction;
+  const words = [
+    m.title,
+    ...m.screens.flatMap((s) => [s.id, s.title, s.menu ?? ""]),
+    ...m.entities.map((e) => e.id),
+  ]
+    .join(" ")
+    .toLowerCase();
+  const by: [Direction, RegExp][] = [
+    [
+      "counting-house",
+      /invoic|account|ledger|bill|payment|tax|quote|order|supplier|stock|inventory|erp|bank/,
+    ],
+    ["paper", /crm|contact|client|customer|lead|deal|hr|employee|candidate|doc|note|member/],
+    ["ledger", /monitor|server|log|ticket|incident|ops|shipment|fleet|sensor|metric/],
+    ["atelier", /booking|class|course|student|lesson|appointment|event|shop/],
+  ];
+  return by.find(([, re]) => re.test(words))?.[0] ?? "signal";
+}
 export type MigrationScreen = Migration["screens"][number];
 
 /**
@@ -137,7 +165,7 @@ function put(appDir: string, rel: string, content: string | Uint8Array): void {
 /** Lay the app out from the template: the shell, the kit, the list of screens, and the migrated records. */
 export function scaffold(appDir: string, m: Migration, entities: Entity[]): void {
   mkdirSync(appDir, { recursive: true });
-  restoreFixed(appDir, m.title);
+  restoreFixed(appDir, m);
   put(appDir, "server.ts", readFileSync(join(TEMPLATE, "server.ts"), "utf8"));
   const byId = new Map(entities.map((e) => [e.id, e]));
   const screens = m.screens.map((s) => ({
@@ -156,7 +184,11 @@ export function scaffold(appDir: string, m: Migration, entities: Entity[]): void
         `// Muse Code fills this screen.\nexport async function render(root, kit) {\n  root.append(kit.ui.empty("Not migrated yet."));\n}\n`,
       );
   }
-  put(appDir, "migration.json", `${JSON.stringify({ name: m.name, title: m.title, screens }, null, 2)}\n`);
+  put(
+    appDir,
+    "migration.json",
+    `${JSON.stringify({ name: m.name, title: m.title, direction: directionFor(m), screens }, null, 2)}\n`,
+  );
 }
 
 const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -165,13 +197,15 @@ const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(
  * Put the template's fixed files back, read from the template only, with the app's name in the shell: whatever a
  * build did to them, links included, is replaced.
  */
-function restoreFixed(appDir: string, title: string) {
+function restoreFixed(appDir: string, m: Migration) {
+  const title = m.title;
   for (const f of FIXED) {
     if (f !== "public/index.html") {
       put(appDir, f, readFileSync(join(TEMPLATE, f)));
       continue;
     }
     const html = readFileSync(join(TEMPLATE, f), "utf8")
+      .replace('<html lang="en">', `<html lang="en" data-direction="${directionFor(m)}">`)
       .replace("<title>Rebuilt app</title>", `<title>${escapeHtml(title)}</title>`)
       .replace('<span id="app-name">Rebuilt app</span>', `<span id="app-name">${escapeHtml(title)}</span>`);
     put(appDir, f, html);
@@ -216,7 +250,7 @@ export function buildPrompt(m: Migration, screen: MigrationScreen, proof: Proof,
     .join("\n");
   const entity = entities.find((e) => e.id === screen.entity);
   const lines = [
-    `You are migrating one screen of ${m.title} into the modern app in this folder. Read CONTRACT.md, DESIGN.md and the two reference screens in reference/design/, then the kit in public/app.js. Write only public/screens/${screen.id}.js.`,
+    `You are migrating one screen of ${m.title} into the modern app in this folder. Read CONTRACT.md, DESIGN.md and the two reference screens in reference/design/, then the kit in public/app.js. Write only public/screens/${screen.id}.js. This app's direction is "${directionFor(m)}": the shell already applies its colors and sizes; follow its notes in DESIGN.md.`,
     "",
     `Screen ${code(screen.id)}: ${code(screen.title)}.`,
     entity
@@ -335,7 +369,7 @@ export async function buildScreen(
     );
     run.costUsd += muse.costUsd;
     if (n > 0) run.repairs = n;
-    restoreFixed(appDir, m.title);
+    restoreFixed(appDir, m);
     if (!muse.ok) {
       run.state = "failed";
       run.error = `Muse Code exited with ${muse.exitCode}: ${muse.stderr.slice(-300)}`;
