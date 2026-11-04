@@ -5,6 +5,7 @@ import { RuleStore } from "../rules/store";
 import { openDb } from "../store/db";
 import { createApp } from "./app";
 import { RepairJobs } from "./repair";
+import { MigrateJobs } from "./wizard";
 
 const config = loadConfig();
 const db = openDb(config.PARITY_DB);
@@ -18,6 +19,7 @@ const app = createApp(ledger, {
   rules: new RuleStore(db),
   runsDir: "runs",
   repairs: new RepairJobs(resolve(import.meta.dir, "..", ".."), resolve("runs")),
+  migrations: new MigrateJobs(resolve(import.meta.dir, "..", ".."), resolve("runs")),
 });
 
 // Local only: the server never listens on a public interface.

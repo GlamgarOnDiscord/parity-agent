@@ -172,3 +172,8 @@ From the runs documented above; the send log of each run has the call-by-call de
 | open | Muse Spark Open on Baseten | none | $0 | not verified: no key |
 
 Muse Code is 90 % of the spend itemized here (76 % of the $18.07 ledger total, which includes the reruns), and within it the self-checking rebuild loop (D3, $6.73) is half: targeted repairs with the difference as evidence cost $0.30 to $0.50 each.
+
+## Rebuild an app from the page (2026-11-04)
+
+The three-step page driven in headless Chrome against a small CRM with a cookie login (three customers picked from a list, a delete link and a logout link). Step 1 found 2 screens and did not follow the delete or logout links. Step 2 picked the customer form and priced it (about $1.45, at most $1.90). Reading the records was free: 3 customers, 3 fields each. The rebuild, confirmed with a $2 budget, built the screen with Muse Code and proved it at the first replay: 9 of 9 fields over 3 scenarios, $0.25. The same run showed that a list of three records was ignored by the crawl's old threshold of four choices; it is two now, since a person picks the screens.
+

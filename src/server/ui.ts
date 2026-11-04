@@ -122,7 +122,7 @@ export interface ShellOptions {
   title: string;
   /** The run the page belongs to; empty on the list of runs. */
   run: string;
-  active: "rules" | "diff" | "migrate" | "home";
+  active: "rules" | "diff" | "migrate" | "home" | "new";
   css: string;
   body: string;
   script?: string;
@@ -149,6 +149,7 @@ export function shell(o: ShellOptions): string {
 <div class="shell">
 <nav class="nav" aria-label="Parity">
   <div class="brand">${LOGO}Parity</div>
+  ${link("/new", "spark", "Rebuild an app", "new")}
   ${link("/", "eye", "All runs", "home")}
   ${
     o.run
