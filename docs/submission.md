@@ -20,7 +20,7 @@ The 3:00 cut from [video.md](video.md), uploaded by 12:00 on Nov 4. Link to add 
 
 **Landing page**
 
-The GitHub Pages site built from `site/` (the URL GitHub shows after the first deployment of the Pages workflow).
+https://glamgarondiscord.github.io/parity-agent/ (built from `site/` by the Pages workflow)
 
 **What it does**
 
