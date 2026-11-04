@@ -143,9 +143,9 @@ On FrontAccounting: customers (28 of 28 fields, first build, $0.30), items (113 
 | Exploration that writes tests, coverage of what it added     | done                                                          |
 | Migration mode, opt-in: inventory, migrated records, modern template, one build per screen, board | done: 3 FrontAccounting screens proved, $2.83 |
 | Benchmarks per driver and per role, threat model, landing page | done (Lightpanda not measured yet): [benchmarks](docs/benchmarks.md), [threat model](docs/threat-model.md), `site/` on GitHub Pages |
-| Video, X thread, submission                                  | script, shots and captions in [docs/video.md](docs/video.md); recording and posting by the founder |
+| Video, X thread, submission                                  | done: animated 2:59 cut, [docs/video.md](docs/video.md)        |
 | Muse Spark Open on Baseten for on-premise rule extraction    | client ready, not verified (no key yet)                       |
-| Virtual Salesman 3 driven under Wine by computer use         | not done: needs the VS3 binary, which is not redistributed    |
+| Virtual Salesman 3 driven under Wine by computer use         | cut: the VS3 binary is not redistributed ([#73](https://github.com/GlamgarOnDiscord/parity-agent/issues/73)) |
 | Replaying the Windows app itself instead of its recording    | cut: the recording is the reference ([D3](docs/decisions.md)) |
 
 Plan and exit checks: [docs/sprints.md](docs/sprints.md).
