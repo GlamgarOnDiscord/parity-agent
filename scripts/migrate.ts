@@ -93,6 +93,12 @@ if (command === "inventory") {
   process.exit(0);
 }
 
+if (m.screens.length === 0) {
+  console.log(
+    "No screen to migrate yet: run inventory, then list the screens to rebuild in the migration file.",
+  );
+  process.exit(2);
+}
 printPlan();
 if (command === "plan") process.exit(0);
 if (command === "run" && (!values.yes || !values.budget)) {

@@ -42,7 +42,7 @@ export function homePage(runs: RunEntry[]): string {
 ${
   runs.length
     ? `<section class="card"><table><thead><tr><th>Run</th><th>Screens</th></tr></thead><tbody>${rows}</tbody></table></section>`
-    : `<p class="empty">No run yet. Try <span class="mono">bun run report --proof fixtures/proofs/vs3-invoice.json --fixture</span>, then reload. ${icon("eye")}</p>`
+    : `<p class="empty"><a href="/new">Rebuild an app</a> in three steps, or start from the example. No run yet. Try <span class="mono">bun run report --proof fixtures/proofs/vs3-invoice.json --fixture</span>, then reload. ${icon("eye")}</p>`
 }
 </div>`,
   });

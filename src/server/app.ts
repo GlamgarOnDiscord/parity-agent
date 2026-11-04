@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
@@ -7,6 +7,8 @@ import type { Capture } from "../capture/capture";
 import { coverageOf, exploredOf } from "../coverage/coverage";
 import { type Decision, reapplyDecisions } from "../diff/decisions";
 import { matchScreens } from "../fields/match";
+import type { Inventory } from "../migrate/inventory";
+import { estimate, MigrationSchema } from "../migrate/migrate";
 import type { Ledger } from "../models/ledger";
 import { ProofSchema, ScreenSchema } from "../proof/schema";
 import { readHistory } from "../rebuild/history";
@@ -18,6 +20,7 @@ import { type DiffInput, diffPage, type SavedResult } from "./diff";
 import { homePage } from "./home";
 import type { RepairJobs } from "./repair";
 import { reviewPage } from "./review";
+import { draft, type MigrateJobs, NewAppSchema, PicksSchema, withScreens, wizardPage } from "./wizard";
 
 const MatchBody = z.object({
   legacy: ScreenSchema,
@@ -36,6 +39,8 @@ export interface AppOptions {
   runsDir: string;
   /** Repairs started from the diff screen; without it the button is not offered. */
   repairs?: RepairJobs;
+  /** Migrations started from the "Rebuild an app" page. */
+  migrations?: MigrateJobs;
 }
 
 const RUN = /^[\w.-]{1,64}$/;
@@ -151,6 +156,71 @@ export function createApp(ledger: Ledger, options: AppOptions) {
       return c.text("Open the link printed by the server first.", 401);
     return c.html(reviewPage(run));
   });
+
+  // "Rebuild an app": three steps on one page, each one a `parity migrate` command run by this server.
+  app.get("/new", (c) => {
+    if (!validSession(getCookie(c, SESSION_COOKIE)))
+      return c.text("Open the link printed by the server first.", 401);
+    return c.html(wizardPage());
+  });
+
+  const migrationFile = (name: string) => join(resolve(options.runsDir), name, "migration.json");
+  const readJson = async (file: string) => {
+    const f = Bun.file(file);
+    return (await f.exists()) ? await f.json().catch(() => undefined) : undefined;
+  };
+
+  app.post("/api/new", async (c) => {
+    if (!options.migrations) return c.json({ error: "migrations are not enabled on this server" }, 404);
+    const body = NewAppSchema.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json({ error: body.error.issues[0]?.message ?? "bad request" }, 400);
+    const file = migrationFile(body.data.name);
+    mkdirSync(join(resolve(options.runsDir), body.data.name), { recursive: true });
+    writeFileSync(file, `${JSON.stringify(draft(body.data), null, 2)}\n`);
+    const job = options.migrations.start(body.data.name, "inventory");
+    return typeof job === "string" ? c.json({ error: job }, 409) : c.json(job, 202);
+  });
+
+  app.get("/api/new/:name", async (c) => {
+    const name = c.req.param("name");
+    if (!RUN.test(name)) return c.json({ error: "bad name" }, 400);
+    const inventory = (await readJson(join(resolve(options.runsDir), name, "inventory.json"))) as
+      | Inventory
+      | undefined;
+    return c.json({ job: options.migrations?.status(name) ?? null, inventory: inventory ?? null });
+  });
+
+  app.post("/api/new/:name/screens", async (c) => {
+    const name = c.req.param("name");
+    if (!RUN.test(name)) return c.json({ error: "bad name" }, 400);
+    const m = MigrationSchema.safeParse(await readJson(migrationFile(name)));
+    const inv = (await readJson(join(resolve(options.runsDir), name, "inventory.json"))) as
+      | Inventory
+      | undefined;
+    if (!m.success || !inv) return c.json({ error: "find the screens first" }, 409);
+    const body = PicksSchema.safeParse(await c.req.json().catch(() => null));
+    if (!body.success) return c.json({ error: body.error.issues[0]?.message ?? "bad request" }, 400);
+    try {
+      const next = withScreens(m.data, inv, body.data.picks);
+      writeFileSync(migrationFile(name), `${JSON.stringify(next, null, 2)}\n`);
+      const e = estimate(next);
+      return c.json({ screens: next.screens.length, expected: e.expected, upTo: e.upTo });
+    } catch (error) {
+      return c.json({ error: String(error instanceof Error ? error.message : error) }, 400);
+    }
+  });
+
+  for (const step of ["prepare", "run"] as const) {
+    app.post(`/api/new/:name/${step}`, async (c) => {
+      const name = c.req.param("name");
+      if (!RUN.test(name) || !options.migrations) return c.json({ error: "bad request" }, 400);
+      const m = MigrationSchema.safeParse(await readJson(migrationFile(name)));
+      if (!m.success || m.data.screens.length === 0) return c.json({ error: "pick the screens first" }, 409);
+      const body = (await c.req.json().catch(() => ({}))) as { budget?: unknown };
+      const job = options.migrations.start(name, step, step === "run" ? Number(body.budget) : undefined);
+      return typeof job === "string" ? c.json({ error: job }, 409) : c.json(job, 202);
+    });
+  }
 
   app.get("/migrate/:run", async (c) => {
     const run = c.req.param("run");
