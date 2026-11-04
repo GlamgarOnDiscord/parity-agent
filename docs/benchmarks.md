@@ -142,11 +142,19 @@ Total $2.83. Two lessons. A form that shows one record can be rebuilt from its d
 |---|---|---|---|---|---|
 | `chromium`: Chrome launched by Parity, throwaway profile, egress guard | 40 | 3.56 s | 3.68 s | 3.47 to 3.73 s | 0 |
 | `cdp`: the same Chrome already running, attached over CDP | 40 | 3.19 s | 3.26 s | 3.10 to 3.32 s | 0 |
-| `lightpanda` | not measured | | | | |
+| `lightpanda` | measured on the laptop, below | | | | |
 
 What it says: launching a fresh confined Chrome costs about 0.4 s per proof, a tenth of it; the rest is the replay itself, so a faster engine would have to replay faster, not start faster. Since the review of #113 the driver closes its context before it disconnects, so the attached browser is left without the pages of the runs; the figures above were measured with that fix. The default stays `chromium`, because only a browser Parity launches gets the egress guard: during the `cdp` run the unconfined Chrome tried to reach `mtalk.google.com` on its own, which the guarded one cannot.
 
-Lightpanda was not measured: running a downloaded nightly binary was not allowed in that container. To measure it where it is: `lightpanda serve --host 127.0.0.1 --port 9222`, then `PARITY_BROWSER=lightpanda PARITY_CDP_URL=ws://127.0.0.1:9222 bun run bench --runs 20`.
+Lightpanda was not measured in that container. It was measured on 2026-11-04 on the Windows laptop (12 threads, 15 GB, Bun 1.3.1, Chrome 156), the three drivers on the same machine with the same loop, 40 proofs each: Lightpanda 1.0.2 (the official `lightpanda-x86_64-linux` release, its SHA-256 checked against GitHub's, run in WSL2 with `lightpanda serve --host 127.0.0.1 --port 9222`, then deleted). WSL2 here uses NAT, so for Lightpanda the fixtures were served on the WSL host adapter address only; the two Chrome drivers used loopback.
+
+| driver, Windows laptop | proofs | median | p90 | range | flaky |
+|---|---|---|---|---|---|
+| `chromium`: Chrome launched by Parity for each proof | 40 | 6.31 s | 7.34 s | 4.46 to 11.83 s | 0 |
+| `cdp`: Chrome already running, throwaway profile | 40 | 3.61 s | 3.75 s | 3.51 to 5.46 s | 0 |
+| `lightpanda`: already running, in WSL2 | 40 | 2.93 s | 2.97 s | 2.78 to 3.15 s | 0 |
+
+Against Chrome already running, Lightpanda replays the same proof about 19 % faster with the tightest spread, through WSL's network bridge at that; on this laptop, launching Chrome per proof costs far more than in the container. The default stays `chromium` for the reason above: the egress guard needs a browser Parity launches itself. Lightpanda is the option for a CI that proves many scenarios, behind its own network rules.
 
 Earlier figure for comparison: on the Windows laptop one proof of the same fixture took about 1 s (README), the FrontAccounting invoice 3.3 s per run.
 
