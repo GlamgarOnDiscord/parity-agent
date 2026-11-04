@@ -50,8 +50,9 @@ export const MigrationSchema = z.object({
         port: z.string().max(200).optional(),
       }),
     )
-    .min(1)
-    .max(100),
+    .max(100)
+    // Empty while the app is only being inventoried: screens are picked from what the crawl found.
+    .default([]),
   maxRepairs: z.number().int().min(0).max(5).default(2),
   maxSteps: z.number().int().min(4).max(40).default(16),
 });

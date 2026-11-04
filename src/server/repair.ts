@@ -113,7 +113,7 @@ export class RepairJobs {
   }
 }
 
-function spawnLines(cmd: string[], cwd: string) {
+export function spawnLines(cmd: string[], cwd: string) {
   const proc = Bun.spawn(cmd, { cwd, stdout: "pipe", stderr: "pipe", env: process.env });
   async function* lines() {
     const decoder = new TextDecoder();

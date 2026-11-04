@@ -53,7 +53,7 @@ export async function crawl(
     setup: Exclude<Step, { do: "check" }>[];
     start: string[];
     maxScreens?: number;
-    /** A list with fewer choices than this is a setting (currency, tax group), not a list of records. */
+    /** A list with fewer choices is not a list of records; settings lists (currency, tax group) still pass, and a person picks. */
     minChoices?: number;
   },
 ): Promise<Inventory> {
@@ -83,7 +83,7 @@ export async function crawl(
       for (const f of screen.fields) {
         if (selectors.some((s) => s.field === f.label)) continue;
         const choices = await driver.choices(f.label).catch(() => []);
-        if (choices.length >= (options.minChoices ?? 4))
+        if (choices.length >= (options.minChoices ?? 2))
           selectors.push({ field: f.label, choices: choices.length });
       }
     }

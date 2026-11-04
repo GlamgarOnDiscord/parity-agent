@@ -29,7 +29,7 @@ Rebuilds old business software as a web app and proves the new app behaves the s
 - `src/replay/`, `src/diff/`: replay, proof, field diff, accepted differences
 - `src/rebuild/`, `src/fuzz/`, `src/explore/`: Muse Code rebuild and repair, differential fuzzing, exploration
 - `src/migrate/` + `templates/migrated-app/`: opt-in migration (inventory, records, per-screen builds)
-- `src/server/`: Hono app (rules, diff, migration board)
+- `src/server/`: Hono app (rules, diff, migration board, "Rebuild an app" page in `wizard.ts`)
 - `docs/`: pitch, decisions, sprints (`docs/sprints.md`, milestones D2 to D10 on GitHub), benchmarks, threat model, video, X thread, submission
 - `site/`: the landing page, published by `.github/workflows/pages.yml` with the README media; no script, no tracking
 - `founder/`: product research (board, panel, competitors, plan)
