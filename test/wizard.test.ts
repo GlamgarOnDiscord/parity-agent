@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import type { Inventory } from "../src/migrate/inventory";
@@ -124,6 +124,9 @@ describe("the Rebuild an app routes", () => {
     ]);
     const m = MigrationSchema.parse(JSON.parse(readFileSync(join(dir, "crm", "migration.json"), "utf8")));
     expect(m.title).toBe("Our CRM");
+    // It holds the old app's login: owner only, where the system has file modes.
+    if (process.platform !== "win32")
+      expect(statSync(join(dir, "crm", "migration.json")).mode & 0o077).toBe(0);
     expect((await (await call("/api/new/crm")).json()).job.state).toBe("done");
   });
 

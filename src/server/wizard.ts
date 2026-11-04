@@ -103,6 +103,10 @@ export class MigrateJobs {
     return this.current?.name === name ? this.current : null;
   }
 
+  busy(): boolean {
+    return this.current?.state === "running";
+  }
+
   start(name: string, step: WizardJob["step"], budgetUsd?: number): WizardJob | string {
     if (this.current?.state === "running")
       return `${this.current.step} of ${this.current.name} is still running`;

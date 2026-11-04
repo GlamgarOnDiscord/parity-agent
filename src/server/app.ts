@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
@@ -165,6 +165,11 @@ export function createApp(ledger: Ledger, options: AppOptions) {
   });
 
   const migrationFile = (name: string) => join(resolve(options.runsDir), name, "migration.json");
+  // The migration file holds the old app's login: readable by this user only (where the system has modes).
+  const writePrivate = (file: string, value: unknown) => {
+    writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
+    chmodSync(file, 0o600);
+  };
   const readJson = async (file: string) => {
     const f = Bun.file(file);
     return (await f.exists()) ? await f.json().catch(() => undefined) : undefined;
@@ -174,9 +179,9 @@ export function createApp(ledger: Ledger, options: AppOptions) {
     if (!options.migrations) return c.json({ error: "migrations are not enabled on this server" }, 404);
     const body = NewAppSchema.safeParse(await c.req.json().catch(() => null));
     if (!body.success) return c.json({ error: body.error.issues[0]?.message ?? "bad request" }, 400);
-    const file = migrationFile(body.data.name);
-    mkdirSync(join(resolve(options.runsDir), body.data.name), { recursive: true });
-    writeFileSync(file, `${JSON.stringify(draft(body.data), null, 2)}\n`);
+    if (options.migrations.busy()) return c.json({ error: "another step is still running" }, 409);
+    mkdirSync(join(resolve(options.runsDir), body.data.name), { recursive: true, mode: 0o700 });
+    writePrivate(migrationFile(body.data.name), draft(body.data));
     const job = options.migrations.start(body.data.name, "inventory");
     return typeof job === "string" ? c.json({ error: job }, 409) : c.json(job, 202);
   });
@@ -202,7 +207,7 @@ export function createApp(ledger: Ledger, options: AppOptions) {
     if (!body.success) return c.json({ error: body.error.issues[0]?.message ?? "bad request" }, 400);
     try {
       const next = withScreens(m.data, inv, body.data.picks);
-      writeFileSync(migrationFile(name), `${JSON.stringify(next, null, 2)}\n`);
+      writePrivate(migrationFile(name), next);
       const e = estimate(next);
       return c.json({ screens: next.screens.length, expected: e.expected, upTo: e.upTo });
     } catch (error) {
