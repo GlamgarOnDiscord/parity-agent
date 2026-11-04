@@ -73,11 +73,12 @@ export function withScreens(
     const s = inv.screens.find((x) => x.path === p.path);
     if (!s?.selectors.some((x) => x.field === p.selector))
       throw new Error(`${p.path} has no list "${p.selector}"`);
-    let id = slug(s.title || s.path);
+    const title = s.name || s.title || s.path;
+    let id = slug(title);
     while (entities.some((e) => e.id === id)) id = `${id}-2`.slice(0, 40);
     const param = isInternal(p.selector) ? p.selector.replace(/[\s:]+$/, "") : undefined;
     entities.push({ id, path: s.path, selector: p.selector, ...(param ? { param } : {}) });
-    screens.push({ id, title: s.title || s.path, menu: s.menu, entity: id, uses: [] });
+    screens.push({ id, title, menu: s.menu, entity: id, uses: [] });
   }
   return MigrationSchema.parse({ ...m, entities, screens });
 }
@@ -202,7 +203,7 @@ $("find").onclick = async () => {
         const l = document.createElement("label");
         const c = document.createElement("input");
         c.type = "checkbox"; c.dataset.path = x.path; c.dataset.selector = x.selectors[0].field;
-        const t = document.createElement("b"); t.textContent = x.title || x.path;
+        const t = document.createElement("b"); t.textContent = x.name || x.title || x.path;
         const p = document.createElement("span"); p.textContent = x.path;
         l.append(c, t, p);
         return l;
@@ -211,6 +212,7 @@ $("find").onclick = async () => {
     });
   } catch (e) { $("find").disabled = false; say("err1", e.message); }
 };
+$("all").onclick = () => document.querySelectorAll("#screens input").forEach((c) => { c.checked = true; });
 $("pick").onclick = async () => {
   say("err2", "");
   const picks = [...document.querySelectorAll("#screens input:checked")].map((c) => ({ path: c.dataset.path, selector: c.dataset.selector }));
@@ -268,7 +270,7 @@ export function wizardPage(): string {
 
 <section class="card step" id="s2" aria-disabled="true"><header><b>2</b><h2>Which screens should be rebuilt?</h2></header>
 <p class="note" id="found"></p><div class="screens" id="screens"></div>
-<div class="go"><button id="pick">Use these screens</button></div><p class="err" id="err2"></p></section>
+<div class="go"><button class="ghost" id="all">Select all</button><button id="pick">Use these screens</button></div><p class="err" id="err2"></p></section>
 
 <section class="card step" id="s3" aria-disabled="true"><header><b>3</b><h2>Go</h2></header>
 <p id="plan" class="note"></p>
