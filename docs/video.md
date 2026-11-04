@@ -47,6 +47,17 @@ The network-cut clip (shot 9) doubles as the short clip of D9: export it alone, 
 - Captions: [video.srt](video.srt), the voice column timed to the script. Burn them in for X, keep them as a separate track for YouTube.
 - Check before export: every number heard is on screen in the same shot, and every number on screen is in [benchmarks.md](benchmarks.md).
 
+## The cut made on 2026-11-04
+
+A full 2:59 cut exists, built only from real material: the report, the VS3 recording and side-by-side, the review, diff and migration screens of the local server, the terminal output of `bun run prove`, `prove --fixed` and the D6 fuzz run, the comment the Parity check posted on a real pull request, the screen exploration found, the migrated invoice and the landing page. Stills get a 4 % push-in; nothing is retyped or mocked.
+
+Where it differs from the script above:
+
+- Shot 6 shows the D6 run (the tax cent found by fuzzing, the table of cases around it, one repair for $0.36, parity) instead of the D4 items; the voice line says so.
+- Shot 7 is [pull request #120](https://github.com/GlamgarOnDiscord/parity-agent/pull/120): the example invoice changed to round each tax first, the Parity check failing and its comment naming Total 69.21 → $69.22 and Balance 49.21 → $49.22. It was closed unmerged.
+- Shot 9 shows the send log only. The network cut needs Linux (`unshare --net`); the same proof without network runs in the `offline` CI job on every push.
+- The voice is a draft read by Windows' built-in English voice, so the cut can be timed; the founder's take replaces it row by row with the same timing. There is no music yet. [video.srt](video.srt) matches the draft voice.
+
 ## Export
 
 ```bash
