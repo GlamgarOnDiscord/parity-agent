@@ -200,12 +200,16 @@
       nav.append(h("h2", { text: m }));
       for (const s of screens.filter((x) => (x.menu || "Screens") === m)) {
         nav.append(
-          h("a", {
-            class: "item",
-            href: s.path,
-            "aria-current": location.pathname === s.path.split("?")[0] ? "page" : undefined,
-            text: s.title,
-          }),
+          h(
+            "a",
+            {
+              class: "item",
+              href: s.path,
+              "aria-current": location.pathname === s.path.split("?")[0] ? "page" : undefined,
+            },
+            h("span", { class: "glyph", "aria-hidden": "true", text: s.title.trim().charAt(0).toUpperCase() }),
+            h("span", { text: s.title }),
+          ),
         );
       }
     }
@@ -218,6 +222,7 @@
       return;
     }
     document.getElementById("screen-title").textContent = here.title;
+    document.getElementById("crumb-menu").textContent = here.menu || "";
     document.title = here.title;
     try {
       const mod = await import(`/screens/${here.id}.js`);
