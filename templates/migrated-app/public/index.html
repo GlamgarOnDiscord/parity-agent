@@ -7,13 +7,20 @@
 <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
+<div class="backdrop" aria-hidden="true"></div>
 <div class="shell">
   <nav class="side" aria-label="Screens">
     <a class="brand" href="/"><span class="mark" aria-hidden="true"></span><span id="app-name">Rebuilt app</span></a>
+    <div class="search" aria-hidden="true"><span>Search</span><kbd>Ctrl K</kbd></div>
     <div id="nav"></div>
+    <div class="side-foot"><span class="dot" aria-hidden="true"></span>Migrated with Parity</div>
   </nav>
   <main>
-    <header class="top"><h1 id="screen-title">Loading</h1><p id="screen-sub" class="sub"></p></header>
+    <header class="top">
+      <div class="crumbs"><span id="crumb-menu"></span><span class="sep" aria-hidden="true">/</span><h1 id="screen-title">Loading</h1></div>
+      <p id="screen-sub" class="sub"></p>
+      <div class="avatar" aria-hidden="true"></div>
+    </header>
     <div id="screen" class="screen"></div>
   </main>
 </div>
