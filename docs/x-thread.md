@@ -1,6 +1,6 @@
 # X thread: the one cent
 
-Drafted for the submission day (Nov 4, 17:00 Paris, [founder/launch.md](../founder/launch.md)). Each post under 280 characters; every number is measured: the runs are in [benchmarks.md](benchmarks.md) and the README, and the spend ($18.07 as logged on Oct 30) in [sprints.md](sprints.md). The founder posts it from their own account; nothing here is posted automatically.
+Drafted for the submission day (Nov 4, 17:00 Paris). Each post under 280 characters; every number is measured: the runs are in [benchmarks.md](benchmarks.md) and the README, and the spend ($18.07 as logged on Oct 30) in [sprints.md](sprints.md). The founder posts it from their own account; nothing here is posted automatically.
 
 **1/** (with the 30-second square cut of the video)
 

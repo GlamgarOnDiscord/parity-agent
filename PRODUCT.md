@@ -39,7 +39,7 @@ Proof, not generation. Every rule is traced to evidence (recorded frames, narrat
 
 ## Brand Commitments
 
-- Name: Parity. Logo: the P with one pixel broken away (`founder/brand.md`).
+- Name: Parity. Logo: the P with one pixel broken away.
 - Voice: exact, calm, plain. "69.21 before, 69.22 after, on the Total field", never "minor discrepancies detected".
 - Visual direction chosen by the founder before the kickoff: near-black, dense, calm app screens close to developer tools; light document pages for what the client signs; blue marks actions and live work; status colours only report results. Geist and Geist Mono. The eight screens rebuilt from the founder's Pinterest references are the visual reference for app screens; they live in the private pre-kickoff repository and are reimplemented here, not copied.
 

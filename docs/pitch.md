@@ -52,4 +52,3 @@ Cut list frozen on day 3. Optional: autonomous exploration, FrontAccounting, Pla
 - Open Weights: Muse Spark Open on Baseten.
 - Agentic: computer-use exploration, if it holds.
 
-Evidence behind these choices: `founder/` (board, competitors, buyer panel, offer, CFO, launch plan).

@@ -166,7 +166,7 @@ Browser drivers and model clients are chosen by configuration, so they can be be
 | `src/rebuild/`, `src/fuzz/`, `src/explore/` | Muse Code rebuild and repair, differential fuzzing, exploration             |
 | `src/migrate/`, `templates/migrated-app/` | opt-in migration                                                              |
 | `src/server/`                             | local Hono app: rules, diff, migration board, "Rebuild an app" page           |
-| `docs/`, `site/`, `founder/`              | docs, landing page (GitHub Pages), product research                           |
+| `docs/`, `site/`                          | docs, landing page (GitHub Pages)                                             |
 
 ## Status
 
@@ -194,7 +194,7 @@ Plan and exit checks: [docs/sprints.md](docs/sprints.md).
 
 ## Research behind it
 
-Before writing code, the idea went through a product review: a board of three framework lenses, a competitor map, a simulated buyer panel (15 % would try the first pitch, 40 % the revised offer), pricing, a credit budget and a launch plan. All of it is in [`founder/`](founder/summary.md), with the pitch in [`docs/pitch.md`](docs/pitch.md). The panel is simulated and the numbers are projections.
+The pitch and the product choices behind it are in [`docs/pitch.md`](docs/pitch.md).
 
 ## Links
 

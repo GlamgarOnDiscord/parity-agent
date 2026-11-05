@@ -11,3 +11,8 @@ legacy-apps/
 .impeccable/review/
 .impeccable/mocks/
 .impeccable/config.local.json
+
+# Local notes, never published
+/founder/
+/CLAUDE.md
+/.impeccable/
