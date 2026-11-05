@@ -26,6 +26,7 @@ jobs:
         run: |
           mkdir -p _site/media
           cp site/index.html _site/
+          cp -r site/fonts _site/fonts
           cp docs/media/vs3-side-by-side.gif docs/media/report-one-cent.png _site/media/
           touch _site/.nojekyll
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
