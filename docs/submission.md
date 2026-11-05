@@ -36,7 +36,7 @@ Parity watches someone use an old app and talk about it, explores the app on its
 | Muse Wonder | settles contradictions between rules |
 | Muse Spark computer use | explores the app alone, confined to it, and turns new screens into scenarios |
 | Muse Code | builds the web app and repairs it from each difference, headless, with Parity attached over MCP |
-| Muse Spark Open on Baseten | the same rule extraction on open weights; client ready, not verified (no key) |
+| Muse Spark Open on Baseten | the same structured extraction on open weights; verified with a live call on Nov 5 |
 
 All calls on the Standard tier; Parity refuses a Contributor model. Every call goes through a send log with its cost and bytes, and stops at a budget. Total spent during the hackathon: $18.07 as logged on Oct 30.
 
@@ -60,7 +60,7 @@ Needs Bun 1.3 or later and Chrome or Chromium; no API key.
 
 **Bonus categories**
 
-- Open Weights: Muse Spark Open path on Baseten (client ready; claim only if verified with a key before submitting).
+- Open Weights: Muse Spark Open on Baseten, verified with a live call.
 - Agentic: Muse Spark computer use exploration that writes tests; Muse Code proving its own fix over MCP.
 - Most Viral on X: the thread in [x-thread.md](x-thread.md).
 

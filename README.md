@@ -186,7 +186,7 @@ Browser drivers and model clients are chosen by configuration, so they can be be
 | Migration mode, opt-in: inventory, migrated records, modern template, one build per screen, board | done: 3 FrontAccounting screens proved, $2.83 |
 | Benchmarks per driver and per role, threat model, landing page | done (Lightpanda not measured yet): [benchmarks](docs/benchmarks.md), [threat model](docs/threat-model.md), `site/` on GitHub Pages |
 | Video, X thread, submission                                  | done: animated 2:59 cut, [docs/video.md](docs/video.md)        |
-| Muse Spark Open on Baseten for on-premise rule extraction    | client ready, not verified (no key yet)                       |
+| Muse Spark Open on Baseten for on-premise rule extraction    | verified: a live structured call on 2026-11-05                |
 | Virtual Salesman 3 driven under Wine by computer use         | cut: the VS3 binary is not redistributed ([#73](https://github.com/GlamgarOnDiscord/parity-agent/issues/73)) |
 | Replaying the Windows app itself instead of its recording    | cut: the recording is the reference ([D3](docs/decisions.md)) |
 
