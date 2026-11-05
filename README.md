@@ -1,35 +1,64 @@
+<div align="center">
+
 # Parity
 
-**Parity rebuilds old business software as a modern web app, and proves the new app does exactly what the old one did.**
+**Rebuild old business software as a modern web app, and prove the new app does exactly what the old one did, field by field.**
 
-![Virtual Salesman 3 on the left, the web app rebuilt from its recording on the right](docs/media/vs3-side-by-side.gif)
+[![CI](https://github.com/GlamgarOnDiscord/parity-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/GlamgarOnDiscord/parity-agent/actions/workflows/ci.yml)
+[![Pages](https://github.com/GlamgarOnDiscord/parity-agent/actions/workflows/pages.yml/badge.svg)](https://github.com/GlamgarOnDiscord/parity-agent/actions/workflows/pages.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Bun](https://img.shields.io/badge/runtime-Bun%201.3%2B-f9f1e1?logo=bun&logoColor=black)](https://bun.sh)
+[![TypeScript](https://img.shields.io/badge/language-TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Meta Muse](https://img.shields.io/badge/models-Meta%20Muse-0866ff?logo=meta&logoColor=white)](docs/meta-api.md)
+[![Site](https://img.shields.io/badge/site-GitHub%20Pages-222222?logo=github&logoColor=white)](https://glamgarondiscord.github.io/parity-agent/)
+[![Demo video](https://img.shields.io/badge/demo-YouTube-ff0000?logo=youtube&logoColor=white)](https://youtu.be/wS5QdjVRi4I)
+
+[Demo video](https://youtu.be/wS5QdjVRi4I) · [Site](https://glamgarondiscord.github.io/parity-agent/) · [Quick start](#quick-start) · [Benchmarks](docs/benchmarks.md) · [Pitch](docs/pitch.md)
+
+<img src="docs/media/vs3-side-by-side.gif" alt="Virtual Salesman 3 on the left, the web app rebuilt from its recording on the right" width="960">
+
+</div>
 
 Left: Virtual Salesman 3, a Windows sales app from 2006, recorded under Wine. Right: the web app Muse Code built from that recording. Parity replayed the same invoice on the rebuilt app and compared it with the recorded screens: 8 of 8 fields equal, first try, $0.46.
 
-Point it at an app nobody fully understands anymore. Parity watches it being used, explores it on its own, writes down its business rules in plain language for an expert to confirm, generates the new app, then replays the same scenarios until every field matches. The proof stays: replay it after any later change, by a person or an AI coding agent, and see every field that moved.
+## What it does
+
+Point Parity at an app nobody fully understands anymore. It watches the app being used, explores it on its own, writes down its business rules in plain language for an expert to confirm, generates the new app, then replays the same scenarios until every field matches. The proof stays: replay it after any later change, by a person or an AI coding agent, and see every field that moved.
+
+Built solo for the Meta Global AI Developer Hackathon. Open source, and local by default.
+
+## How it works
 
 ```
 record ─► explore ─► rules ─► rebuild ─► prove ─► keep proving
 ```
 
-| step        | what happens                                                                                                      | Meta model                                 |
-| ----------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| **Record**  | A narrated screen recording of someone using the old app ("the Quebec tax always goes on top of the federal tax") | Muse Voice Transcribe                      |
-| **See**     | Fields and values are read from every key frame                                                                   | Muse Spark, SAM 3.1 for overlays           |
-| **Explore** | The agent drives the app alone to reach screens the recording missed                                              | Muse Spark computer use                    |
-| **Rules**   | Business rules in plain language, each with its evidence, formulas checked against the recorded values by code    | Muse Spark, Muse Wonder for contradictions |
-| **Rebuild** | A web app generated from the rules, then repaired difference by difference                                        | Muse Code                                  |
-| **Prove**   | Every scenario replayed, fields matched and compared                                                              | none: plain code                           |
+| #   | Step        | What happens                                                                                                      | Meta model                                 |
+| --- | ----------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| 1   | **Record**  | A narrated screen recording of someone using the old app ("the Quebec tax always goes on top of the federal tax") | Muse Voice Transcribe                      |
+| 2   | **See**     | Fields and values are read from every key frame                                                                   | Muse Spark, SAM 3.1 for overlays           |
+| 3   | **Explore** | The agent drives the app alone to reach screens the recording missed                                              | Muse Spark computer use                    |
+| 4   | **Rules**   | Business rules in plain language, each with its evidence, formulas checked against the recorded values by code    | Muse Spark, Muse Wonder for contradictions |
+| 5   | **Rebuild** | A web app generated from the rules, then repaired difference by difference                                        | Muse Code                                  |
+| 6   | **Prove**   | Every scenario replayed, fields matched and compared                                                              | none: plain code                           |
+
+### Principles
+
+- **AI never decides what "the same" means.** Matching and comparison are plain code. AI captures, proposes and explains.
+- **Noise is measured, not guessed.** Each scenario runs at least twice on the same app; a field that changes on its own (an invoice number, a timestamp) is masked and shown as masked, per grid row when labels repeat.
+- **Nothing leaves your machine unless you send it.** The server listens on 127.0.0.1. Replays and diffs run offline. The browser Parity drives can reach the app under test and nothing else: other origins, other ports, WebSockets, WebRTC and popups are blocked, and a test covers each one.
+- **The agent does not get a blank cheque.** Exploration has a step and a dollar cap, stops on any safety check unless the operator acknowledged that exact code for a local app, and lists every acknowledged action.
+- **A clean report is never silent.** Fields with no counterpart and fields never tested are listed, not dropped.
 
 ## The one cent
 
 Every line of an invoice looks right and the total is one cent off. Virtual Salesman 3 adds the unrounded taxes and rounds once; a rebuild that adds the rounded amounts shows 69.22 instead of 69.21. Parity catches it and puts the two screens side by side in a one-page report, ready to sign:
 
-![Proof report: no parity, 1 difference, Total 69.21 before and 69.22 after, with both screens zoomed on the field](docs/media/report-one-cent.png)
+<img src="docs/media/report-one-cent.png" alt="Proof report: no parity, 1 difference, Total 69.21 before and 69.22 after, with both screens zoomed on the field" width="900">
 
-## Try it in two minutes, no API key
+## Quick start
 
-Needs [Bun](https://bun.sh) 1.3 or later and Chrome or Chromium (`PARITY_CHROME_PATH` to point at one). The browser runs headless with a throwaway profile.
+Try it in two minutes, no API key. Needs [Bun](https://bun.sh) 1.3 or later and Chrome or Chromium (`PARITY_CHROME_PATH` to point at one). The browser runs headless with a throwaway profile.
 
 ```sh
 git clone https://github.com/GlamgarOnDiscord/parity-agent.git
@@ -59,11 +88,28 @@ s2-invoice-gst-qst › invoice (step 6)
 NO PARITY: differences above.
 ```
 
+## Results
+
+Measured, not claimed.
+
+| What                                                                            | Result                                                      |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Virtual Salesman 3, 32 s recording                                              | 6 key frames, 6 rules, 5 formulas checked, no contradiction |
+| VS3 rebuilt by Muse Code from those rules                                       | parity on 8 of 8 fields, first try, $0.46                   |
+| VS3 capture, rules and rebuild together, including reruns while building Parity | 29 model calls, 1.68 MB sent, $1.58                         |
+| FrontAccounting invoice, 5 replays                                              | 63 fields, 4 noisy, 3.3 s per run                           |
+| Exploration of FrontAccounting by Muse Spark computer use                       | 12 steps, 4 screens the recording never showed, $0.153      |
+| Report on a rebuild that adds rounded taxes                                     | 1 difference: 69.21 before, 69.22 after                     |
+| Proof of the example invoice, 40 proofs per driver, Linux container             | 3.56 s median launched by Parity, 3.19 s attached; 0 flaky  |
+| Fuzzing the FrontAccounting rebuild against the live app, 12 invoices           | 3 items the recording never showed, each shrunk to one or two lines; fixed by one $0.46 repair, then 52 fresh invoices at parity |
+
+Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behaviour: [docs/meta-api.md](docs/meta-api.md).
+
 ## The whole pipeline
 
 Model calls need a Meta Model API key: `cp .env.example .env` and set `MODEL_API_KEY`. Every call is logged with its cost and the bytes sent, and refused once `PARITY_BUDGET_USD` (default 20) is spent.
 
-| command                                                | what it does                                                                                        | model calls    |
+| Command                                                | What it does                                                                                        | Model calls    |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | -------------- |
 | `bun run models:check`                                 | one real call per Meta model                                                                        | a few cents    |
 | `bun run capture <video>`                              | key frames, transcript, fields per frame, rules with evidence                                       | yes            |
@@ -74,7 +120,7 @@ Model calls need a Meta Model API key: `cp .env.example .env` and set `MODEL_API
 | `bun run record:reference <scenario.json> --url <app>` | records a web app as the reference over several runs and measures its noise                         | none           |
 | `bun run explore <proof.json> --url <app> [--save]`    | Muse Spark computer use explores the app; `--save` turns each new screen into a scenario of the proof (held back if it went through an acknowledged action, until `--from <exploration.json> --save-acknowledged`) | yes, capped    |
 | `bun run parity fuzz <spec.json> --proof <proof.json> --reference-url <legacy> --app <dir>` | generates cases from a seed, plays each on both apps, shrinks every difference and adds it to the proof; `--repair` hands them to Muse Code with a table of the cases around each numeric difference (`--examples` prints it alone) | none; `--repair` uses Muse Code |
-| `bun run parity migrate inventory\|plan\|prepare\|prove <migration.json>` | opt-in migration: crawl the legacy app, cost per screen, records read through its forms into `data/`, proof per screen | none |
+| `bun run parity migrate inventory\|plan\|prepare\|prove <migration.json>` | opt-in migration: crawl the legacy app, cost per screen, records read through its forms into `data/`, proof per screen | none           |
 | `bun run parity migrate run <migration.json> --budget 6 --yes` | one Muse Code build per screen on the modern template, proved, repaired, stopped at the budget; board at `/migrate/<run>` | yes, Muse Code, capped |
 | `bun run bench --runs 20`                              | replay time and flaky runs of the configured browser driver (`PARITY_BROWSER`)                      | none           |
 | `bun run export:playwright runs/<run>`                 | a standalone Playwright test from a proof                                                           | none           |
@@ -91,44 +137,40 @@ bun run record:reference fixtures/scenarios/frontaccounting-invoice.json --url h
 bun run prove --proof fixtures/scenarios/frontaccounting-invoice.proof.json --url http://127.0.0.1:8080/
 ```
 
-## Measured, not claimed
-
-| what                                                                             | result                                                      |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| Virtual Salesman 3, 32 s recording                                               | 6 key frames, 6 rules, 5 formulas checked, no contradiction |
-| VS3 rebuilt by Muse Code from those rules                                        | parity on 8 of 8 fields, first try, $0.46                   |
-| VS3 capture, rules and rebuild together, including reruns while building Parity  | 29 model calls, 1.68 MB sent, $1.58                         |
-| FrontAccounting invoice, 5 replays                                               | 63 fields, 4 noisy, 3.3 s per run                           |
-| Exploration of FrontAccounting by Muse Spark computer use                        | 12 steps, 4 screens the recording never showed, $0.153      |
-| Report on a rebuild that adds rounded taxes                                      | 1 difference: 69.21 before, 69.22 after                     |
-| Proof of the example invoice, 40 proofs per driver, Linux container              | 3.56 s median launched by Parity, 3.19 s attached; 0 flaky  |
-| Fuzzing the FrontAccounting rebuild against the live app, 12 invoices            | 3 items the recording never showed, each shrunk to one or two lines; fixed by one $0.46 repair, then 52 fresh invoices at parity |
-
-Details and method: [docs/benchmarks.md](docs/benchmarks.md). Verified API behaviour: [docs/meta-api.md](docs/meta-api.md).
-
 ## Migrating a whole app, screen by screen
 
 The simple way: `bun run dev`, open the link it prints, then **Rebuild an app**. Three steps on one page: where the old app is (and its login, if any), which of the screens Parity found should be rebuilt, then go. Finding the screens and reading the records are free; the rebuild shows its price first, asks for a budget and a second click, and ends on the board. On a small CRM with a login, the whole page took one customer screen to a proved rebuild (9 of 9 fields, 3 records) for $0.25.
 
 Rebuilt screens are modern by construction: the template's kit (Geist, hairlines, dense tables, status pills, light and dark) carries the look, and Muse Code reads a design skill, `DESIGN.md`, and two reference screens before writing each one ([decision D6](docs/decisions.md)). On the small CRM, the screen it wrote with them put the credit limit first, grouped the rest by meaning, and still proved 9 of 9 fields, $0.26.
 
-The same steps from the terminal:
+The same steps from the terminal. Off by default, because it spends:
 
-Off by default, because it spends. `parity migrate inventory` crawls the legacy app by its links and lists every screen, its fields and the lists that pick a record, with no model call. `plan` prints the cost per screen and which Meta model does what. `prepare` reads every record through the legacy app's own forms into `data/*.json`, which the rebuilt app loads into SQLite, and turns each record into a scenario of the proof. `run --budget 6 --yes` has Muse Code build each screen from a modern template, proves it, and stops before crossing the budget. `prove` checks the screens again for free; the board at `/migrate/<run>` shows each screen, its proof and its spend.
+1. `parity migrate inventory` crawls the legacy app by its links and lists every screen, its fields and the lists that pick a record, with no model call.
+2. `plan` prints the cost per screen and which Meta model does what.
+3. `prepare` reads every record through the legacy app's own forms into `data/*.json`, which the rebuilt app loads into SQLite, and turns each record into a scenario of the proof.
+4. `run --budget 6 --yes` has Muse Code build each screen from a modern template, proves it, and stops before crossing the budget.
+5. `prove` checks the screens again for free; the board at `/migrate/<run>` shows each screen, its proof and its spend.
 
 On FrontAccounting: customers (28 of 28 fields, first build, $0.30), items (113 of 113, after a fix on Parity's side and one repair, $2.03) and the sales invoice (258 of 258, ported to the template with prices and descriptions read from the migrated records instead of written in code, $0.50). [Details](docs/benchmarks.md).
 
-## Principles
+## Architecture
 
-- **AI never decides what "the same" means.** Matching and comparison are plain code. AI captures, proposes and explains.
-- **Noise is measured, not guessed.** Each scenario runs at least twice on the same app; a field that changes on its own (an invoice number, a timestamp) is masked and shown as masked, per grid row when labels repeat.
-- **Nothing leaves your machine unless you send it.** The server listens on 127.0.0.1. Replays and diffs run offline. The browser Parity drives can reach the app under test and nothing else: other origins, other ports, WebSockets, WebRTC and popups are blocked, and a test covers each one.
-- **The agent does not get a blank cheque.** Exploration has a step and a dollar cap, stops on any safety check unless the operator acknowledged that exact code for a local app, and lists every acknowledged action.
-- **A clean report is never silent.** Fields with no counterpart and fields never tested are listed, not dropped.
+Browser drivers and model clients are chosen by configuration, so they can be benchmarked and swapped ([docs/decisions.md](docs/decisions.md)). Stack: Bun, TypeScript, Hono, SQLite, Zod, Puppeteer over CDP, the Vercel AI SDK and the OpenAI SDK pointed at the Meta Model API.
+
+| Path                                      | Role                                                                          |
+| ----------------------------------------- | ----------------------------------------------------------------------------- |
+| `src/models/`                             | model client roles, pricing, send ledger                                      |
+| `src/drivers/`                            | app driver interface and registry (browser, desktop)                          |
+| `src/fields/`                             | field model, value normalization, screen matching                             |
+| `src/replay/`, `src/diff/`                | replay, proof, field diff, accepted differences                               |
+| `src/rebuild/`, `src/fuzz/`, `src/explore/` | Muse Code rebuild and repair, differential fuzzing, exploration             |
+| `src/migrate/`, `templates/migrated-app/` | opt-in migration                                                              |
+| `src/server/`                             | local Hono app: rules, diff, migration board, "Rebuild an app" page           |
+| `docs/`, `site/`, `founder/`              | docs, landing page (GitHub Pages), product research                           |
 
 ## Status
 
-| part                                                         | status                                                        |
+| Part                                                         | Status                                                        |
 | ------------------------------------------------------------ | ------------------------------------------------------------- |
 | Field matching across two UIs with different labels          | done                                                          |
 | Replay, field diff, noise detection, old table layouts       | done (web apps)                                               |
@@ -150,13 +192,15 @@ On FrontAccounting: customers (28 of 28 fields, first build, $0.30), items (113 
 
 Plan and exit checks: [docs/sprints.md](docs/sprints.md).
 
-## Design choices
-
-Browser drivers and model clients are chosen by configuration, so they can be benchmarked and swapped ([docs/decisions.md](docs/decisions.md)). Stack: Bun, TypeScript, Hono, SQLite, Zod, Puppeteer over CDP, the Vercel AI SDK and the OpenAI SDK pointed at the Meta Model API.
-
 ## Research behind it
 
 Before writing code, the idea went through a product review: a board of three framework lenses, a competitor map, a simulated buyer panel (15 % would try the first pitch, 40 % the revised offer), pricing, a credit budget and a launch plan. All of it is in [`founder/`](founder/summary.md), with the pitch in [`docs/pitch.md`](docs/pitch.md). The panel is simulated and the numbers are projections.
+
+## Links
+
+- Demo video: [youtu.be/wS5QdjVRi4I](https://youtu.be/wS5QdjVRi4I) ([video notes](docs/video.md))
+- Site: [glamgarondiscord.github.io/parity-agent](https://glamgarondiscord.github.io/parity-agent/)
+- Docs: [pitch](docs/pitch.md), [decisions](docs/decisions.md), [benchmarks](docs/benchmarks.md), [threat model](docs/threat-model.md), [Meta API notes](docs/meta-api.md), [sprints](docs/sprints.md), [submission](docs/submission.md)
 
 ## Licence
 
