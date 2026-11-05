@@ -177,7 +177,7 @@ From the runs documented above; the send log of each run has the call-by-call de
 | hard | Muse Wonder | called on contradictions only; none in these runs | in the above | none to settle |
 | computer | Muse Spark computer use | 2 explorations, 20 steps | $0.22 | 5 screens the recording never showed; 1 turned into a scenario at parity on FrontAccounting |
 | code | Muse Code | 10 builds and repairs, VS3 and FrontAccounting | $13.67 | parity at the first build on 3 screens of 5 (VS3 invoice, FrontAccounting customers, the invoice ported to the template); the D3 invoice after 3 iterations and a repair, the items after a fix in Parity and one repair; every fuzz difference closed |
-| open | Muse Spark Open on Baseten | none | $0 | not verified: no key |
+| open | Muse Spark Open on Baseten | `meta-models/muse-spark-open` | under $0.01 | verified 2026-11-05: a live structured call through `bun run models:check` |
 
 Muse Code is 90 % of the spend itemized here (76 % of the $18.07 ledger total, which includes the reruns), and within it the self-checking rebuild loop (D3, $6.73) is half: targeted repairs with the difference as evidence cost $0.30 to $0.50 each.
 

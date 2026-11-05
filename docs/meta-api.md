@@ -10,7 +10,7 @@ Verified 2026-10-26 with `bun run models:check` (5 calls, $0.04). Base URL `http
 | `muse-spark-1.3` computer use | OpenAI SDK, `responses.create`, `tools: [{ type: "computer" }]`                                                             | A `computer_call` item with an **`actions` array** (not a single `action`), `call_id`, `pending_safety_checks` and a `meta_safety_replay_receipt`. The first call asks for a screenshot |
 | `muse-voice-transcribe-1.0`   | `POST /asr/transcribe`, multipart: a JSON part `request` = `{ model, audioEncoding: "WAV" }` and a part `audio`             | `{ transcript, audioDurationMs, turns, sessionId }`. WAV must be mono s16le at 16000 or 24000 Hz; 22050 Hz is refused                                                                   |
 
-Not verified yet: Muse Spark Open on Baseten (`BASETEN_API_KEY` not set).
+Verified on 2026-11-05: Muse Spark Open on Baseten answers through the same structured client; the model id is `meta-models/muse-spark-open`.
 
 Structured outputs are strict: every property of the JSON schema must be listed as required. Use `.nullable()` in Zod for fields that may be absent, never `.optional()` (verified 2026-10-26, 400 "'required' is required to be supplied").
 

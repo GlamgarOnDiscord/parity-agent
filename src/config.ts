@@ -10,7 +10,7 @@ const Env = z.object({
   PARITY_MODEL_COMPUTER: z.string().default("muse-spark-1.3"),
   PARITY_MODEL_SEGMENT: z.string().default("sam-3.1"),
   PARITY_MODEL_TRANSCRIBE: z.string().default("muse-voice-transcribe-1.0"),
-  PARITY_MODEL_OPEN: z.string().default("meta-models/muse-spark-open-1026"),
+  PARITY_MODEL_OPEN: z.string().default("meta-models/muse-spark-open"),
   PARITY_BROWSER: z.enum(["chromium", "lightpanda", "cdp"]).default("chromium"),
   PARITY_CDP_URL: z.string().optional(),
   PARITY_PORT: z.coerce.number().int().positive().default(8787),

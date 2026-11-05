@@ -11,7 +11,7 @@ describe("pricing", () => {
     );
     expect(costOf("sam-3.1", { images: 31 }).usd).toBeCloseTo(0.0775);
     expect(costOf("muse-voice-transcribe-1.0", { audioSeconds: 3600 }).usd).toBeCloseTo(0.18);
-    expect(costOf("meta-models/muse-spark-open-1026", { inputTokens: 1000 })).toEqual({
+    expect(costOf("meta-models/muse-spark-open", { inputTokens: 1000 })).toEqual({
       usd: 0,
       known: false,
     });
