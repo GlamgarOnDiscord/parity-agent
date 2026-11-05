@@ -67,3 +67,12 @@ ffmpeg -i parity-edit.mov -c:v libx264 -preset slow -crf 20 -pix_fmt yuv420p -c:
 `-t 179` cuts at 2:59 whatever the edit says, which is why the last shot is timed to end there; check the length with `ffprobe -v error -show_entries format=duration -of csv=p=0 parity-demo.mp4`.
 
 The X cut: the first 0:12 and shot 5 trimmed to 18 s, 30 seconds, square 1080×1080, captions burnt in.
+
+## The cut published on 2026-11-05
+
+Published: https://youtu.be/ke7WQ8_DfJs (2:05, unlisted). It replaces the earlier cuts, now private.
+
+- Ten scenes rendered frame by frame from one HTML page (headless Chrome, 30 fps), in a flat black style: Geist type, hairline cards, one blue accent, no glow, blur or drop shadows.
+- Voice: one ElevenLabs take split at its pauses, each line placed half a second into its scene. Music: a quiet bed synthesized in code, ducked under the voice.
+- Captions burnt in from the same lines, in Geist.
+- The README GIF is cut from this video (cold open and the proof scene).

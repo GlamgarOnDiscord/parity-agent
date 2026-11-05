@@ -16,7 +16,7 @@ https://github.com/GlamgarOnDiscord/parity-agent (Apache-2.0)
 
 **Video**
 
-The 3:00 cut from [video.md](video.md), uploaded by 12:00 on Nov 4. Link to add once uploaded.
+https://youtu.be/ke7WQ8_DfJs (2:05, unlisted on YouTube). The cut and how it was made: [video.md](video.md).
 
 **Landing page**
 

@@ -11,9 +11,9 @@
 [![TypeScript](https://img.shields.io/badge/language-TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Meta Muse](https://img.shields.io/badge/models-Meta%20Muse-0866ff?logo=meta&logoColor=white)](docs/meta-api.md)
 [![Site](https://img.shields.io/badge/site-GitHub%20Pages-222222?logo=github&logoColor=white)](https://glamgarondiscord.github.io/parity-agent/)
-[![Demo video](https://img.shields.io/badge/demo-YouTube-ff0000?logo=youtube&logoColor=white)](https://youtu.be/wS5QdjVRi4I)
+[![Demo video](https://img.shields.io/badge/demo-YouTube-ff0000?logo=youtube&logoColor=white)](https://youtu.be/ke7WQ8_DfJs)
 
-[Demo video](https://youtu.be/wS5QdjVRi4I) · [Site](https://glamgarondiscord.github.io/parity-agent/) · [Quick start](#quick-start) · [Benchmarks](docs/benchmarks.md) · [Pitch](docs/pitch.md)
+[Demo video](https://youtu.be/ke7WQ8_DfJs) · [Site](https://glamgarondiscord.github.io/parity-agent/) · [Quick start](#quick-start) · [Benchmarks](docs/benchmarks.md) · [Pitch](docs/pitch.md)
 
 <img src="docs/media/vs3-side-by-side.gif" alt="Virtual Salesman 3 on the left, the web app rebuilt from its recording on the right" width="960">
 
@@ -198,7 +198,7 @@ Before writing code, the idea went through a product review: a board of three fr
 
 ## Links
 
-- Demo video: [youtu.be/wS5QdjVRi4I](https://youtu.be/wS5QdjVRi4I) ([video notes](docs/video.md))
+- Demo video: [youtu.be/ke7WQ8_DfJs](https://youtu.be/ke7WQ8_DfJs) ([video notes](docs/video.md))
 - Site: [glamgarondiscord.github.io/parity-agent](https://glamgarondiscord.github.io/parity-agent/)
 - Docs: [pitch](docs/pitch.md), [decisions](docs/decisions.md), [benchmarks](docs/benchmarks.md), [threat model](docs/threat-model.md), [Meta API notes](docs/meta-api.md), [sprints](docs/sprints.md), [submission](docs/submission.md)
 
